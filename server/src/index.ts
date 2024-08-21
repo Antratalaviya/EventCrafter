@@ -4,10 +4,10 @@ import { connectDB } from "./dbConnection/dbConfig";
 
 dotenv.config();
 
-connectDB();
+const port = process.env.PORT!;
 
-const port = process.env.PORT as string;
-
-app.listen(port, ()=>{
-    console.log(`Server is running on PORT : ${port}`)
-})
+connectDB().then(() => {
+    app.listen(port, () => {
+        console.log(`Server is running on PORT : ${port}`)
+    })
+}).catch((error) => console.log(error));

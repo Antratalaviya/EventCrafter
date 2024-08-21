@@ -5,7 +5,7 @@ import EventTypeBox from '../component/events/EventTypeBox'
 import ProfilesComponent from '../component/ProfilesComponent'
 import MaxHome from '../component/max/MaxHome'
 import EventsHome from '../component/events/EventsHome'
-import { useMax } from '../component/context/useMax'
+import { useMax } from '../context/useMax'
 import SecurityMode from '../component/events/SecurityMode'
 
 function HomePage() {

@@ -4,7 +4,7 @@ export const SidebarLinks = [
     {
         key: "add",
         label: "Create Event",
-        icon: <AddCircleIcon className="fill-none"/>,
+        icon: <AddCircleIcon className="fill-none" />,
         path: "/create-event",
     },
     {
@@ -52,12 +52,12 @@ export const EventsLinks = [
     {
         key: "private",
         label: "Create Private Event",
-        path: "/create-private-event",
+        path: "create-private-event",
     },
     {
         key: "public",
         label: "Create Public Event",
-        path: "/create-public-event",
+        path: "create-public-event",
     },
     {
         key: "workshop",

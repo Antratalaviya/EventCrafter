@@ -14,4 +14,8 @@ router.patch(
   authController.logout
 );
 
+router.post("/send-otp", authMiddleware.verifyUserAccess, authController.sendOtp);
+
+router.post("/verify-otp", authMiddleware.verifyUserAccess, authController.verifyOtp);
+
 export default router;

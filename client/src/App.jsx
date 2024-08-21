@@ -1,6 +1,6 @@
 import { Outlet } from "react-router-dom"
 import { Header, Sidebar } from "./component"
-import { Providers } from "./component/context"
+import { Providers } from "./context"
 
 function App() {
 

@@ -16,6 +16,12 @@ export const AppString = {
   INVALID_SESSION: "your session is not valid",
   INVALID_TOKEN: "token is invalid",
   TOKEN_EXPIRE: "session expire",
+
+  OTP_ERR: "please resend the otp",
+  OTP_SEND: "otp send successfully",
+  OTP_NOT_MATCH: "otp not matched !! please try again",
+  OTP_VERIFY: "user verified successfully",
+  OTP_EXPIRED: "otp expired !! please try again",
 };
 
 export const Collection = {

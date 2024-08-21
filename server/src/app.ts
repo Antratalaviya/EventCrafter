@@ -18,6 +18,7 @@ app.use((_, res: Response, next: NextFunction) => {
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 app.use(express.static("public"));
+app.set("view engine", "ejs");
 
 app.use(
   cors({
@@ -31,6 +32,6 @@ app.get("/test", (_, res: Response) => {
   res.json("Api is running");
 });
 
-app.use("/api/v1/auth", authRoutes);
+app.use("/auth", authRoutes);
 
 export { app };

@@ -1,8 +1,10 @@
 import React from 'react'
 import { img } from '../../assets/assets'
 import Button from '../Button'
+import { useNavigate } from 'react-router-dom'
 
 function SetModal({ onSubmit }) {
+    const navigate = useNavigate();
     return (
         <div className='w-full h-full flex items-center flex-col space-y-4'>
             <p className='text-white text-xl'>Set Max</p>

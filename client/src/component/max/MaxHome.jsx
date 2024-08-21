@@ -1,6 +1,6 @@
 import React from 'react'
 import MaxActive from './MaxActive';
-import { useMax } from '../context/useMax';
+import { useMax } from '../../context/useMax';
 import CarouselHome from '../carousel';
 
 function MaxHome() {

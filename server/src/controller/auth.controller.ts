@@ -5,6 +5,8 @@ import { ApiError, ApiResponse, asyncHandler } from "../utils/customUtilities";
 import { UserDocument, UserInput } from "../constants";
 import userService from "../service/user.service";
 import { AppString } from "../utils/appString";
+import eventEmitter from "../utils/event";
+import otpService from "../service/otp.service";
 
 const register = asyncHandler(async (req: Request, res: Response) => {
   try {
@@ -26,7 +28,6 @@ const register = asyncHandler(async (req: Request, res: Response) => {
     }
 
     let userExist = await userService.getUserByEmail(body.email);
-
     if (userExist) {
       return res
         .status(status.UNAUTHORIZED)
@@ -66,7 +67,8 @@ const login = asyncHandler(async (req: Request, res: Response) => {
         .status(status.NOT_FOUND)
         .json(new ApiError(status.NOT_FOUND, AppString.USER_NOT_EXIST));
     }
-    let passValid = user.isPasswordMatched(credential.password as string);
+
+    let passValid = await user.isPasswordMatched(credential.password);
 
     if (!passValid) {
       return res
@@ -97,6 +99,8 @@ const login = asyncHandler(async (req: Request, res: Response) => {
         )
       );
   } catch (error) {
+    console.log(error)
+
     return res
       .status(status.INTERNAL_SERVER_ERROR)
       .json(
@@ -136,8 +140,102 @@ const logout = asyncHandler(async (req: Request, res: Response) => {
   }
 });
 
+const sendOtp = asyncHandler(async (req: Request, res: Response) => {
+  try {
+    let user = req.user;
+
+    let otpExist = await otpService.getOtp(user.email);
+
+    let otp = await otpService.generateOtp();
+
+    if (otpExist) {
+      await otpService.deleteOtp(user.email);
+    }
+
+    let newOtpSchema = await otpService.createOtp(user.email, otp);
+
+    if (!newOtpSchema) {
+      return res
+        .status(status.INTERNAL_SERVER_ERROR)
+        .json(new ApiError(status.INTERNAL_SERVER_ERROR, AppString.OTP_ERR));
+    }
+
+    let to = user.email;
+    let subject = "Verify your email";
+    let text = "Your email verified Succesfully";
+
+    console.log(otp)
+
+    // await sendMail(to, text, otp, subject);
+
+    return res
+      .status(status.OK)
+      .json(new ApiResponse(status.OK, {}, AppString.OTP_SEND));
+  } catch (error) {
+    return res
+      .status(status.INTERNAL_SERVER_ERROR)
+      .json(
+        new ApiError(status.INTERNAL_SERVER_ERROR, (error as Error).message)
+      );
+  }
+});
+
+const sendMail = async (
+  to: string,
+  text: string,
+  otp: number,
+  subject: string
+) => {
+  try {
+    await eventEmitter.emit("send_otp_with_mail", {
+      to: to,
+      subject: subject,
+      text: text,
+      otp: otp,
+    });
+  } catch (error) {
+    console.log(error);
+  }
+};
+
+const verifyOtp = asyncHandler(async (req: Request, res: Response) => {
+  try {
+    let otp = req.body.otp;
+    let user = req.user;
+
+    let otpExist = await otpService.getOtp(user.email);
+
+    if (!otpExist) {
+      return res
+        .status(status.NOT_FOUND)
+        .json(new ApiError(status.NOT_FOUND, AppString.OTP_EXPIRED));
+    }
+
+    console.log(typeof otp);
+    console.log(typeof otpExist.otp.toString())
+
+    if (otp !== otpExist.otp.toString()) {
+      return res
+        .status(status.BAD_REQUEST)
+        .json(new ApiError(status.BAD_REQUEST, AppString.OTP_NOT_MATCH));
+    }
+
+    return res
+      .status(status.OK)
+      .json(new ApiResponse(status.OK, {}, AppString.OTP_VERIFY));
+  } catch (error) {
+    return res
+      .status(status.INTERNAL_SERVER_ERROR)
+      .json(
+        new ApiError(status.INTERNAL_SERVER_ERROR, (error as Error).message)
+      );
+  }
+});
+
 export default {
   register,
   login,
   logout,
+  sendOtp,
+  verifyOtp,
 };

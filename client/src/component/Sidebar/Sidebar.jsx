@@ -2,7 +2,7 @@ import React from 'react'
 import { NavLink } from 'react-router-dom'
 import { LogoIcon, LogoutIcon } from '../../assets/svg/Icon'
 import { SidebarLinks, LogoutLink } from "../../lib/consts"
-import { useCurrLocation } from '../context/useCurrLocation'
+import { useCurrLocation } from '../../context/useCurrLocation'
 
 function Sidebar() {
   const { setLoc } = useCurrLocation();
@@ -17,7 +17,7 @@ function Sidebar() {
         <ul>
           <li>
             {SidebarLinks && SidebarLinks.map((item) => (
-              <NavLink to={item.path} key={item.key} className={({ isActive }) => `${isActive ? `bg-primary border-r-2 border-white ${setLoc(item.label)}` : ""} py-4 px-8 flex justify-center items-center`}>
+              <NavLink to={item.path} key={item.key} className={({ isActive }) => `${isActive ? `bg-primary border-r-2 border-white` : ""} py-4 px-8 flex justify-center items-center`} onClick={() => setLoc(item.label)}>
 
                 {item.icon}
               </NavLink>

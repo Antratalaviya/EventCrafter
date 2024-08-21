@@ -14,7 +14,7 @@ function DeactiveModal({ onSubmit, onCancel }) {
                     <p className='text-white/70'>Mex will stop responding and action in this case.</p>
                 </div>
                 <div className='w-full flex gap-2'>
-                    <Button onEvent={onCancel} text={'No'} varient='bg-stroke'/>
+                    <Button onEvent={onCancel} text={'No'} className='bg-stroke' />
                     <Button onEvent={onSubmit} text={'Yes'} />
                 </div>
             </div>

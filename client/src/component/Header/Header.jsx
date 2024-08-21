@@ -4,12 +4,17 @@ import { BellIcon, GPSIcon, LocationIcon, SearchIcon } from '../../assets/svg/Ic
 import Drawer from '../Drawer/Drawer'
 import { Max } from '../max'
 import Button from '../Button'
-import { useCurrLocation } from '../context/useCurrLocation'
+import { useCurrLocation } from "../../context/useCurrLocation"
+import Login from '../../pages/Login'
+import { useSelector } from 'react-redux'
+import { useNavigate } from 'react-router-dom'
 
 function Header() {
   const add = 'Caleta de Fuste, Fuerteventura ESP'
   const [locDrawer, setLocDrawer] = useState(false);
   const { loc } = useCurrLocation();
+  const authStatus = useSelector((state) => state.auth.status)
+  const navigate = useNavigate();
 
   return (
     <div className='bg-black-light grid grid-cols-12 text-white py-4 px-3 border-b border-body-text'>
@@ -59,19 +64,25 @@ function Header() {
       <div className='flex col-span-7 justify-end items-center px-2'>
         <SearchIcon className="pr-3 w-10" />
         <BellIcon className="pr-3 w-10" />
-        {/* <div className='w-12 h-12 rounded-md mr-2 bg-new-card border border-stroke'>
-          <img className='w-full h-full' src={img.happy} alt="happy" />
-        </div> */}
         <Max />
-        <div className='grid grid-flow-col gap-2 px-3 py-1 bg-new-card border border-stroke rounded-md'>
-          <div className='w-10 h-10 rounded-full overflow-hidden object-contain'>
-            <img src={img.profile} alt="profile" />
+
+        {authStatus ? (
+          <div className='grid grid-flow-col gap-2 px-3 py-1 bg-new-card border border-stroke rounded-md'>
+            <div className='w-10 h-10 rounded-full overflow-hidden object-contain'>
+              <img src={img.profile} alt="profile" />
+            </div>
+            <div className='flex flex-col'>
+              <p className='text-white text-sm'>Violet Fahey</p>
+              <p className='text-body-text text-sm'>Johndoe@gmai.com</p>
+            </div>
           </div>
-          <div className='flex flex-col'>
-            <p className='text-white text-sm'>Violet Fahey</p>
-            <p className='text-body-text text-sm'>Johndoe@gmai.com</p>
-          </div>
-        </div>
+        ) : (
+          <Button
+            text={'Sign in'}
+            onClick={() => navigate('/sign-in')}
+            className={`w-32 h-full -translate-y-1`}
+          />
+        )}
       </div>
     </div>
   )

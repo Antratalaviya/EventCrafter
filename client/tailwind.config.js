@@ -30,6 +30,9 @@ export default {
       fontFamily: {
         sans: ["Plus Jakarta", "sans-serif"],
       },
+      boxShadow: {
+        "custom-black": "0px 0px 35px 0px #000000",
+      },
     },
   },
   plugins: [],

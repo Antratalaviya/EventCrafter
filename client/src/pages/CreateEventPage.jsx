@@ -1,5 +1,5 @@
 import React from 'react'
-import { useCurrLocation } from '../component/context/useCurrLocation'
+import { useCurrLocation } from '../context/useCurrLocation'
 import Event from '../component/events/Event'
 import { img } from '../assets/assets';
 

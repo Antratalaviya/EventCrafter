@@ -1,17 +1,23 @@
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import ActivityModal from "./ActivityModal"
 import { img } from "../../assets/assets"
 import Modal from "../Modal/Modal"
 import TimeModal from "./TimeModal"
 import SetModal from "./SetModal"
-import { useMax } from "../context/useMax"
+import { useMax } from "../../context/useMax"
+import { useNavigate } from 'react-router-dom';
 
 
 export function Max() {
-    const { setActive } = useMax();
+    const { active, setActive } = useMax();
     const [openMex, setOpenMex] = useState(false)
     const [modalIndex, setModal] = useState(null);
+    const navigate = useNavigate();
+    const [disabled, setDisabled] = useState(false);
 
+    useEffect(() => {
+        setDisabled(active ? true : false)
+    }, [active])
     const handleToggle = () => {
         setModal((prev) => prev === 0 ? null : 0)
         setOpenMex((prev) => !prev)
@@ -21,6 +27,7 @@ export function Max() {
         setOpenMex(false);
         setModal(null);
         setActive(true);
+        navigate('/');
     }
 
 
@@ -35,7 +42,7 @@ export function Max() {
     return (
         <div
             className={`w-12 h-12 cursor-pointer rounded-md mr-2 bg-new-card border border-stroke ${openMex ? "z-50 bg-white/50 border border-body-text" : ""}`}
-            onClick={handleToggle}
+            onClick={!disabled && handleToggle}
         >
             <img className={`w-full h-full ${openMex && "z-50"}`} src={img.happy} alt="happy" />
 

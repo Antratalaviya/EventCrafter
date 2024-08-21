@@ -3,7 +3,7 @@ import DeactiveModal from './DeactiveModal';
 import { img } from '../../assets/assets';
 import Button from '../Button';
 import Modal from '../Modal/Modal';
-import { useMax } from '../context/useMax';
+import { useMax } from '../../context/useMax';
 
 function MaxActive() {
     const [activeModal, setActiveModal] = useState(false);
