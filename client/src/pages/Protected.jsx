@@ -9,16 +9,16 @@ function Protected({ children, authentication = true }) {
 
   useEffect(() => {
     console.log(authStatus);
-    if(authentication && authStatus !== authentication){
+    if (authentication && authStatus !== authentication) {
       navigate('/sign-in');
-    }else if (!authentication && authStatus !== authentication){
+    } else if (!authentication && authStatus !== authentication) {
       navigate('/');
     }
 
   }, [authentication, navigate, authStatus])
 
   return (
-    <h1>Hello</h1>
+    { children }
   )
 }
 

@@ -1,12 +1,8 @@
 import React from 'react'
-import { useCurrLocation } from '../context/useCurrLocation'
 import Event from '../component/events/Event'
 import { img } from '../assets/assets';
 
 function CreateEventPage() {
-    const { loc } = useCurrLocation();
-
-
     const events = [
         {
             className: "bg-[#FFE7FF] text-[#48236A] border-[#FA3E97]",

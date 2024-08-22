@@ -4,11 +4,13 @@ import { AddCircleIcon, CalenderIcon, CrossIcon, CurrectIcon, DownIcon, FileIcon
 import '../index.css'
 import Modal from '../component/Modal/Modal';
 import Input from '../component/Input';
+import { EventCategory } from '../lib/consts';
 
 function CreatePriEvent() {
     const [progress, setProgress] = useState(1);
     const [openSelect, setOpenSelect] = useState(false);
     const [openConsent, setOpenConsent] = useState(false);
+    const [openCat, setOpenCat] = useState(false);
     const fileInputRef = useRef(null);
     const videoInputRef = useRef(null);
     const imgInputRef = useRef(null);
@@ -16,7 +18,7 @@ function CreatePriEvent() {
         title: "",
         subtitle1: "",
         subtitle2: "",
-        category: "Adventure",
+        category: "Select private event category",
         createDate: "",
         expiresIn: "",
         startDate: "",
@@ -105,9 +107,43 @@ function CreatePriEvent() {
                 <div className="p-4 border-b-2 border-body-text">
                     <form className='flex justify-start'>
                         {progress === 1 &&
-                            <div className='w-full space-y-5'>
-                                <div className=''>
-                                    <p>Event Category</p>
+                            <div className='w-full space-y-5 '>
+                                <div className='grid grid-cols-3 gap-5'>
+                                    <div className='space-y-2 col-span-1'>
+                                        <div className='bg-[#252A30] rounded-lg ring-1 ring-gray flex items-center'>
+                                            <input
+                                                type='text'
+                                                placeholder={event.category}
+                                                className='bg-transperent focus:outline-none w-full text-body-text p-3 text-sm datepicker-input'
+                                                name='category'
+                                                readOnly
+                                                required
+                                            />
+                                            <div onClick={() => setOpenCat((prev) => !prev)}>
+                                                <DownIcon className={`stroke-white fill-transperent size-5 mr-3 ${openCat ? "rotate-180" : "rotate-0"} transition-all cursor-pointer`} />
+                                            </div>
+                                        </div>
+                                        <div className={`${openCat ? "visible block" : "hidden"} w-full bg-transperent focus:outline-none text-body-text rounded-lg overflow-hidden text-sm transition-all`}>
+
+                                            {EventCategory && EventCategory.map((item, index) => (
+                                                <div className='bg-[#252A30] flex items-center pr-3 w-full cursor-pointer transition-all delay-150'
+                                                    key={index}
+                                                    onClick={() => setEvent((prev) => ({ ...prev, category: item.text }))}>
+                                                    <div className={`bg-transperent focus:outline-none w-full py-3 px-5 text-sm ${event.category === item.text ? "text-white" : "text-white/40"}`}>
+                                                        <p>{item.text}</p>
+
+                                                    </div>
+                                                    <div className='cursor-pointer'>
+                                                        {event.category === item.text ? <SelectIcon /> : (
+                                                            <div className='w-4 h-4 rounded-full ring-1 ring-white' />
+                                                        )}
+                                                    </div>
+                                                </div>
+                                            ))}
+                                        </div>
+                                    </div>
+                                </div>
+                                {/* <div className=''>
                                     <div className='flex justify-start items-center gap-3'>
                                         <label htmlFor="eventCat1" className='cursor-pointer relative inline-flex items-center' >
                                             <input type="radio" name="category" id="eventCat1" value='Adventure' onChange={handleChange} className='sr-only peer h-full w-full' checked={event.category === 'Adventure'} />
@@ -140,7 +176,7 @@ function CreatePriEvent() {
                                             </div>
                                         </label>
                                     </div>
-                                </div>
+                                </div> */}
                                 <div className='grid grid-cols-3 text-body-text gap-5'>
                                     <Input
                                         type={'text'}
@@ -163,19 +199,6 @@ function CreatePriEvent() {
                                         onChange={handleChange}
                                         className={'col-span-1'}
                                     />
-                                    {/* <Input
-                                        type={'text'}
-                                        placeholder={'Event Create Date'}
-                                        name={'createDate'}
-                                        onChange={handleChange}
-                                        onFocus={(e) => e.target.type = 'date'}
-                                        onBlur={(e) => e.target.type = 'text'}
-                                        className={'col-span-1 flex items-center relative'}
-                                        InputClassName={'datepicker-input'}
-                                    >
-                                        <CalenderIcon className="mr-3" />
-                                    </Input>
-                                    <div className='col-span-2' /> */}
 
                                     <Input
                                         type={'text'}
@@ -252,13 +275,13 @@ function CreatePriEvent() {
                                                 readOnly
                                             />
                                             <div onClick={() => setOpenSelect((prev) => !prev)}>
-                                                <AddCircleIcon className={"stroke-white fill-transperent mr-3"} />
+                                                <AddCircleIcon className={`stroke-white fill-transperent mr-3 ${openSelect ? "rotate-90" : "rotate-0"} transition-all cursor-pointer`} />
                                             </div>
                                         </div>
-                                        <div className={`${openSelect ? "visible block" : "hidden"} w-full bg-transperent focus:outline-none text-body-text rounded-lg text-sm transition-all`}>
+                                        <div className={`${openSelect ? "visible block" : "hidden"} w-full bg-transperent focus:outline-none text-body-text rounded-lg overflow-hidden text-sm transition-all`}>
 
                                             {offersToSelect && offersToSelect.map((item, index) => (
-                                                <div className='bg-[#252A30] flex items-center pr-3 w-full cursor-pointer'
+                                                <div className='bg-[#252A30] flex items-center pr-3 w-full cursor-pointer transition-all delay-150'
                                                     key={index}
                                                     onClick={() => {
                                                         setOfferToSelect((prev) => (prev.map((pItem, i) => i === index ? { ...pItem, checked: !pItem.checked } : pItem)))
@@ -273,7 +296,7 @@ function CreatePriEvent() {
                                                     </div>
                                                     <div className='cursor-pointer'>
                                                         {item.checked ? <SelectIcon /> : (
-                                                            <div className='size-3 bg-white' />
+                                                            <div className='size-3 bg-white mr-1' />
                                                         )}
                                                     </div>
 
@@ -448,53 +471,49 @@ function CreatePriEvent() {
                                     </div>
                                 </div>
                                 <div className={`bg-[#252A30] flex flex-col items-center space-y-5 p-5 rounded-lg border-dashed border-2 border-primary`}>
-                                    {event.photos.length > 0 ? (
-                                        <>
-                                            <div className='grid grid-cols-3 grid-rows-2 gap-5 transition-all'>
-                                                {event.photos.map((img, index) => (
-                                                    <div className='relative' key={index}>
-                                                        <img
-                                                            src={URL.createObjectURL(img)}
-                                                            alt={`Selected ${index}`}
-                                                            className='h-48 w-full object-cover rounded'
-                                                        />
-                                                        <button
-                                                            type="button"
-                                                            onClick={() => setEvent((prev) => ({ ...prev, photos: prev.photos.filter((_, i) => i !== index) }))}
-                                                            className="absolute top-0 right-1 rounded-full bg-stroke/50 size-10 flex items-center justify-center"
-                                                        >
-                                                            <CrossIcon className="size-5" />
-                                                        </button>
-                                                    </div>
-                                                ))}
-                                            </div>
+                                    <div onClick={() => imgInputRef.current.click()}>
+                                        <GalleryIcon />
+                                    </div>
+                                    <input
+                                        type="file"
+                                        name='photos'
+                                        ref={imgInputRef}
+                                        onChange={(e) => {
+                                            setEvent((prev) => ({ ...prev, photos: [...e.target.files, ...prev.photos].slice(0, 6) }))
 
-                                        </>
-                                    ) : (
-                                        <>
-                                            <div onClick={() => imgInputRef.current.click()}>
-                                                <GalleryIcon />
-                                            </div>
-                                            <input
-                                                type="file"
-                                                name='photos'
-                                                ref={imgInputRef}
-                                                onChange={(e) => {
-                                                    setEvent((prev) => ({ ...prev, photos: [...e.target.files, ...prev.photos].slice(0, 6) }))
-
-                                                }}
-                                                accept='image/*'
-                                                className='hidden'
-                                                multiple
-                                            />
-                                            <div className='text-center'>
-                                                <p>Upload Photos</p>
-                                                <p className='text-body-text'>Maximum 6 photos upload</p>
-                                            </div>
-                                        </>
-                                    )}
-
+                                        }}
+                                        accept='image/*'
+                                        className='hidden'
+                                        multiple
+                                    />
+                                    <div className='text-center'>
+                                        <p>Upload Photos</p>
+                                        <p className='text-body-text'>Maximum 6 photos upload</p>
+                                    </div>
                                 </div>
+                                {event.photos.length > 0 && (
+                                    <div className={`bg-[#252A30] flex flex-col items-center space-y-5 p-5 rounded-lg border-dashed border-2 border-primary`}>
+                                        <div className='grid grid-cols-3 grid-rows-2 gap-5 transition-all'>
+                                            {event.photos.map((img, index) => (
+                                                <div className='relative' key={index}>
+                                                    <img
+                                                        src={URL.createObjectURL(img)}
+                                                        alt={`Selected ${index}`}
+                                                        className='h-48 w-full object-cover rounded'
+                                                    />
+                                                    <button
+                                                        type="button"
+                                                        onClick={() => setEvent((prev) => ({ ...prev, photos: prev.photos.filter((_, i) => i !== index) }))}
+                                                        className="absolute top-0 right-1 rounded-full bg-stroke/50 size-10 flex items-center justify-center"
+                                                    >
+                                                        <CrossIcon className="size-5" />
+                                                    </button>
+                                                </div>
+                                            ))}
+                                        </div>
+                                    </div>
+                                )}
+
                             </div>
                         }
                         {progress === 4 &&

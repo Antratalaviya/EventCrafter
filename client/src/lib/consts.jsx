@@ -1,10 +1,9 @@
 import { AddCircleIcon, BuildingIcon, HomeIcon, LogoutIcon, MoneyIcon, MsgIcon, SettingIcon } from '../assets/svg/Icon'
-
 export const SidebarLinks = [
     {
         key: "add",
         label: "Create Event",
-        icon: <AddCircleIcon className="fill-none" />,
+        icon: <AddCircleIcon className={`fill-none`} />,
         path: "/create-event",
     },
     {
@@ -75,3 +74,42 @@ export const EventsLinks = [
         path: "/create-business-event",
     }
 ];
+
+export const EventCategory = [
+    {
+        text: "Arts and crafts evening",
+    },
+    {
+        text: "Anniversary",
+    },
+    {
+        text: "Birthday party",
+    },
+    {
+        text: "Brunch",
+    },
+    {
+        text: "Book club meeting",
+    },
+    {
+        text: "Boys night",
+    },
+    {
+        text: "Beauty",
+    },
+    {
+        text: "BBQ evening",
+    },
+    {
+        text: "Birth of our child/children",
+    },
+    {
+        text: "Costume party",
+    },
+    {
+        text: "Cinema evening",
+    },
+    {
+        text: "Computer club meeting",
+    },
+]

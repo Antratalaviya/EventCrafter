@@ -5,12 +5,12 @@ export const HomeIcon = (props) => (
     width={props.width ? props.width : "24"}
     height={props.height ? props.height : "24"}
     viewBox="0 0 24 24"
-    className={props.className}
+    className={twMerge(props.className)}
     xmlns="http://www.w3.org/2000/svg"
   >
     <path
       d="M20.04 6.82663L14.28 2.79663C12.71 1.69663 10.3 1.75663 8.78999 2.92663L3.77999 6.83663C2.77999 7.61663 1.98999 9.21663 1.98999 10.4766V17.3766C1.98999 19.9266 4.05999 22.0066 6.60999 22.0066H17.39C19.94 22.0066 22.01 19.9366 22.01 17.3866V10.6066C22.01 9.25663 21.14 7.59663 20.04 6.82663ZM12.75 18.0066C12.75 18.4166 12.41 18.7566 12 18.7566C11.59 18.7566 11.25 18.4166 11.25 18.0066V15.0066C11.25 14.5966 11.59 14.2566 12 14.2566C12.41 14.2566 12.75 14.5966 12.75 15.0066V18.0066Z"
-      fill={props.fill ? props.fill : "white"}
+    // fill={"#96989D"}
     />
   </svg>
 );
@@ -196,7 +196,7 @@ export const AddCircleIcon = (props) => (
     height="24"
     viewBox="0 0 24 24"
     xmlns="http://www.w3.org/2000/svg"
-    className={twMerge("stroke-[#96989D]", props.className)}
+    className={twMerge(props.className)}
   >
     <path d="M12.3335 22.3467C17.8335 22.3467 22.3335 17.8467 22.3335 12.3467C22.3335 6.84668 17.8335 2.34668 12.3335 2.34668C6.8335 2.34668 2.3335 6.84668 2.3335 12.3467C2.3335 17.8467 6.8335 22.3467 12.3335 22.3467Z" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
     <path d="M8.3335 12.3467H16.3335" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />

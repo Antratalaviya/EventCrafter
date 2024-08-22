@@ -1,11 +1,11 @@
 import React from 'react'
 import { NavLink } from 'react-router-dom'
-import { LogoIcon, LogoutIcon } from '../../assets/svg/Icon'
+import { AddCircleIcon, BuildingIcon, HomeIcon, LogoIcon, LogoutIcon, MoneyIcon, MsgIcon, SettingIcon } from '../../assets/svg/Icon'
 import { SidebarLinks, LogoutLink } from "../../lib/consts"
 import { useCurrLocation } from '../../context/useCurrLocation'
 
 function Sidebar() {
-  const { setLoc } = useCurrLocation();
+  const { setLoc, loc } = useCurrLocation();
   return (
     <div className='border bg-gray border-stroke flex flex-col items-center gap-3'>
       <div>
@@ -16,34 +16,34 @@ function Sidebar() {
       <div className='flex items-center flex-col'>
         <ul>
           <li>
-            {SidebarLinks && SidebarLinks.map((item) => (
-              <NavLink to={item.path} key={item.key} className={({ isActive }) => `${isActive ? `bg-primary border-r-2 border-white` : ""} py-4 px-8 flex justify-center items-center`} onClick={() => setLoc(item.label)}>
+            {SidebarLinks && SidebarLinks.map((item, index) => (
+              <NavLink to={item.path} key={item.key} className={({ isActive }) => `${isActive ? `bg-primary border-r-2 border-white` : ""} py-4 px-8 flex justify-center items-center fill-yellow`} onClick={() => setLoc(item.label)}>
+                {(() => {
+                  switch (item.key) {
+                    case "add":
+                      return <AddCircleIcon className={`fill-none ${loc === item.label ? 'stroke-primary fill-white stroke-2' : "stroke-[#96989D]"}`} />;
 
-                {item.icon}
+                    case "home":
+                      return <HomeIcon fill={'white'} className={`${loc === item.label ? 'stroke-transperent fill-white' : "stroke-[#96989D] fill-transperent"}`} />;
+
+                    case "message":
+                      return <MsgIcon className={`${loc === item.label && 'stroke-white'}`} />;
+
+                    case "money":
+                      return <MoneyIcon className={`${loc === item.label && 'stroke-white'}`} />;
+
+                    case "building":
+                      return <BuildingIcon className={`${loc === item.label && 'stroke-white'}`} />;
+
+                    case "settings":
+                      return <SettingIcon className={`${loc === item.label && 'stroke-white'}`} />;
+                  }
+                })()}
               </NavLink>
             ))}
           </li>
 
         </ul>
-        {/* <NavLink to={'/add'} className={({ isActive }) => `w-full py-5 px-3 flex justify-center items-center ${isActive ? "bg-primary border-r-2 border-white" : ""}`}>
-          <AddCircleIcon />
-        </NavLink>
-        <NavLink to={'/'} className={({ isActive }) => `w-full py-5 px-3 flex justify-center items-center ${isActive ? "bg-primary border-r-2 border-white" : ""}`}>
-          <HomeIcon />
-        </NavLink>
-
-        <NavLink to={'/msg'} className={({ isActive }) => `w-full py-5 px-3 flex justify-center items-center ${isActive ? "bg-primary border-r-2 border-white" : ""}`}>
-          <MsgIcon />
-        </NavLink>
-        <NavLink to={'/money'} className={({ isActive }) => `w-full py-5 px-3 flex justify-center items-center ${isActive ? "bg-primary border-r-2 border-white" : ""}`}>
-          <MoneyIcon />
-        </NavLink>
-        <NavLink to={'/building'} className={({ isActive }) => `w-full py-5 px-3 flex justify-center items-center ${isActive ? "bg-primary border-r-2 border-white" : ""}`}>
-          <BuildingIcon />
-        </NavLink>
-        <NavLink to={'/settings'} className={({ isActive }) => `w-full py-5 px-3 flex justify-center items-center ${isActive ? "bg-primary border-r-2 border-white" : ""}`}>
-          <SettingIcon />
-        </NavLink> */}
       </div>
       <div className='mt-auto'>
         <ul>
@@ -55,11 +55,7 @@ function Sidebar() {
               </NavLink>
             ))}
           </li>
-
         </ul>
-        {/* <NavLink to={'/logout'} className={({ isActive }) => `w-full mb-5 py-5 px-3 flex justify-center items-center ${isActive ? "" : ""}`}>
-          <LogoutIcon />
-        </NavLink> */}
       </div>
     </div>
 

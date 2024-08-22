@@ -42,17 +42,18 @@ function SignUp() {
                 </div>
                 <form onSubmit={handleSubmit(handleRegister)}>
                     <div className='w-full space-y-5'>
-                        <div className='w-full bg-[#252A30] rounded-lg ring-1 ring-gray'>
+                        <div className='w-full bg-[#252A30] rounded-lg ring-1 ring-gray relative'>
                             <select
+                                defaultValue={'personal'}
                                 value={orgType}
-                                className=' border-transperent bg-transperent cursor-pointer focus:outline-none w-[95%] text-body-text rounded p-3 text-sm'
+                                className='border-transperent bg-transperent cursor-pointer focus:outline-none w-[95%] text-body-text rounded p-3 text-sm'
+
                                 onChange={(e) => setOrgType(e.target.value)}
                                 {...register('orgType', {
                                     required: true,
                                     onChange: (e) => setOrgType(e.target.value)
                                 })}
                             >
-                                <option disabled defaultValue={'Please choose account type'}>Please choose account type</option>
                                 <option value="personal">Personal</option>
                                 <option value="institution">Institution</option>
                                 <option value="company">Company</option>
