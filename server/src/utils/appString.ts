@@ -22,9 +22,18 @@ export const AppString = {
   OTP_NOT_MATCH: "otp not matched !! please try again",
   OTP_VERIFY: "user verified successfully",
   OTP_EXPIRED: "otp expired !! please try again",
+
+  INVALID_DATE: "please check start and end date",
+  EVENT_CREATED: "event created successfully",
+  EVENT_UPDATED: "event update successfully",
+  EVENT_END: "event ended !!",
+  EVENT_DELETED: "event deleted successfully",
+  EVENT_RETRIEVED: "event retrieved successfully",
+  EVENT_CREATION_FAILED: "event creation failed!!!! please try again",
 };
 
 export const Collection = {
   MODEL_USER: "User",
   MODEL_OTP: "Otp",
+  MODEL_EVENT: "Event"
 };

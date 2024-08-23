@@ -11,7 +11,6 @@ import otpService from "../service/otp.service";
 const register = asyncHandler(async (req: Request, res: Response) => {
   try {
     const body = req.body as UserInput;
-
     if (
       !(
         body.email ||

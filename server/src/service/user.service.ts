@@ -1,5 +1,5 @@
 import { UserInput } from "../constants";
-import { User } from "../model/auth.model";
+import { User } from "../model/user.model";
 
 const getUserById = async (id: string) => {
   return await User.findById(id).select("-__v");

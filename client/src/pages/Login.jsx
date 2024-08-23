@@ -2,16 +2,19 @@ import React, { useRef, useState } from 'react'
 import { EmailIcon, EyeIcon, LockIcon, NamedLogoIcon } from '../assets/svg/Icon'
 import Input from '../component/Input'
 import Button from '../component/Button'
-import { Link } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import { useForm } from 'react-hook-form'
+import { useLoginMutation } from '../api/api'
 
 function Login() {
   const [passType, setPassType] = useState('password')
   const { register, handleSubmit } = useForm();
+  const [loginUser, { isError, isLoading, isSuccess, error }] = useLoginMutation();
+  const navigate = useNavigate();
 
-  const login = (data) => {
-
-    console.log(data)
+  const handleLogin = (data) => {
+    loginUser({ email: data.email, password: data.password })
+    navigate('/');
   }
 
   return (
@@ -21,7 +24,7 @@ function Login() {
           <NamedLogoIcon />
           <h1 className='text-3xl font-bold font-serif'>Sign In</h1>
         </div>
-        <form onSubmit={handleSubmit(login)}>
+        <form onSubmit={handleSubmit(handleLogin)}>
           <div className='w-full space-y-5'>
             <div className='relative w-full'>
               <EmailIcon className="absolute top-1/2 left-2 transform -translate-y-1/2" />

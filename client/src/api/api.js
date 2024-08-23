@@ -1,12 +1,26 @@
 import config from "../config/config";
 import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react'
-import { getItem, setItem } from "../utils/localStorageUtility";
+import { getItem, removeItem, setItem } from "../utils/localStorageUtility";
 import { CONSTS } from "../utils/consts";
 import { authLogin } from "../store/AuthSlice";
 
+export const baseQueryIntercepter = (args) =>{
+  const baseQuery = fetchBaseQuery(args);
+
+  return async (args, api, options)=>{
+    const result = await baseQuery(args, api, options);
+
+    if(result?.error?.status === 401){
+      removeItem(CONSTS.AUTH_TOKEN);
+      location.replace('/sign-in');
+    }
+    return result
+  }
+}
+
 export const api = createApi({
   reducerPath : "api",
-  baseQuery : fetchBaseQuery({ 
+  baseQuery : baseQueryIntercepter({ 
     baseUrl : `${config.apiUrl}`,
     prepareHeaders : (headers)=>{
       const token = getItem(CONSTS.AUTH_TOKEN);
@@ -15,30 +29,29 @@ export const api = createApi({
         headers.set("Authorization", `Bearer ${token}`)
       }
       return headers;
-    }
+    },
   },
 ),
   tagTypes : ['Auth'],
   endpoints : (builder)=>({
     register : builder.mutation({
       query : (userDetails) => ({ 
-        url : "/sign-up", 
+        url : "/auth/sign-up", 
         method : 'POST', 
         body : userDetails 
       }),
     }),
     login : builder.mutation({
       query : ({email, password}) => ({ 
-        url : "/sign-in", 
+        url : "/auth/sign-in", 
         method : "POST", 
         body : {email, password}
       }),
       onQueryStarted : async (args, {dispatch, queryFulfilled} )=>{
        try {
         const {data} = await queryFulfilled;
-        setItem(CONSTS.AUTH_TOKEN, data.token);
-
-        dispatch(authLogin({email}))
+        setItem(CONSTS.AUTH_TOKEN, data.data.accessToken);
+        dispatch(authLogin())
        } catch (error) {
         console.log("Login failed !! ", error);
        }
@@ -47,15 +60,27 @@ export const api = createApi({
     }),
     getUser : builder.query({
       query : ()=>({
-        url : "/user",
+        url : "/user/profile",
         method : "GET"
       }),
+      onQueryStarted : async (args, {dispatch,  queryFulfilled} )=>{
+        try {
+         const {data} = await queryFulfilled;
+          dispatch(authLogin({...data.data}))
+        } catch (error) {
+         console.log("user retrieve failed !! ", error);
+        }
+       },
       providesTags : ['Auth']
     })
   })
 })
 
-export const { useRegisterMutation, useLoginMutation} = api;
+export const { 
+  useRegisterMutation, 
+  useLoginMutation,
+  useGetUserQuery
+} = api;
 
 // class AuthService {
 //   constructor() {

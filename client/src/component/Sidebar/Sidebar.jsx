@@ -6,6 +6,7 @@ import { useCurrLocation } from '../../context/useCurrLocation'
 
 function Sidebar() {
   const { setLoc, loc } = useCurrLocation();
+
   return (
     <div className='border bg-gray border-stroke flex flex-col items-center gap-3'>
       <div>
@@ -17,26 +18,26 @@ function Sidebar() {
         <ul>
           <li>
             {SidebarLinks && SidebarLinks.map((item, index) => (
-              <NavLink to={item.path} key={item.key} className={({ isActive }) => `${isActive ? `bg-primary border-r-2 border-white` : ""} py-4 px-8 flex justify-center items-center fill-yellow`} onClick={() => setLoc(item.label)}>
+              <NavLink to={item.path} key={index} className={({ isActive }) => `${isActive ? `bg-primary border-r-2 border-white` : ""} py-4 px-8 flex justify-center items-center fill-yellow`} onClick={() => setLoc(item.label)}>
                 {(() => {
                   switch (item.key) {
                     case "add":
-                      return <AddCircleIcon className={`fill-none ${loc === item.label ? 'stroke-primary fill-white stroke-2' : "stroke-[#96989D]"}`} />;
+                      return <AddCircleIcon className={`fill-none ${loc.split(" ")[0] === item.label.split(" ")[0] ? 'stroke-primary fill-white stroke-2' : "stroke-[#96989D]"}`} />;
 
                     case "home":
-                      return <HomeIcon fill={'white'} className={`${loc === item.label ? 'stroke-transperent fill-white' : "stroke-[#96989D] fill-transperent"}`} />;
+                      return <HomeIcon fill={'white'} className={`${loc.split(" ")[0] === item.label.split(" ")[0] ? 'stroke-transperent fill-white' : "stroke-[#96989D] fill-transperent"}`} />;
 
                     case "message":
-                      return <MsgIcon className={`${loc === item.label && 'stroke-white'}`} />;
+                      return <MsgIcon className={`${loc.split(" ")[0] === item.label.split(" ")[0] && 'stroke-white'}`} />;
 
                     case "money":
-                      return <MoneyIcon className={`${loc === item.label && 'stroke-white'}`} />;
+                      return <MoneyIcon className={`${loc.split(" ")[0] === item.label.split(" ")[0] && 'stroke-white'}`} />;
 
                     case "building":
-                      return <BuildingIcon className={`${loc === item.label && 'stroke-white'}`} />;
+                      return <BuildingIcon className={`${loc.split(" ")[0] === item.label.split(" ")[0] && 'stroke-white'}`} />;
 
                     case "settings":
-                      return <SettingIcon className={`${loc === item.label && 'stroke-white'}`} />;
+                      return <SettingIcon className={`${loc.split(" ")[0] === item.label.split(" ")[0] && 'stroke-white'}`} />;
                   }
                 })()}
               </NavLink>

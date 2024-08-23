@@ -27,9 +27,9 @@ export class ApiError {
 
 export const asyncHandler =
   (requestHandler: Function) =>
-  async (req: Request, res: Response, next: NextFunction) => {
-    Promise.resolve(requestHandler(req, res, next)).catch((error) =>
-      next(error)
-    );
-  };
+    async (req: Request, res: Response, next: NextFunction) => {
+      Promise.resolve(requestHandler(req, res, next)).catch((error) =>
+        next(error)
+      );
+    };
 

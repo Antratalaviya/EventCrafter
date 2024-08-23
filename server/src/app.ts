@@ -2,6 +2,8 @@ import express, { Response, NextFunction } from "express";
 import cors from "cors";
 
 import authRoutes from "./router/auth.router";
+import userRoutes from "./router/user.router";
+import eventRoutes from "./router/event.router";
 
 const app = express();
 
@@ -33,5 +35,7 @@ app.get("/test", (_, res: Response) => {
 });
 
 app.use("/auth", authRoutes);
+app.use("/user", userRoutes);
+app.use("/event", eventRoutes);
 
 export { app };

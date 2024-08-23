@@ -1,13 +1,13 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { img } from '../../assets/assets'
 import { BellIcon, GPSIcon, LocationIcon, SearchIcon } from '../../assets/svg/Icon'
 import Drawer from '../Drawer/Drawer'
 import { Max } from '../max'
 import Button from '../Button'
 import { useCurrLocation } from "../../context/useCurrLocation"
-import Login from '../../pages/Login'
 import { useSelector } from 'react-redux'
 import { useNavigate } from 'react-router-dom'
+import { useGetUserQuery } from '../../api/api'
 
 function Header() {
   const add = 'Caleta de Fuste, Fuerteventura ESP'
@@ -15,6 +15,7 @@ function Header() {
   const { loc } = useCurrLocation();
   const authStatus = useSelector((state) => state.auth.status)
   const navigate = useNavigate();
+  const { data } = useGetUserQuery();
 
   return (
     <div className='bg-black-light grid grid-cols-12 text-white py-4 px-3 border-b border-body-text'>
@@ -72,8 +73,10 @@ function Header() {
               <img src={img.profile} alt="profile" />
             </div>
             <div className='flex flex-col'>
-              <p className='text-white text-sm'>Violet Fahey</p>
-              <p className='text-body-text text-sm'>Johndoe@gmai.com</p>
+              {/* <p className='text-white text-sm'>Violet Fahey</p>
+              <p className='text-body-text text-sm'>Johndoe@gmai.com</p> */}
+              <p className='text-white text-sm'>{data?.data?.name + " " + data?.data?.surname}</p>
+              <p className='text-body-text text-sm'>{data?.data?.email}</p>
             </div>
           </div>
         ) : (

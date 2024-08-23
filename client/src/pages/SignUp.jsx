@@ -5,15 +5,15 @@ import "../index.css"
 import Button from '../component/Button';
 import { Link, useNavigate } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
-import authService from '../api/auth';
+import { useRegisterMutation } from '../api/api';
 
 function SignUp() {
     const [passType, setPassType] = useState('password');
     const [currPassType, setCurrPassType] = useState('password');
-    const [errors, setErrors] = useState('');
     const [orgType, setOrgType] = useState();
     const { register, handleSubmit } = useForm();
     const navigate = useNavigate();
+    const [regitserUser, { isError, isLoading, isSuccess, error }] = useRegisterMutation();
 
 
     useEffect(() => {
@@ -28,6 +28,9 @@ function SignUp() {
 
 
     const handleRegister = (data) => {
+        regitserUser({
+            ...data
+        })
         console.log(data)
         navigate('/sign-in');
     }

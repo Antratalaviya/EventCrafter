@@ -12,6 +12,7 @@ export interface UserInput {
 export interface UserDocument extends UserInput, Document {
   orgName: string;
   passcode: number;
+  profileImg: string;
   refreshToken: string;
   createdAt: Date;
   updatedAt: Date;
@@ -21,6 +22,39 @@ export interface UserDocument extends UserInput, Document {
   clearRefresh(): void;
 }
 
+export interface EventInput {
+  type: string;
+  category: string;
+  title: string;
+  subtitle1: string;
+  subtitle2: string;
+  startDate: string;
+  endDate: string;
+  startTime: string;
+  endTime: string;
+  offers: Array<string>;
+  carCapacity: string;
+  street: string;
+  city: string;
+  country: string;
+  photos: [{
+    url: string;
+  }];
+  pdfFile: [{
+    url: string
+  }];
+  description: string;
+}
+
+export interface EventDocument extends EventInput, Document {
+  videoFile: {
+    url: string
+  };
+  status: string;
+  expiresIn: number;
+  createdAt: Date;
+  updatedAt: Date;
+}
 export interface UserTokenPayload {
   _id: string;
   email: string;
