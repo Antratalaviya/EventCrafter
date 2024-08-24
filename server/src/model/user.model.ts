@@ -48,6 +48,26 @@ const userSchema = new mongoose.Schema(
       type: String,
       default: "",
     },
+    likedEvent: [{
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Event"
+    }],
+    savedEvent: [{
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Event"
+    }],
+    subscriber: [{
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "User"
+    }],
+    subscribing: [{
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "User"
+    }],
+    joinedEvent: [{
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Event"
+    }]
   },
   {
     timestamps: true,

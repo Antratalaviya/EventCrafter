@@ -4,15 +4,15 @@ import eventController from '../controller/event.controller';
 
 const router = express.Router();
 
-router.post('/',
-    authMiddleware.verifyUserAccess,
-    eventController.createEvent
-)
+router.post('/', authMiddleware.verifyUserAccess, eventController.createEvent)
 
-router.get('/',
-    authMiddleware.verifyUserAccess,
-    eventController.getEvent
-)
+router.get('/', authMiddleware.verifyUserAccess, eventController.getEvent);
+
+router.post('/like/:eventId', authMiddleware.verifyUserAccess, eventController.likeEvent);
+
+router.post('/save/:eventId', authMiddleware.verifyUserAccess, eventController.saveEvent);
+
+router.post('/invite', authMiddleware.verifyUserAccess, eventController.sendInvitation);
 
 export default router;
 

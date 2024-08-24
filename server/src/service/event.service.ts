@@ -1,4 +1,4 @@
-import mongoose from "mongoose";
+import mongoose, { PipelineStage } from "mongoose";
 import { EventInput } from "../constants";
 import { Event } from "../model/event.model";
 /**
@@ -26,8 +26,7 @@ const createEvent = async (userId: string, event: EventInput) => {
  */
 
 const getEventByUserId = async (userId: string, page: number, limit: number, keyword: string, eventStatus: string, eventType: string, sortby: string) => {
-    console.log(page)
-    const pipeline = [];
+    const pipeline: PipelineStage[] = [];
     pipeline.push({
         $match: { owner: new mongoose.Types.ObjectId(userId) }
     })
@@ -56,19 +55,19 @@ const getEventByUserId = async (userId: string, page: number, limit: number, key
     }, {
         $limit: limit
     })
-    // if (sortby === 'asc') {
-    //     pipeline.push({
-    //         $sort: {
-    //             price: 1
-    //         }
-    //     })
-    // } else if (sortby === 'desc') {
-    //     pipeline.push({
-    //         $sort: {
-    //             createdAt: -1
-    //         }
-    //     })
-    // }
+    if (sortby === 'asc') {
+        pipeline.push({
+            $sort: {
+                createdAt: 1
+            }
+        })
+    } else if (sortby === 'desc') {
+        pipeline.push({
+            $sort: {
+                createdAt: -1
+            }
+        })
+    }
     pipeline.push(
         {
             $lookup: {
@@ -84,6 +83,15 @@ const getEventByUserId = async (userId: string, page: number, limit: number, key
                 preserveNullAndEmptyArrays: true
             }
         },
+        {
+            $lookup: {
+                from: 'users',
+                localField: "likedBy",
+                foreignField: "_id",
+                as: "likedByUsers"
+            }
+        }
+        ,
         {
             $project: {
                 _id: 1,
@@ -102,22 +110,42 @@ const getEventByUserId = async (userId: string, page: number, limit: number, key
                 status: 1,
                 name: '$user.name',
                 surname: '$user.surname',
+                subscriber: "$user.subscriber",
+                price: 1,
+                likedBy: { $size: '$likedByUsers' },
+                participants: 1
             }
         }
     )
 
-
-
-    /**
-     title,category, type, photos,start-date, time-both, carCapacity, street, city, country,description, offers, 
-     name, surname, subscriber, 
-     */
-
-
     return await Event.aggregate(pipeline)
+}
+
+const getEventById = async (eventId: string) => {
+    return await Event.findById(eventId);
+}
+
+const likedEventByUser = async (eventId: string, userId: string) => {
+    let event = await Event.findOne({
+        likedBy: { $in: [new mongoose.Types.ObjectId(userId)] }
+    })
+    if (event) {
+        return await Event.findByIdAndUpdate(eventId, {
+            $pull: {
+                likedBy: new mongoose.Types.ObjectId(userId)
+            }
+        }, { new: true })
+    }
+    return await Event.findByIdAndUpdate(eventId, {
+        $push: {
+            likedBy: new mongoose.Types.ObjectId(userId)
+        }
+    }, { new: true })
 }
 
 export default {
     createEvent,
-    getEventByUserId
+    getEventByUserId,
+    getEventById,
+    likedEventByUser
 }

@@ -1,4 +1,4 @@
-import { Document } from "mongoose";
+import mongoose, { Document } from "mongoose";
 
 export interface UserInput {
   orgType: string;
@@ -14,6 +14,7 @@ export interface UserDocument extends UserInput, Document {
   passcode: number;
   profileImg: string;
   refreshToken: string;
+  savedEvent: Array<string>;
   createdAt: Date;
   updatedAt: Date;
   isPasswordMatched(password: string): Promise<boolean>;
@@ -58,4 +59,16 @@ export interface EventDocument extends EventInput, Document {
 export interface UserTokenPayload {
   _id: string;
   email: string;
+}
+
+export interface NotificationIp {
+  sender: string;
+  recipient: string;
+  message: string;
+  type: string;
+}
+
+export interface NotificationDoc extends NotificationIp, Document {
+  isRead: boolean;
+  createdAt: Date;
 }

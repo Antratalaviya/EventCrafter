@@ -98,7 +98,15 @@ const eventSchema = new mongoose.Schema({
         type: String,
         enum: ['upcoming', 'completed', 'cancelled', "draft"],
         default: 'upcoming'
-    }
+    },
+    participants: [{
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "User"
+    }],
+    likedBy: [{
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "User"
+    }]
 }, {
     timestamps: true
 })

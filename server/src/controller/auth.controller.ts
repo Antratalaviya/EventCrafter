@@ -2,11 +2,12 @@ import status from "http-status";
 
 import { Request, Response } from "express";
 import { ApiError, ApiResponse, asyncHandler } from "../utils/customUtilities";
-import { UserDocument, UserInput } from "../constants";
+import { UserInput } from "../constants";
 import userService from "../service/user.service";
-import { AppString } from "../utils/appString";
+import { AppString, NotificationMsg } from "../utils/appString";
 import eventEmitter from "../utils/event";
 import otpService from "../service/otp.service";
+import notificationService from "../service/notification.service";
 
 const register = asyncHandler(async (req: Request, res: Response) => {
   try {
@@ -34,6 +35,12 @@ const register = asyncHandler(async (req: Request, res: Response) => {
     }
 
     let user = await userService.register(body);
+    await notificationService.createNotification({
+      type: "register",
+      message: NotificationMsg.USER_REGISTERED,
+      sender: user._id as string,
+      recipient: user._id as string,
+    })
 
     if (user) {
       return res
@@ -82,7 +89,12 @@ const login = asyncHandler(async (req: Request, res: Response) => {
       httpOnly: true,
       secure: true,
     };
-
+    await notificationService.createNotification({
+      type: "login",
+      message: NotificationMsg.USER_LOGIN,
+      sender: user._id as string,
+      recipient: user._id as string,
+    })
     return res
       .status(status.OK)
       .cookie("accessToken", accessToken, option)
