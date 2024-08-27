@@ -1,4 +1,4 @@
-import { AddCircleIcon, BuildingIcon, HomeIcon, LogoutIcon, MoneyIcon, MsgIcon, SettingIcon } from '../assets/svg/Icon'
+import { AddCircleIcon, AlcoholIcon, BuildingIcon, DrinkIcon, FoodIcon, HandicappedIcon, HomeIcon, LogoutIcon, MedicIcon, MoneyIcon, MsgIcon, MusicIcon, SettingIcon, ToiletsIcon, VeganIcon } from '../assets/svg/Icon'
 export const SidebarLinks = [
     {
         key: "add",
@@ -61,17 +61,17 @@ export const EventsLinks = [
     {
         key: "workshop",
         label: "Create Workshop Event",
-        path: "/create-workshop-event",
+        path: "create-workshop-event",
     },
     {
         key: "ticket",
-        label: "Create Ticket",
-        path: "/create-ticket",
+        label: "Create Ticket Event",
+        path: "create-ticket-event",
     },
     {
         key: "business",
         label: "Create Business Event",
-        path: "/create-business-event",
+        path: "create-business-event",
     }
 ];
 
@@ -111,5 +111,48 @@ export const EventCategory = [
     },
     {
         text: "Computer club meeting",
+    },
+]
+
+export const offers = [
+    {
+        text: 'Paramedic',
+        icon: <MedicIcon />,
+        checked: false
+    },
+    {
+        text: 'Toilets',
+        icon: <ToiletsIcon />,
+        checked: false
+    },
+    {
+        text: 'Handicapped accessible',
+        icon: <HandicappedIcon />,
+        checked: false
+    },
+    {
+        text: 'Food',
+        icon: <FoodIcon />,
+        checked: false
+    },
+    {
+        text: 'Vegan',
+        icon: <VeganIcon />,
+        checked: false
+    },
+    {
+        text: 'Music',
+        icon: <MusicIcon />,
+        checked: false
+    },
+    {
+        text: 'Non Alcohol',
+        icon: <AlcoholIcon />,
+        checked: false
+    },
+    {
+        text: 'Drink',
+        icon: <DrinkIcon />,
+        checked: false
     },
 ]

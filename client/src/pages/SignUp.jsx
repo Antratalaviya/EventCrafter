@@ -13,26 +13,20 @@ function SignUp() {
     const [orgType, setOrgType] = useState();
     const { register, handleSubmit } = useForm();
     const navigate = useNavigate();
-    const [regitserUser, { isError, isLoading, isSuccess, error }] = useRegisterMutation();
+    const [regitserUser, { isLoading }] = useRegisterMutation();
 
 
-    useEffect(() => {
-        const fetch = async () => {
-            // let item = await authService.register({ email: 'tre@trddg.com', name: 'abc', dob: "2024-06-14", orgType: "school", password: "abc", surname: "abc" });
-            // let item = await authService.login({email: 'tre@trddg.com',password: "abc"})
-            // console.log(item.data.data.accessToken)
+    const handleRegister = async (data) => {
+        try {
+            let responce = await regitserUser({
+                ...data
+            })
+            if (responce.Success) {
+                navigate('/sign-in');
+            }
+        } catch (error) {
+            console.log(error)
         }
-        fetch();
-        // console.log(orgType)
-    }, [orgType])
-
-
-    const handleRegister = (data) => {
-        regitserUser({
-            ...data
-        })
-        console.log(data)
-        navigate('/sign-in');
     }
 
 
@@ -43,7 +37,7 @@ function SignUp() {
                     <NamedLogoIcon />
                     <h1 className='text-3xl font-bold font-serif'>Sign up</h1>
                 </div>
-                <form onSubmit={handleSubmit(handleRegister)}>
+                <form onSubmit={handleSubmit(handleRegister)} id='signup' name='signup'>
                     <div className='w-full space-y-5'>
                         <div className='w-full bg-[#252A30] rounded-lg ring-1 ring-gray relative'>
                             <select
@@ -180,7 +174,7 @@ function SignUp() {
                         </div>
                         <p className='text-body-text'>By creating an account, you agree our <span className='text-white'>terms of Service</span> and <span className='text-white'>privacy policy</span></p>
                         <Button onSubmit={() => disabled}
-                            text='Sign up'
+                            text={isLoading ? "Loading" : "Sign Up"}
                         />
                     </div>
 

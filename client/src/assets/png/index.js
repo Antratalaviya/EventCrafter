@@ -21,6 +21,7 @@ import publicEvent from './publicevent.png'
 import workshopEvent from './workshopevent.png'
 import ticket from './ticket.png'
 import businessEvent from './businessevent.png'
+import event_main_1 from "./event_main_1.png"
 
 export default {
     happy,
@@ -45,5 +46,6 @@ export default {
     publicEvent,
     workshopEvent,
     ticket,
-    businessEvent
+    businessEvent,
+    event_main_1
 }

@@ -2,7 +2,7 @@ import mongoose, { PipelineStage } from "mongoose";
 import { UserInput } from "../constants";
 import { User } from "../model/user.model";
 
-const getUserById = async (id: string) => {
+const getUserById = async (id: string | mongoose.Types.ObjectId) => {
   return await User.findById(id).select("-__v");
 };
 
@@ -35,6 +35,7 @@ const likeEventByUser = async (eventId: string, userId: string) => {
 
 const saveEventByUser = async (eventId: string, userId: string) => {
   let user = await User.findOne({
+    _id: userId,
     savedEvent: { $in: [new mongoose.Types.ObjectId(eventId)] }
   })
   if (user) {
@@ -60,21 +61,32 @@ const getSavedEventByUser = async (userId: string) => {
     {
       $lookup: {
         from: "events",
-        localField: 'savedEvent',
+        localField: "savedEvent",
         foreignField: "_id",
-        as: "eventSaved"
+        as: "savedEvents"
       }
     },
     {
       $unwind: {
-        path: '$eventSaved',
+        path: '$savedEvents',
         preserveNullAndEmptyArrays: true
       }
     },
     {
       $project: {
         _id: 0,
-        eventSaved: 1
+        type: "$savedEvents.type",
+        title: '$savedEvents.title',
+        street: "$savedEvents.street",
+        city: "$savedEvents.city",
+        country: "$savedEvents.country",
+        startDate: "$savedEvents.startDate",
+        photos: { $first: "$savedEvents.photos" },
+        likedBy: {
+          $size: {
+            $ifNull: ["$savedEvents.likedBy", []]
+          }
+        }
       }
     }
   ]
@@ -104,7 +116,17 @@ const getLikedEventByUser = async (userId: string) => {
     {
       $project: {
         _id: 0,
-        eventLiked: 1
+        type: "$eventLiked.type",
+        title: '$eventLiked.title',
+        street: "$eventLiked.street",
+        city: "$eventLiked.city",
+        country: "$eventLiked.country",
+        startDate: "$eventLiked.startDate",
+        likedBy: {
+          $size: {
+            $ifNull: ["$eventLiked.likedBy", []]
+          }
+        }
       }
     }
   ]
@@ -130,6 +152,74 @@ const subscribeUser = async (subscriberId: string, subscribedToId: string) => {
   }, { new: true })
 }
 
+const addEventToJoinedEvent = async (userId: mongoose.Types.ObjectId, eventId: mongoose.Types.ObjectId) => {
+  await User.findByIdAndUpdate(userId,
+    {
+      $push: {
+        joinedEvent: eventId
+      }
+    },
+    { new: true }
+  );
+  return;
+}
+
+const getAllUsers = async (keyword: string) => {
+  const pipeline: PipelineStage[] = [];
+  if (keyword) {
+    pipeline.push({
+      $match: {
+        $or: [
+          { name: { $regex: new RegExp(keyword, 'i') } },
+          { surname: { $regex: new RegExp(keyword, 'i') } }
+        ]
+      }
+    })
+  }
+  pipeline.push(
+    {
+      $project: {
+        _id: 1,
+        avatar: 1,
+        name: 1,
+        surname: 1
+      }
+    }
+  )
+
+  return await User.aggregate(pipeline);
+}
+
+const getUserProfile = async (userId: string) => {
+  const pipeline = [
+    {
+      $match: { _id: new mongoose.Types.ObjectId(userId) }
+    },
+    {
+      $project: {
+        email: 1,
+        name: 1,
+        surname: 1,
+        subscriber: {
+          $size: {
+            $ifNull: ["$subscriber", []]
+          }
+        },
+        subscribing: {
+          $size: {
+            $ifNull: ["$subscribing", []]
+          }
+        },
+        joinedEvent: {
+          $size: "$joinedEvent"
+        }
+      }
+    }
+  ]
+
+  return await User.aggregate(pipeline)
+}
+
 export default {
   getUserById,
   getUserByEmail,
@@ -138,5 +228,8 @@ export default {
   saveEventByUser,
   getSavedEventByUser,
   subscribeUser,
-  getLikedEventByUser
+  getLikedEventByUser,
+  addEventToJoinedEvent,
+  getAllUsers,
+  getUserProfile
 };

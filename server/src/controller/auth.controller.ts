@@ -38,8 +38,8 @@ const register = asyncHandler(async (req: Request, res: Response) => {
     await notificationService.createNotification({
       type: "register",
       message: NotificationMsg.USER_REGISTERED,
-      sender: user._id as string,
-      recipient: user._id as string,
+      sender: user._id,
+      recipient: user._id,
     })
 
     if (user) {
@@ -92,8 +92,8 @@ const login = asyncHandler(async (req: Request, res: Response) => {
     await notificationService.createNotification({
       type: "login",
       message: NotificationMsg.USER_LOGIN,
-      sender: user._id as string,
-      recipient: user._id as string,
+      sender: user._id,
+      recipient: user._id,
     })
     return res
       .status(status.OK)

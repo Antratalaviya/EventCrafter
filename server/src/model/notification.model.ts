@@ -23,6 +23,9 @@ const notificationSchema = new mongoose.Schema({
         type: String,
         required: true
     },
+    invitationId: {
+        type: String,
+    },
     createdAt: {
         type: Date,
         default: Date.now()

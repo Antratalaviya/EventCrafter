@@ -44,7 +44,7 @@ const createEvent = asyncHandler(async (req: Request, res: Response) => {
     }
 })
 
-const getEvent = asyncHandler(async (req: Request, res: Response) => {
+const getOwnEvents = asyncHandler(async (req: Request, res: Response) => {
     try {
         // let { page, } = req.query; it is required that's why we can't use
         let page: number =
@@ -63,11 +63,52 @@ const getEvent = asyncHandler(async (req: Request, res: Response) => {
             && req.query?.type || "";
         let sortby = typeof req.query?.sortby === "string"
             && req.query?.sortby || "";
+        // let eventExist = await eventService.getEventByUserId(req.user._id)
+        // if (!eventExist) {
+        //     return;
+        // }
+        // if (new Date(eventExist?.startDate).getTime() >= new Date(Date.now()).getTime()) {
+        //     if (eventExist.status !== 'cancelled') {
+        //         eventExist.status = 'upcoming'
+        //     }
 
-        let event = await eventService.getEventByUserId(req.user._id, page, limit, keyword, eventStatus, eventType, sortby);
+        // } else if (new Date(eventExist?.endDate).getTime() <= new Date(Date.now()).getTime()) {
+        //     if (eventExist.status !== 'cancelled') {
+        //         eventExist.status = "completed"
+        //     }
+        // }
+        // await eventExist.save();
+        let event = await eventService.getOwnEventsByUserId(req.user._id, page, limit, keyword, eventStatus, eventType, sortby);
+
         return res.status(status.OK)
             .json(
-                new ApiResponse(status.OK, { event }, AppString.EVENT_RETRIEVED)
+                new ApiResponse(status.OK, event, AppString.EVENT_RETRIEVED)
+            );
+    } catch (error) {
+        return res
+            .status(status.INTERNAL_SERVER_ERROR)
+            .json(
+                new ApiError(status.INTERNAL_SERVER_ERROR, (error as Error).message)
+            );
+    }
+})
+
+const getFullEvent = asyncHandler(async (req: Request, res: Response) => {
+    try {
+        const { eventId } = req.params;
+        let event = await eventService.getFullEventByEventId(eventId);
+
+        if (!event) {
+            return res
+                .status(status.BAD_REQUEST)
+                .json(
+                    new ApiError(status.BAD_REQUEST, AppString.EVENT_NOT_EXIST)
+                );
+        }
+
+        return res.status(status.OK)
+            .json(
+                new ApiResponse(status.OK, event, AppString.EVENT_RETRIEVED)
             );
     } catch (error) {
         return res
@@ -91,7 +132,7 @@ const likeEvent = asyncHandler(async (req: Request, res: Response) => {
         }
 
         let likeSavedUser = await userService.likeEventByUser(eventId, userId);
-        let likeSavedEvent = await eventService.likedEventByUser(eventId, userId);
+        let likeSavedEvent = await eventService.eventLikedByUser(eventId, userId);
 
         if (!likeSavedUser || !likeSavedEvent) {
             return res
@@ -125,9 +166,9 @@ const saveEvent = asyncHandler(async (req: Request, res: Response) => {
                 .json(new ApiError(status.NOT_FOUND, AppString.EVENT_NOT_FOUND));
         }
 
-        let likeSavedUser = await userService.saveEventByUser(eventId, userId);
+        let savedEventUser = await userService.saveEventByUser(eventId, userId);
 
-        if (!likeSavedUser) {
+        if (!savedEventUser) {
             return res
                 .status(status.INTERNAL_SERVER_ERROR)
                 .json(new ApiError(status.INTERNAL_SERVER_ERROR, AppString.EVENT_NOT_SAVED));
@@ -151,6 +192,13 @@ const sendInvitation = asyncHandler(async (req: Request, res: Response) => {
     try {
         const user = req.user
         const { recipientId, eventId } = req.body;
+        if (recipientId === user._id) {
+            return res
+                .status(status.BAD_REQUEST)
+                .json(
+                    new ApiError(status.BAD_REQUEST, AppString.RECIPIENT_IS_OWNER)
+                );
+        }
         const recipient = await userService.getUserById(recipientId)
 
         const event = await eventService.getEventById(eventId)
@@ -161,13 +209,14 @@ const sendInvitation = asyncHandler(async (req: Request, res: Response) => {
                     new ApiError(status.BAD_REQUEST, AppString.EVENT_RECIPIENT_NOT)
                 );
         }
-        let invitation = await invitationService.createInvitation(eventId, user._id, recipientId);
+        const invitation = await invitationService.createInvitation(eventId, user._id, recipientId);
 
         await notificationService.createNotification({
             type: "invitation",
             message: `${user.name} Invite ${event.title}`,
-            sender: user._id as string,
-            recipient: user._id as string,
+            sender: user._id,
+            recipient: user._id,
+            invitationId: invitation._id
         })
 
         return res
@@ -186,9 +235,33 @@ const sendInvitation = asyncHandler(async (req: Request, res: Response) => {
 
 const acceptInvitation = asyncHandler(async (req: Request, res: Response) => {
     try {
-        //send notif to owner of event 
-        //joined event save(User)
-        //participants add to event
+        const { invitationId } = req.params;
+        const invitation = await invitationService.getInvitationById(invitationId);
+
+        const event = await eventService.getEventById(invitation?.event!);
+        const recipient = await userService.getUserById(invitation?.recipient!);
+
+        if (!invitation || !event || !recipient) {
+            return res
+                .status(status.BAD_REQUEST)
+                .json(
+                    new ApiError(status.BAD_REQUEST, AppString.INVITAIION_NOT_EXIST)
+                );
+        }
+
+        await notificationService.createNotification({
+            type: "joinEvent",
+            message: `${recipient.name} Acceted Your ${event.title!}`,
+            sender: recipient._id,
+            recipient: invitation?.sender!,
+        })
+
+        await invitationService.acceptInvitation(invitationId)
+        await userService.addEventToJoinedEvent(recipient._id, event._id);
+        await eventService.addUserToParticipants(event._id, recipient._id,);
+
+        return res.status(status.OK).json(new ApiResponse(status.OK, {}, AppString.INVITATION_ACCEPT))
+
     } catch (error) {
         return res
             .status(status.INTERNAL_SERVER_ERROR)
@@ -200,7 +273,31 @@ const acceptInvitation = asyncHandler(async (req: Request, res: Response) => {
 
 const rejectInvitation = asyncHandler(async (req: Request, res: Response) => {
     try {
-        //send notif to owner of event 
+        const { invitationId } = req.params;
+        const invitation = await invitationService.getInvitationById(invitationId);
+
+        const event = await eventService.getEventById(invitation?.event!);
+        const recipient = await userService.getUserById(invitation?.recipient!);
+
+        if (!invitation || !event || !recipient) {
+            return res
+                .status(status.BAD_REQUEST)
+                .json(
+                    new ApiError(status.BAD_REQUEST, AppString.INVITAIION_NOT_EXIST)
+                );
+        }
+
+        await notificationService.createNotification({
+            type: "joinEvent",
+            message: `${recipient.name} Rejected Your ${event.title!}`,
+            sender: recipient._id,
+            recipient: invitation?.sender!
+        })
+
+        await invitationService.rejectInvitation(invitationId)
+
+        return res.status(status.OK).json(new ApiResponse(status.OK, {}, AppString.INVITATION_REJECT))
+
     } catch (error) {
         return res
             .status(status.INTERNAL_SERVER_ERROR)
@@ -212,7 +309,149 @@ const rejectInvitation = asyncHandler(async (req: Request, res: Response) => {
 
 const cancelEvent = asyncHandler(async (req: Request, res: Response) => {
     try {
+        const { eventId } = req.params;
+        const event = await eventService.getEventById(eventId);
 
+        if (!event) {
+            return res
+                .status(status.BAD_REQUEST)
+                .json(
+                    new ApiError(status.BAD_REQUEST, AppString.EVENT_NOT_EXIST)
+                );
+        }
+        const owner = await userService.getUserById(event.owner);
+        if (!owner) {
+            return res
+                .status(status.BAD_REQUEST)
+                .json(
+                    new ApiError(status.BAD_REQUEST, AppString.EVENT_OWNER_NOT_EXIST)
+                );
+        }
+        if (owner._id !== req.user._id) {
+            return res
+                .status(status.UNAUTHORIZED)
+                .json(
+                    new ApiError(status.UNAUTHORIZED, AppString.USER_NOT_OWNER)
+                );
+        }
+
+        let eve = await eventService.cancelEvent(eventId)
+        return res.status(status.OK).json(new ApiResponse(status.OK, { eve }, AppString.EVENT_CANCEL))
+    } catch (error) {
+        return res
+            .status(status.INTERNAL_SERVER_ERROR)
+            .json(
+                new ApiError(status.INTERNAL_SERVER_ERROR, (error as Error).message)
+            );
+    }
+})
+
+const getAllEvents = asyncHandler(async (req: Request, res: Response) => {
+    try {
+        let page: number =
+            typeof req.query?.page === "string"
+            && parseInt(req.query?.page) || 1;
+        let limit: number =
+            typeof req.query?.limit === "string"
+            && parseInt(req.query?.limit) || 10;
+
+        let keyword = typeof req.query?.keyword === "string"
+            && req.query?.keyword || "";
+
+        let eventType = typeof req.query?.type === "string"
+            && req.query?.type || "";
+        let sortby = typeof req.query?.sortby === "string"
+            && req.query?.sortby || "";
+        // let eventExist = await eventService.getEventByUserId(req.user._id)
+        // if (!eventExist) {
+        //     return;
+        // }
+        // if (new Date(eventExist?.startDate).getTime() >= new Date(Date.now()).getTime()) {
+        //     if (eventExist.status !== 'cancelled') {
+        //         eventExist.status = 'upcoming'
+        //     }
+
+        // } else if (new Date(eventExist?.endDate).getTime() <= new Date(Date.now()).getTime()) {
+        //     if (eventExist.status !== 'cancelled') {
+        //         eventExist.status = "completed"
+        //     }
+        // }
+        let event = await eventService.getAllEvents(req.user._id, page, limit, keyword, eventType, sortby);
+
+        return res.status(status.OK)
+            .json(
+                new ApiResponse(status.OK, event, AppString.EVENT_RETRIEVED)
+            );
+    } catch (error) {
+        return res
+            .status(status.INTERNAL_SERVER_ERROR)
+            .json(
+                new ApiError(status.INTERNAL_SERVER_ERROR, (error as Error).message)
+            );
+    }
+})
+
+const getAllInvitation = asyncHandler(async (req: Request, res: Response) => {
+    try {
+        const user = req.user;
+        const invitations = await invitationService.getInvitationBySenderId(user._id);
+
+        if (!invitations) {
+            return res
+                .status(status.OK)
+                .json(
+                    new ApiResponse(status.OK, {}, AppString.NO_INVITATION)
+                );
+        }
+
+        return res.status(status.OK).json(new ApiResponse(status.OK, invitations, AppString.INVITAIIONS))
+    } catch (error) {
+        return res
+            .status(status.INTERNAL_SERVER_ERROR)
+            .json(
+                new ApiError(status.INTERNAL_SERVER_ERROR, (error as Error).message)
+            );
+    }
+})
+
+const getAllParticipants = asyncHandler(async (req: Request, res: Response) => {
+    try {
+        const { eventId } = req.params;
+        const userId = req.user._id;
+        const participants = await eventService.getAllParticipants(userId, eventId);
+
+        if (!participants) {
+            return res
+                .status(status.OK)
+                .json(
+                    new ApiResponse(status.OK, {}, AppString.NO_PARTICIPANT)
+                );
+        }
+
+        return res.status(status.OK).json(new ApiResponse(status.OK, participants, AppString.PARTICIPANTS))
+    } catch (error) {
+        return res
+            .status(status.INTERNAL_SERVER_ERROR)
+            .json(
+                new ApiError(status.INTERNAL_SERVER_ERROR, (error as Error).message)
+            );
+    }
+})
+
+const getAllSendParticipants = asyncHandler(async (req: Request, res: Response) => {
+    try {
+        const { eventId } = req.params;
+        const recipients = await invitationService.getInvitationRecipientByEventId(eventId);
+
+        if (!recipients) {
+            return res
+                .status(status.OK)
+                .json(
+                    new ApiResponse(status.OK, {}, AppString.NO_PARTICIPANT)
+                );
+        }
+
+        return res.status(status.OK).json(new ApiResponse(status.OK, recipients, AppString.INVITAIIONS))
     } catch (error) {
         return res
             .status(status.INTERNAL_SERVER_ERROR)
@@ -224,8 +463,16 @@ const cancelEvent = asyncHandler(async (req: Request, res: Response) => {
 
 export default {
     createEvent,
-    getEvent,
+    getOwnEvents,
+    getFullEvent,
     likeEvent,
     saveEvent,
-    sendInvitation
+    sendInvitation,
+    acceptInvitation,
+    rejectInvitation,
+    cancelEvent,
+    getAllEvents,
+    getAllInvitation,
+    getAllParticipants,
+    getAllSendParticipants
 }

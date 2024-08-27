@@ -5,19 +5,18 @@ import { AppString } from "../utils/appString";
 import userService from "../service/user.service";
 import notificationService from "../service/notification.service";
 import invitationService from "../service/invitation.service";
+import eventService from "../service/event.service";
 
 
 const getUserProfile = asyncHandler(async (req: Request, res: Response) => {
     try {
-        const user = req.user;
-        return res.status(status.OK).json(new ApiResponse(status.OK, {
-            _id: user._id,
-            email: user.email,
-            name: user.name,
-            surname: user.surname,
-            profileImg: user.profileImg
-            // subscriber counts
-        }, AppString.USER_RETRIEVED));
+        const user = await userService.getUserProfile(req.user._id)
+        const eventsCreated = await eventService.getEventByUserId(req.user._id)
+        const newUser = {
+            ...user[0],
+            events: eventsCreated.length
+        }
+        return res.status(status.OK).json(new ApiResponse(status.OK, newUser, AppString.USER_RETRIEVED));
     } catch (error) {
         return res
             .status(status.INTERNAL_SERVER_ERROR)
@@ -31,8 +30,7 @@ const savedEventsByUser = asyncHandler(async (req: Request, res: Response) => {
     try {
         const userId = req.user._id;
         const eventSaved = await userService.getSavedEventByUser(userId);
-        let events = eventSaved.map((e) => e.eventSaved)
-        return res.status(status.OK).json(new ApiResponse(status.OK, events, AppString.SAVED_EVENTS))
+        return res.status(status.OK).json(new ApiResponse(status.OK, eventSaved, AppString.SAVED_EVENTS))
     } catch (error) {
         return res
             .status(status.INTERNAL_SERVER_ERROR)
@@ -46,8 +44,7 @@ const likedEventsByUser = asyncHandler(async (req: Request, res: Response) => {
     try {
         const userId = req.user._id;
         const eventLiked = await userService.getLikedEventByUser(userId);
-        let events = eventLiked.map((e) => e.eventLiked)
-        return res.status(status.OK).json(new ApiResponse(status.OK, events, AppString.LIKED_EVENTS))
+        return res.status(status.OK).json(new ApiResponse(status.OK, eventLiked, AppString.LIKED_EVENTS))
     } catch (error) {
         return res
             .status(status.INTERNAL_SERVER_ERROR)
@@ -109,8 +106,8 @@ const subscribeUser = asyncHandler(async (req: Request, res: Response) => {
         await notificationService.createNotification({
             type: "subscribe",
             message: `${subscribedToUser.name} Started Subscribe You`,
-            sender: user._id as string,
-            recipient: user._id as string,
+            sender: user._id,
+            recipient: user._id,
         })
 
         return res.status(status.OK).json(new ApiResponse(status.OK, {}, AppString.SUBSCRIBED))
@@ -123,12 +120,28 @@ const subscribeUser = asyncHandler(async (req: Request, res: Response) => {
     }
 })
 
+const getAllUsers = asyncHandler(async (req: Request, res: Response) => {
+    try {
 
+        let keyword = typeof req.query?.keyword === "string"
+            && req.query?.keyword || "";
+
+        const users = await userService.getAllUsers(keyword)
+        return res.status(status.OK).json(new ApiResponse(status.OK, users, AppString.USER_RETRIEVED));
+    } catch (error) {
+        return res
+            .status(status.INTERNAL_SERVER_ERROR)
+            .json(
+                new ApiError(status.INTERNAL_SERVER_ERROR, (error as Error).message)
+            );
+    }
+})
 export default {
     getUserProfile,
     savedEventsByUser,
     getAllNotification,
     getAllInvitation,
     subscribeUser,
-    likedEventsByUser
+    likedEventsByUser,
+    getAllUsers
 }

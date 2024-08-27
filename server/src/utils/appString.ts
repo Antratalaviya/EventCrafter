@@ -35,6 +35,11 @@ export enum AppString {
   EVENT_NOT_SAVED = "event save failed!! please try again",
   EVENT_LIKED = "event liked successfully",
   EVENT_SAVED = "event saved successfully",
+  EVENT_CANCEL = "event cancelled successfully",
+  EVENT_NOT_EXIST = "event does not exist",
+  EVENT_OWNER_NOT_EXIST = "event owner does not exist",
+
+  USER_NOT_OWNER = "user is not owner of this event",
 
   SAVED_EVENTS = "saved events retrieved successfully",
   LIKED_EVENTS = "liked events retrieved successfully",
@@ -43,15 +48,20 @@ export enum AppString {
   NOTIFICATIONS = "notification retrieved successfully",
 
   EVENT_RECIPIENT_NOT = "event or recipient does not exist",
+  RECIPIENT_IS_OWNER = "recipient is owner of the event",
 
   INVITATION_SENT = "invitation sent successfully",
   INVITATION_ACCEPT = "invitation accepted successfully",
   INVITATION_REJECT = "invitation rejected!!",
   INVITAIIONS = 'all invitations retrieved',
   NO_INVITATION = "no new invitation",
+  INVITAIION_NOT_EXIST = "no invitation exist",
 
   SUBSCRIBED = "user subscribed successfully",
-  SUBSCRIBE_FAILED = "subscribe failed!! please try again"
+  SUBSCRIBE_FAILED = "subscribe failed!! please try again",
+
+  NO_PARTICIPANT = "no new participants",
+  PARTICIPANTS = 'all participantss retrieved',
 
 };
 

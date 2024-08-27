@@ -118,5 +118,5 @@ eventSchema.pre("save", async function (this: EventDocument, next) {
     next();
 })
 
-export const Event = mongoose.model<EventDocument>(Collection.MODEL_EVENT, eventSchema);
+export const Event = mongoose.model(Collection.MODEL_EVENT, eventSchema);
 

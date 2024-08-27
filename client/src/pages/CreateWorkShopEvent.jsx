@@ -6,7 +6,7 @@ import Modal from '../component/Modal/Modal';
 import Input from '../component/Input';
 import { EventCategory, offers } from '../lib/consts';
 
-function CreatePubEvent() {
+function CreateWorkShopEvent() {
     const [progress, setProgress] = useState(1);
     const [openSelect, setOpenSelect] = useState(false);
     const [openConsent, setOpenConsent] = useState(false);
@@ -19,7 +19,7 @@ function CreatePubEvent() {
         title: "",
         subtitle1: "",
         subtitle2: "",
-        category: "Select public event category",
+        category: "Select Work Shop Event Category",
         createDate: "",
         expiresIn: "",
         startDate: "",
@@ -190,8 +190,41 @@ function CreatePubEvent() {
                                             <TimeIcon className="mr-3" />
                                         </Input>
                                     </div>
-
-
+                                    <div className='space-y-5 col-span-1 mt-2'>
+                                        <p className='text-white'>Ticket / invitation quantity</p>
+                                        <Input
+                                            type={'text'}
+                                            placeholder={'VIP Ticket'}
+                                            name={'VIP'}
+                                            onChange={handleChange}
+                                            className={'col-span-1'}
+                                        />
+                                        <Input
+                                            type={'text'}
+                                            placeholder={'Economy Ticket'}
+                                            name={'Economy'}
+                                            onChange={handleChange}
+                                            className={'col-span-1'}
+                                        />
+                                    </div>
+                                    <div className='space-y-5 col-span-1 mt-2'>
+                                        <p className='text-white'>Ticket Price</p>
+                                        <Input
+                                            type={'text'}
+                                            placeholder={'VIP Ticket Price'}
+                                            name={'VIP_Price'}
+                                            onChange={handleChange}
+                                            className={'col-span-1'}
+                                        />
+                                        <Input
+                                            type={'text'}
+                                            placeholder={'Economy Ticket Price'}
+                                            name={'Economy_price'}
+                                            onChange={handleChange}
+                                            className={'col-span-1'}
+                                        />
+                                    </div>
+                                    <div className='col-span-1' />
                                     <div className='space-y-2'>
                                         <p className='text-white'>Event Offer</p>
                                         <div className='bg-[#252A30] rounded-lg ring-1 col-span-1 ring-gray flex items-center'>
@@ -233,7 +266,6 @@ function CreatePubEvent() {
                                         </div>
                                     </div>
                                     <div className='col-span-2' />
-
                                 </div>
                                 <div className='flex gap-2 flex-wrap'>
                                     {event.offers.map((item, index) => (
@@ -565,7 +597,7 @@ function CreatePubEvent() {
     );
 }
 
-export default CreatePubEvent
+export default CreateWorkShopEvent
 
 const ProgressBar = ({ progress }) => {
     return (

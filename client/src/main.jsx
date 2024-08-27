@@ -13,6 +13,10 @@ import store from "./store/store.js"
 import SignUp from './pages/SignUp.jsx'
 import PageNotFound from './pages/PageNotFound.jsx'
 import CreatePubEvent from './pages/CreatePubEvent.jsx'
+import CreateWorkShopEvent from './pages/CreateWorkShopEvent.jsx'
+import CreateTicketEvent from './pages/CreateTicketEvent.jsx'
+import CreateBusinessEvent from './pages/CreateBusinessEvent.jsx'
+import OwnEvents from './pages/OwnEvents.jsx'
 
 const router = createBrowserRouter(
   createRoutesFromElements(
@@ -22,6 +26,10 @@ const router = createBrowserRouter(
         <Route path='create-event' element={<CreateEventPage />} />
         <Route path='create-event/create-private-event' element={<CreatePriEvent />} />
         <Route path='create-event/create-public-event' element={<CreatePubEvent />} />
+        <Route path='create-event/create-workshop-event' element={<CreateWorkShopEvent />} />
+        <Route path='create-event/create-ticket-event' element={<CreateTicketEvent />} />
+        <Route path='create-event/create-business-event' element={<CreateBusinessEvent />} />
+        <Route path='own-events' element={<OwnEvents />} />
       </Route>
       <Route path='/sign-in' element={<Login />} />
       <Route path='/sign-up' element={<SignUp />} />

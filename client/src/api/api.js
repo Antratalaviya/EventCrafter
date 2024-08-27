@@ -3,6 +3,7 @@ import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react'
 import { getItem, removeItem, setItem } from "../utils/localStorageUtility";
 import { CONSTS } from "../utils/consts";
 import { authLogin } from "../store/AuthSlice";
+import { postEvents } from "../store/EventSlice";
 
 export const baseQueryIntercepter = (args) =>{
   const baseQuery = fetchBaseQuery(args);
@@ -32,7 +33,7 @@ export const api = createApi({
     },
   },
 ),
-  tagTypes : ['Auth'],
+  tagTypes : ['Auth',"Notification"],
   endpoints : (builder)=>({
     register : builder.mutation({
       query : (userDetails) => ({ 
@@ -56,7 +57,8 @@ export const api = createApi({
         console.log("Login failed !! ", error);
        }
       },
-      invalidatesTags : ['Auth']
+      invalidatesTags : ['Auth'],
+      providesTags:["Notification"]
     }),
     getUser : builder.query({
       query : ()=>({
@@ -72,6 +74,75 @@ export const api = createApi({
         }
        },
       providesTags : ['Auth']
+    }),
+    getAllNotification : builder.query({
+      query : ()=> ({
+        url :"/user/notifications",
+        method : "GET"
+      }),
+      invalidatesTags: ["Notification"],
+    }),
+    getAllEvents : builder.query({
+      query : ({keyword, filter})=>{
+        let queryString = '';
+
+        if (keyword) {
+          queryString += `keyword=${keyword}`;
+        }
+
+        if (filter) {
+          Object.keys(filter).forEach((key) => {
+            const value = filter[key];
+            if (value) {
+              queryString += `&${key}=${value}`;
+            }
+          });
+        }
+
+        return `/event?${queryString}`;
+      },
+       providesTags : ['Auth']
+    }),
+    getAllOwnEvents : builder.query({
+      query : ({keyword, filter})=>{
+        let queryString = '';
+
+        if (keyword) {
+          queryString += `keyword=${keyword}`;
+        }
+
+        if (filter) {
+          Object.keys(filter).forEach((key) => {
+            const value = filter[key];
+            if (value) {
+              queryString += `&${key}=${value}`;
+            }
+          });
+        }
+
+        return `/event/own?${queryString}`;
+      },
+      onQueryStarted : async (args, {dispatch,  queryFulfilled} )=>{
+        try {
+         const {data} = await queryFulfilled;
+          dispatch(postEvents(data.data))
+        } catch (error) {
+         console.log("event retrieve failed !! ", error);
+        }
+       },
+    }),
+    likeEvent : builder.mutation({
+      query : (eventId)=> ({
+        url : `/event/like/${eventId}`,
+        method : "POST"
+      })
+    }),
+    saveEvent : builder.mutation({
+      query : (eventId)=> ({
+        url : `/event/save/${eventId}`,
+        method : "POST"
+      }),
+   
     })
   })
 })
@@ -79,7 +150,12 @@ export const api = createApi({
 export const { 
   useRegisterMutation, 
   useLoginMutation,
-  useGetUserQuery
+  useGetUserQuery,
+  useGetAllEventsQuery,
+  useLikeEventMutation,
+  useSaveEventMutation,
+  useGetAllNotificationQuery,
+  useGetAllOwnEventsQuery,
 } = api;
 
 // class AuthService {

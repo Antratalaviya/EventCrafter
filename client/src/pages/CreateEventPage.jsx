@@ -29,7 +29,7 @@ function CreateEventPage() {
             className: "bg-[#E7EFFF] text-[#000000] border-[#000000]",
             btnText: "text-[#ffffff]",
             btnClr: "bg-[#000000]",
-            title: "Ticket",
+            title: "Ticket Event",
             img: img.ticket
         },
         {

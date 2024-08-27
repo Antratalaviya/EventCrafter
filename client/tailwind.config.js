@@ -25,10 +25,12 @@ export default {
       "icon-border": "#191D26",
       "body-text": "#9697A1",
       "black-light": "#151A21",
+      red: "#ff1a1a",
+      orange: "#F99460",
     },
     extend: {
       fontFamily: {
-        sans: ["Plus Jakarta", "sans-serif"],
+        sans: ["Plus Jakarta Sans", "sans-serif"],
       },
       boxShadow: {
         "custom-black": "0px 0px 35px 0px #000000",

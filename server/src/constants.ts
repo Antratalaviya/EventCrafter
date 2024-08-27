@@ -10,11 +10,12 @@ export interface UserInput {
 }
 
 export interface UserDocument extends UserInput, Document {
+  _id: mongoose.Types.ObjectId;
   orgName: string;
   passcode: number;
   profileImg: string;
   refreshToken: string;
-  savedEvent: Array<string>;
+  savedEvent: Array<mongoose.Types.ObjectId>;
   createdAt: Date;
   updatedAt: Date;
   isPasswordMatched(password: string): Promise<boolean>;
@@ -48,6 +49,7 @@ export interface EventInput {
 }
 
 export interface EventDocument extends EventInput, Document {
+
   videoFile: {
     url: string
   };
@@ -57,13 +59,14 @@ export interface EventDocument extends EventInput, Document {
   updatedAt: Date;
 }
 export interface UserTokenPayload {
-  _id: string;
+  _id: mongoose.Types.ObjectId;
   email: string;
 }
 
 export interface NotificationIp {
-  sender: string;
-  recipient: string;
+  sender: mongoose.Types.ObjectId;
+  recipient: mongoose.Types.ObjectId;
+  invitationId?: mongoose.Types.ObjectId;
   message: string;
   type: string;
 }

@@ -1,3 +1,4 @@
+import mongoose, { PipelineStage } from "mongoose";
 import { NotificationIp } from "../constants";
 import { Notification } from "../model/notification.model"
 
@@ -6,9 +7,41 @@ const createNotification = async (notification: NotificationIp) => {
 }
 
 const getAllNotification = async (userId: string) => {
-    return await Notification.findOne({
-        recipient: userId
-    })
+    const pipeline: PipelineStage[] = [
+        {
+            $match: { recipient: new mongoose.Types.ObjectId(userId) }
+        },
+        {
+            $sort: {
+                createdAt: -1
+            }
+        },
+        {
+            $lookup: {
+                from: "users",
+                localField: "recipient",
+                foreignField: "_id",
+                as: "user"
+            }
+        }, {
+            $unwind: {
+                path: "$user",
+                preserveNullAndEmptyArrays: true
+            }
+        },
+        {
+            $project: {
+                _id: 1,
+                avatar: "$user.avatar",
+                type: 1,
+                message: 1,
+                isRead: 1,
+                createdAt: 1,
+                invitationId: 1
+            }
+        }
+    ]
+    return await Notification.aggregate(pipeline)
 }
 
 export default {

@@ -9,12 +9,18 @@ import { useLoginMutation } from '../api/api'
 function Login() {
   const [passType, setPassType] = useState('password')
   const { register, handleSubmit } = useForm();
-  const [loginUser, { isError, isLoading, isSuccess, error }] = useLoginMutation();
+  const [loginUser, { isLoading }] = useLoginMutation();
   const navigate = useNavigate();
 
-  const handleLogin = (data) => {
-    loginUser({ email: data.email, password: data.password })
-    navigate('/');
+  const handleLogin = async (data) => {
+    try {
+      let responce = await loginUser({ email: data.email, password: data.password }).unwrap();
+      if (responce.success) {
+        navigate('/');
+      }
+    } catch (error) {
+      console.log("error : ", error)
+    }
   }
 
   return (
@@ -24,7 +30,7 @@ function Login() {
           <NamedLogoIcon />
           <h1 className='text-3xl font-bold font-serif'>Sign In</h1>
         </div>
-        <form onSubmit={handleSubmit(handleLogin)}>
+        <form onSubmit={handleSubmit(handleLogin)} id='login' name='login'>
           <div className='w-full space-y-5'>
             <div className='relative w-full'>
               <EmailIcon className="absolute top-1/2 left-2 transform -translate-y-1/2" />
@@ -58,7 +64,7 @@ function Login() {
               </Input>
             </div>
             <Button
-              text='Sign in'
+              text={isLoading ? "Loading" : "Sign in"}
             />
           </div>
         </form>

@@ -41,8 +41,9 @@ const userSchema = new mongoose.Schema(
       type: String,
       required: true,
     },
-    profileImg: {
+    avatar: {
       type: String,
+      default: "abc"
     },
     refreshToken: {
       type: String,

@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useEffect, useReducer, useState } from 'react'
 import { img } from '../assets/assets'
 import { DropDownIcon } from '../assets/svg/Icon'
 import EventTypeBox from '../component/events/EventTypeBox'
@@ -7,9 +7,26 @@ import MaxHome from '../component/max/MaxHome'
 import EventsHome from '../component/events/EventsHome'
 import { useMax } from '../context/useMax'
 import SecurityMode from '../component/events/SecurityMode'
+import { Link } from 'react-router-dom'
+import { useCurrLocation } from '../context/useCurrLocation'
+import { useGetAllEventsQuery } from '../api/api'
 
 function HomePage() {
   const { active } = useMax();
+  const { data, isSuccess } = useGetAllEventsQuery("");
+  const [filterEvents, setFilterEvents] = useState([])
+  const { setPageName } = useCurrLocation();
+
+  useEffect(() => {
+    if (isSuccess) {
+      setFilterEvents(data?.data)
+    }
+  }, [data])
+
+  const filterEvent = (key) => {
+    setFilterEvents(filterEvents.filter((e) => (e.type === key)))
+  }
+
   return (
     <div className='grid grid-flow-col grid-cols-12 bg-background p-5 gap-5 overflow-y-scroll'>
       <div className='col-span-8 space-y-5'>
@@ -20,23 +37,20 @@ function HomePage() {
           <div style={{ boxShadow: "0px 4px 4px 0px #00000040" }} className='flex flex-col p-4 space-y-5'>
             <p className='text-white text-base tracking-wider'>Events</p>
             <div className='flex gap-x-2'>
-              <button className='focus:bg-red-gradient focus:text-white focus:border-none bg-red-gradient/10 text-red-gradient border border-red-gradient/50 rounded-full px-4 py-1 text-sm'>
-                Private
-              </button>
-              <button className='focus:bg-public focus:text-white focus:border-none bg-public/10 text-public border border-public/50 rounded-full px-4 py-1 text-sm'>
+              <button className='focus:bg-public focus:text-white focus:border-none bg-public/10 text-public border border-public/50 rounded-full px-4 py-1 text-sm' onClick={() => filterEvent('public')}>
                 Public
               </button>
-              <button className='focus:bg-workshop focus:text-white focus:border-none bg-workshop/10 text-workshop border border-workshop/50 rounded-full px-4 py-1 text-sm'>
+              <button className='focus:bg-workshop focus:text-white focus:border-none bg-workshop/10 text-workshop border border-workshop/50 rounded-full px-4 py-1 text-sm' onClick={() => filterEvent('workshop')}>
                 Workshop
               </button>
-              <button className='focus:bg-ticket focus:text-white focus:border-none bg-ticket/10 text-ticket border border-ticket/50 rounded-full px-4 py-1 text-sm'>
+              <button className='focus:bg-ticket focus:text-white focus:border-none bg-ticket/10 text-ticket border border-ticket/50 rounded-full px-4 py-1 text-sm' onClick={() => filterEvent('ticket')}>
                 Ticket
               </button>
-              <button className='focus:bg-primary focus:text-white focus:border-none bg-primary/10 text-primary border border-primary/50 rounded-full px-4 py-1 text-sm'>
+              <button className='focus:bg-red-gradient focus:text-white focus:border-none bg-red-gradient/10 text-red-gradient border border-red-gradient/50 rounded-full px-4 py-1 text-sm' onClick={() => filterEvent('business')}>
                 Business
               </button>
             </div>
-            {active ? <SecurityMode /> : <EventsHome />}
+            {active ? <SecurityMode /> : <EventsHome events={filterEvents} />}
           </div>
         </div>
 
@@ -55,11 +69,21 @@ function HomePage() {
           </div>
 
         </div>
-        <div className='space-y-4'>
-          <EventTypeBox img={img.eventType1} event="Event on Map" />
-          <EventTypeBox img={img.eventType3} event="Own Events" />
-          <EventTypeBox img={img.eventType3} event="Properties Booking" />
-          <EventTypeBox img={img.eventType4} event="News" />
+        <div className='flex flex-col space-y-4'>
+          <Link to={'/'}  >
+            <EventTypeBox img={img.eventType1} event="Event on Map" />
+          </Link>
+          <Link to={'/own-events'} onClick={() => setPageName('Own Events')} >
+            <EventTypeBox img={img.eventType3} event="Own Events" />
+          </Link>
+          <Link to={'/'}>
+            <EventTypeBox img={img.eventType3} event="Properties Booking" />
+          </Link>
+          <Link to={'/'}>
+            <EventTypeBox img={img.eventType4} event="News" />
+          </Link>
+
+
         </div>
       </div>
     </div>

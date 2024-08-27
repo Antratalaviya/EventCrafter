@@ -4,10 +4,13 @@ import { createContext, useContext, useState } from "react";
 const CurrLocationContext = createContext();
 
 export const LocationProvider = ({ children }) => {
-    const [loc, setLoc] = useState('My Home');
+    const [loc, setLoc] = useState('home');
+    const [pageName, setPageName] = useState('My Home');
     return <CurrLocationContext.Provider value={{
         loc,
-        setLoc
+        setLoc,
+        pageName,
+        setPageName
     }}>
         {children}
     </CurrLocationContext.Provider>

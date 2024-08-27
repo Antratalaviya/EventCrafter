@@ -1,16 +1,18 @@
 import React, { useEffect, useRef, useState } from 'react'
 import Button from '../component/Button';
-import { AddCircleIcon, CalenderIcon, CrossIcon, CurrectIcon, DownIcon, FileIcon, FoodIcon, GalleryIcon, PdfIcon, SelectIcon, TimeIcon, VideoIcon } from '../assets/svg/Icon';
+import { AddCircleIcon, CalenderIcon, CrossIcon, CurrectIcon, DownIcon, FileIcon, GalleryIcon, InviteIcon, LinkIcon, PdfIcon, SelectIcon, TimeIcon, VideoIcon } from '../assets/svg/Icon';
 import '../index.css'
 import Modal from '../component/Modal/Modal';
 import Input from '../component/Input';
-import { EventCategory } from '../lib/consts';
+import { EventCategory, offers } from '../lib/consts';
+import { img } from '../assets/assets';
 
 function CreatePriEvent() {
     const [progress, setProgress] = useState(1);
     const [openSelect, setOpenSelect] = useState(false);
     const [openConsent, setOpenConsent] = useState(false);
     const [openCat, setOpenCat] = useState(false);
+    const [acceptConcent, setAcceptConcent] = useState(false);
     const fileInputRef = useRef(null);
     const videoInputRef = useRef(null);
     const imgInputRef = useRef(null);
@@ -36,48 +38,7 @@ function CreatePriEvent() {
         photos: [],
     });
 
-    const [offersToSelect, setOfferToSelect] = useState([
-        {
-            text: 'Paramedic',
-            icon: <FoodIcon />,
-            checked: false
-        },
-        {
-            text: 'Toilets',
-            icon: <FoodIcon />,
-            checked: false
-        },
-        {
-            text: 'Handicapped accessible',
-            icon: <FoodIcon />,
-            checked: false
-        },
-        {
-            text: 'Food',
-            icon: <FoodIcon />,
-            checked: false
-        },
-        {
-            text: 'Vegan',
-            icon: <FoodIcon />,
-            checked: false
-        },
-        {
-            text: 'Music',
-            icon: <FoodIcon />,
-            checked: false
-        },
-        {
-            text: 'Non Alcohol',
-            icon: <FoodIcon />,
-            checked: false
-        },
-        {
-            text: 'Drink',
-            icon: <FoodIcon />,
-            checked: false
-        },
-    ]);
+    const [offersToSelect, setOfferToSelect] = useState(offers);
 
     const handleChange = (e) => {
         setEvent({
@@ -99,10 +60,13 @@ function CreatePriEvent() {
 
     const decreaseProgress = () => {
         setProgress((prev) => Math.max(prev - 1, 1));
+        if (acceptConcent) {
+            setAcceptConcent(false)
+        }
     };
     return (
         <div className='overflow-y-scroll overflow-x-hidden h-screen'>
-            <div style={{ boxShadow: "0px 4px 4px 0px #00000040" }} className="bg-black-light p-5 m-5 rounded-xl border-2 border-stroke relative text-white">
+            <div style={{ boxShadow: "0px 4px 4px 0px #00000040" }} className={`bg-black-light p-5 m-5 rounded-xl border-2 border-stroke relative text-white ${progress > 4 && "hidden"}`}>
                 <ProgressBar progress={progress} />
                 <div className="p-4 border-b-2 border-body-text">
                     <form className='flex justify-start'>
@@ -311,7 +275,15 @@ function CreatePriEvent() {
                                     {event.offers.map((item, index) => (
                                         <label key={index} className='cursor-pointer relative inline-flex items-center' >
                                             <div className={`py-2 rounded-full cursor-pointer mt-2 w-full flex justify-center gap-2 items-center bg-dark px-3`}>
-                                                <FoodIcon />
+                                                <div>
+                                                    {offersToSelect
+                                                        .filter((offer) => offer.text === item)
+                                                        .map((offer) => (
+                                                            <div key={offer.text}>
+                                                                {offer.icon}
+                                                            </div>
+                                                        ))}
+                                                </div>
                                                 <p>{item}</p>
                                                 <div
                                                     onClick={() => {
@@ -458,7 +430,7 @@ function CreatePriEvent() {
                                 <div className='bg-[#252A30] rounded-lg ring-1 ring-gray'>
                                     <textarea
                                         type="text"
-                                        placeholder='Rules, conditions, plans, notes, documents etc'
+                                        placeholder='Please describe your event in more detail so that you arouse curiosity and your visitors know what to expect at yours. Upload an agenda if you have one. Think of the images you can use too. Maybe also pictures of the location or what you think what could be interesting'
                                         name='description'
                                         onChange={handleChange}
                                         maxLength={200}
@@ -543,7 +515,7 @@ function CreatePriEvent() {
                                         <li>In order to create a private event, you must select “Private event - Without promotion”.</li>
                                     </div>
                                 </div>
-                                <div className='space-y-2'>
+                                {/* <div className='space-y-2'>
                                     <p>Are you looking for sponsors?</p>
                                     <div className='flex items-center gap-3'>
                                         <label htmlFor="confirm1" className='flex gap-2 cursor-pointer'>
@@ -560,8 +532,8 @@ function CreatePriEvent() {
                                             No
                                         </label>
                                     </div>
-                                </div>
-                                <div className='grid grid-cols-3 gap-5'>
+                                </div> */}
+                                {/* <div className='grid grid-cols-3 gap-5'>
                                     <div className='col-span-1 space-y-2'>
                                         <p>Time for sponsorship</p>
                                         <Input
@@ -592,11 +564,10 @@ function CreatePriEvent() {
                                             onChange={handleChange}
                                         />
                                     </div>
-                                </div>
+                                </div> */}
                             </div>
                         }
                     </form>
-
                 </div>
                 <div className="mt-4 ml-auto w-1/5 gap-2 flex">
                     <Button
@@ -631,11 +602,103 @@ function CreatePriEvent() {
                     </div>
                     <div className='w-full space-y-3'>
                         <p className='text-body-text'>You accept this declaration of consent?</p>
-                        <Button text={'I Accept'} onEvent={() => setOpenConsent(false)} />
-                        <Button text={'I Do not accept'} className='bg-dark' onEvent={() => setOpenConsent(false)} />
+                        <Button text={'I Accept'} onEvent={() => { setOpenConsent(false); setAcceptConcent(true); setProgress(5) }} />
+                        <Button text={'I Do not accept'} className='bg-dark' onEvent={() => { setOpenConsent(false); setAcceptConcent(false) }} />
                     </div>
                 </div>
             </Modal>
+            {acceptConcent && (
+                <div className='w-full text-white p-5 space-y-5'>
+                    <div className='flex gap-5'>
+                        <Input
+                            placeholder="Invite to event via link"
+                            className="col-span-1 w-full flex items-center pr-5"
+                        >
+                            <LinkIcon />
+                        </Input>
+                        <Input
+                            placeholder="Add Participants"
+                            className="col-span-1 w-full flex items-center pr-5"
+                        >
+                            <InviteIcon />
+                        </Input>
+                    </div>
+                    <div className='flex flex-col gap-5 w-full rounded-lg bg-black-light p-5' >
+                        <h1>Participate Members</h1>
+                        <div className='flex gap-5 items-center'>
+                            <div className='bg-public rounded-md flex items-center gap-2 p-2'>
+                                <SelectIcon />
+                                <p>{`Accepted(14)`}</p>
+                            </div>
+                            <div className='bg-red rounded-md flex items-center gap-2 p-2'>
+                                <AddCircleIcon className="rotate-45 fill-white stroke-red" />
+                                <p>{`Rejected(14)`}</p>
+                            </div>
+                            <div className='bg-yellow rounded-md flex items-center gap-2 p-2'>
+                                <TimeIcon />
+                                <p>{`Pending(14)`}</p>
+                            </div>
+                        </div>
+                        <div className='flex flex-col justify-start space-y-5'>
+                            <div className='flex items-center justify-between'>
+                                <div className='flex items-center gap-5 w-[70%]'>
+                                    <div className='rounded-full size-16 overflow-hidden'>
+                                        <img src={img.p3} alt="profile_img" className='h-16 w-24' />
+                                    </div>
+                                    <div className='flex flex-col w-[80%]'>
+                                        <p className='text-white font-medium'>Clara Tolson </p>
+                                    </div>
+                                </div>
+                                <div className='bg-public/10 rounded-md flex items-center gap-2 py-2 px-4 text-public'>
+                                    <SelectIcon fill="#25d695" />
+                                    <p>{`Accepted`}</p>
+                                </div>
+                            </div>
+                            <div className='flex items-center justify-between'>
+                                <div className='flex items-center gap-5 w-[70%]'>
+                                    <div className='rounded-full size-16 overflow-hidden'>
+                                        <img src={img.p2} alt="profile_img" className='h-16 w-24' />
+                                    </div>
+                                    <div className='flex flex-col w-[80%]'>
+                                        <p className='text-white font-medium'>Clara Tolson </p>
+                                    </div>
+                                </div>
+                                <div className='bg-yellow/10 rounded-md flex items-center gap-2 py-2 px-5 text-yellow'>
+                                    <TimeIcon className="stroke-yellow" />
+                                    <p>{`Pending`}</p>
+                                </div>
+                            </div>
+                            <div className='flex items-center justify-between'>
+                                <div className='flex items-center gap-5 w-[70%]'>
+                                    <div className='rounded-full size-16 overflow-hidden'>
+                                        <img src={img.p4} alt="profile_img" className='h-16 w-24' />
+                                    </div>
+                                    <div className='flex flex-col w-[80%]'>
+                                        <p className='text-white font-medium'>Clara Tolson </p>
+                                    </div>
+                                </div>
+                                <div className='bg-red/10 rounded-md flex items-center gap-2 py-2 px-5 text-red'>
+                                    <AddCircleIcon className="rotate-45 fill-red stroke-black-light" />
+                                    <p>{`Rejected`}</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div className="mt-4 ml-auto w-1/5 gap-2 flex">
+                        <Button
+                            onEvent={decreaseProgress}
+                            className="bg-dark"
+                        >
+                            Cancel
+                        </Button>
+                        <Button
+
+                        >
+                            Next
+                        </Button>
+                    </div>
+                </div>
+            )}
         </div>
     );
 }

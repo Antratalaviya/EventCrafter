@@ -6,13 +6,24 @@ const router = express.Router();
 
 router.post('/', authMiddleware.verifyUserAccess, eventController.createEvent)
 
-router.get('/', authMiddleware.verifyUserAccess, eventController.getEvent);
+router.get('/', authMiddleware.verifyUserAccess, eventController.getAllEvents);
+router.get('/own', authMiddleware.verifyUserAccess, eventController.getOwnEvents);
+router.get('/:eventId', authMiddleware.verifyUserAccess, eventController.getFullEvent);
+
 
 router.post('/like/:eventId', authMiddleware.verifyUserAccess, eventController.likeEvent);
-
 router.post('/save/:eventId', authMiddleware.verifyUserAccess, eventController.saveEvent);
 
+router.get('/invitations', authMiddleware.verifyUserAccess, eventController.getAllInvitation);
+router.get('/send/invitations/:eventId', authMiddleware.verifyUserAccess, eventController.getAllSendParticipants);
 router.post('/invite', authMiddleware.verifyUserAccess, eventController.sendInvitation);
+router.post('/invite/accept/:invitationId', authMiddleware.verifyUserAccess, eventController.acceptInvitation);
+router.post('/invite/reject/:invitationId', authMiddleware.verifyUserAccess, eventController.rejectInvitation);
+router.post('/cancel/:eventId', authMiddleware.verifyUserAccess, eventController.cancelEvent);  //to test
+
+router.get('/participants/:eventId', authMiddleware.verifyUserAccess, eventController.getAllParticipants);
+
+
 
 export default router;
 
