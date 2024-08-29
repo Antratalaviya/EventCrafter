@@ -33,7 +33,7 @@ export default {
         sans: ["Plus Jakarta Sans", "sans-serif"],
       },
       boxShadow: {
-        "custom-black": "0px 0px 35px 0px #000000",
+        "custom-black": "0px 4px 4px 0px #00000040",
       },
     },
   },

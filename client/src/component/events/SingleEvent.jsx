@@ -1,6 +1,6 @@
 import React, { useState } from 'react'
 import ProfilesComponent from '../ProfilesComponent'
-import { LikeIcon, LocationFillIcon, SaveIcon, StarIcon } from '../../assets/svg/Icon'
+import { EditIcon, LikeIcon, LocationFillIcon, SaveIcon, ShareIcon, StarIcon } from '../../assets/svg/Icon'
 import { capitalize } from '../../utils/customUtility'
 import { useLikeEventMutation, useSaveEventMutation } from '../../api/api'
 
@@ -34,7 +34,7 @@ function SingleEvent({ date = '1 Apr', likedBy = "0", img, eventId, add, title =
 
     return (
 
-        <div style={{ boxShadow: "0px 4px 4px 0px #00000040" }} className={`grid grid-cols-12 bg-white/[3%] rounded-lg overflow-hidden relative`}>
+        <div className={`grid grid-cols-12 shadow-custom-black bg-white/[3%] rounded-lg overflow-hidden relative`}>
             {status === "draft" && (
                 <div className='w-full h-full bg-white/20 absolute flex justify-center items-center z-20 backdrop-blur-sm'>
                     <div className='rounded-full px-8 py-2 bg-white/25 text-white'>
@@ -42,15 +42,14 @@ function SingleEvent({ date = '1 Apr', likedBy = "0", img, eventId, add, title =
                     </div>
                 </div>
             )}
-            <div className='col-span-3 h-60 relative'>
+            <div className='col-span-4 h-60 relative'>
 
                 <div className='absolute bg-black/85 rounded-md text-white text-[12px] grid place-items-center w-1/2 py-1 top-2 left-2'>
                     {date}
                 </div>
                 <img className='w-full h-full object-cover' src={img} alt="event_img" />
-
             </div>
-            <div className='col-span-9 flex flex-col justify-evenly px-5'>
+            <div className='col-span-8 flex flex-col justify-evenly px-5'>
                 <div className='flex justify-between items-center py-3 '>
                     <div className='flex gap-3 items-center text-white'>
                         {type === 'private' && (
@@ -95,8 +94,6 @@ function SingleEvent({ date = '1 Apr', likedBy = "0", img, eventId, add, title =
                 <div className='flex gap-x-5 items-center'>
                     <div className='h-7 px-7 grid place-items-center bg-white/10 rounded-full text-white text-[12px]'>{likedBy}+Likes
                     </div>
-
-
                     <div className='relative flex items-center'>
                         <ProfilesComponent />
                         <div className="rounded-full overflow-hidden text-white/75 flex justify-center items-center bg-[#1E232D] p-2 -translate-x-9 z-10">
@@ -112,6 +109,17 @@ function SingleEvent({ date = '1 Apr', likedBy = "0", img, eventId, add, title =
                     <div className='flex items-center gap-x-2'>
                         <LocationFillIcon />
                         <p className='text-white/75 leading-6 font-normal tracking-wider font-sans'>{add}</p>
+                    </div>
+                </div>
+                <div className='flex items-center text-white gap-5'>
+                    <div className='flex items-center gap-2'>
+                        <EditIcon />
+                        <p className='text-body-text font-light'>Edit</p>
+                    </div>
+                    <p className='text-body-text font-light'>|</p>
+                    <div className='flex items-center gap-2'>
+                        <ShareIcon />
+                        <p className='text-body-text font-light'>Share</p>
                     </div>
                 </div>
                 {participating && (

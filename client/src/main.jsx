@@ -17,6 +17,10 @@ import CreateWorkShopEvent from './pages/CreateWorkShopEvent.jsx'
 import CreateTicketEvent from './pages/CreateTicketEvent.jsx'
 import CreateBusinessEvent from './pages/CreateBusinessEvent.jsx'
 import OwnEvents from './pages/OwnEvents.jsx'
+import EventPage from './pages/EventPage.jsx'
+import SendInvitation from './pages/SendInvitation.jsx'
+import SettingPage from './pages/SettingPage.jsx'
+import EditAvatar from './pages/EditAvatar.jsx'
 
 const router = createBrowserRouter(
   createRoutesFromElements(
@@ -30,6 +34,11 @@ const router = createBrowserRouter(
         <Route path='create-event/create-ticket-event' element={<CreateTicketEvent />} />
         <Route path='create-event/create-business-event' element={<CreateBusinessEvent />} />
         <Route path='own-events' element={<OwnEvents />} />
+        <Route path='event/:eventId' element={<EventPage />} />
+        <Route path='event/send/invitation/:eventId' element={<SendInvitation />} />
+        <Route path='settings' element={<SettingPage />} >
+          <Route path='edit/avatar' element={<EditAvatar />} />
+        </Route>
       </Route>
       <Route path='/sign-in' element={<Login />} />
       <Route path='/sign-up' element={<SignUp />} />

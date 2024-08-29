@@ -61,7 +61,7 @@ const getOwnEventsByUserId = async (userId: string, page: number, limit: number,
                 createdAt: 1
             }
         })
-    } else if (sortby === 'desc') {
+    } else {
         pipeline.push({
             $sort: {
                 createdAt: -1
@@ -72,14 +72,14 @@ const getOwnEventsByUserId = async (userId: string, page: number, limit: number,
         {
             $lookup: {
                 from: "users",
-                localField: "owner",
-                foreignField: "_id",
-                as: "user"
+                localField: "_id",
+                foreignField: "savedEvent",
+                as: "eventSavedUser"
             }
         },
         {
             $unwind: {
-                path: '$user',
+                path: '$eventSavedUser',
                 preserveNullAndEmptyArrays: true
             }
         },
@@ -98,6 +98,27 @@ const getOwnEventsByUserId = async (userId: string, page: number, limit: number,
                 likedBy: {
                     $size: {
                         $ifNull: ["$likedBy", []]
+                    }
+                },
+                liked: {
+                    $cond: {
+                        if: {
+                            $in: [
+                                new mongoose.Types.ObjectId(userId),
+                                { $ifNull: ["$likedBy", []] }
+                            ]
+                        },
+                        then: true,
+                        else: false
+                    }
+                },
+                saved: {
+                    $cond: {
+                        if: {
+                            $eq: [new mongoose.Types.ObjectId(userId), "$eventSavedUser._id"]
+                        },
+                        then: true,
+                        else: false
                     }
                 },
                 participating: {
@@ -151,7 +172,10 @@ const getFullEventByEventId = async (eventId: string) => {
                         $ifNull: ['$likedBy', []]
                     }
                 },
-                price: 1,
+                vip: 1,
+                economy: 1,
+                vip_price: 1,
+                economy_price: 1,
                 category: 1,
                 type: 1,
                 photos: 1,

@@ -15,6 +15,13 @@ export const getDay = (index) => {
     return days[index];
 };
 
+export const getFullDay = (index) => {
+    const days = [
+        "Sunday", "Monday", "Tueday", "Wedday", "Thuday", "Friday", "Satday"
+    ];
+    return days[index];
+};
+
 export const capitalize = (str) => {
     return str.split(' ').map(word =>
         word.charAt(0).toUpperCase() + word.slice(1)
@@ -66,4 +73,17 @@ export const getFilterNotification = (strDate) => {
     }
 }
 
+export const getFullTime = (startTime, endTime) => {
+    const formatTime = (time) => {
+        const hours = parseInt(time.substring(0, 2), 10);
+        const minutes = time.substring(3, 5);
+        const suffix = hours >= 12 ? 'PM' : 'AM';
+        const formattedHours = hours % 12 === 0 ? 12 : hours % 12; // Convert 24-hour to 12-hour format
+        return `${formattedHours}:${minutes} ${suffix}`;
+    };
 
+    const formattedStartTime = formatTime(startTime);
+    const formattedEndTime = formatTime(endTime);
+
+    return `${formattedStartTime} - ${formattedEndTime}`;
+};

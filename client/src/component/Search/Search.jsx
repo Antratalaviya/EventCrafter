@@ -4,6 +4,7 @@ import Input from '../Input';
 import Button from '../Button';
 import { useGetAllEventsQuery, useGetAllOwnEventsQuery } from '../../api/api';
 import { useDebounce } from '../../context/useDebounce';
+import Spinner from '../Spinner';
 
 function Search({ filter, setFilter, search, setSearch, events, setEvents }) {
     const [keyword, setKeyword] = useState("");
@@ -12,17 +13,17 @@ function Search({ filter, setFilter, search, setSearch, events, setEvents }) {
 
     const memoizedFilter = useMemo(() => filter, [filter]);
 
-    const { data, isSuccess } = useGetAllOwnEventsQuery(
+    const { data, isSuccess, isLoading } = useGetAllOwnEventsQuery(
         { keyword: debouncedKeyword, filter: memoizedFilter },
         { skip: !search }
     );
 
     useEffect(() => {
         if (isSuccess) {
-            setEvents(data?.data)
+            setEvents(data?.data);
             setSearch(false);
         }
-    }, [isSuccess]);
+    }, [data]);
 
     const handleChange = (e) => {
         setFilter((prev) => ({
@@ -32,16 +33,13 @@ function Search({ filter, setFilter, search, setSearch, events, setEvents }) {
     };
 
     const handleSubmit = async () => {
-        setFilter((prev) => ({
-            ...prev,
-            page: 1,
-            limit: 10
-        }))
         setSearch(true);
         setFilterOpen(false);
-        setKeyword("")
-        setFilter((prev) => ({ ...prev, type: "private", status: "upcoming", sortby: "desc" }))
     };
+
+    if (isLoading) {
+        return <Spinner />
+    }
 
     return (
         <>
@@ -101,31 +99,37 @@ function Search({ filter, setFilter, search, setSearch, events, setEvents }) {
                                         <p>Business</p>
                                     </div>
                                 </label>
+                                <label htmlFor="type6" className='cursor-pointer relative inline-flex items-center' >
+                                    <input type="radio" name="type" id="type6" value='' onChange={handleChange} className='sr-only peer h-full w-full' checked={filter.type === ''} />
+                                    <div className={`py-2 rounded-full cursor-pointer mt-2 w-full flex justify-center items-center peer-checked:bg-primary bg-dark px-5`}>
+                                        <p>All</p>
+                                    </div>
+                                </label>
                             </div>
                         </div>
                         <div className='w-full overflow-hidden space-y-3'>
                             <p>EventClasses</p>
                             <div className='flex justify-start items-center flex-wrap gap-3'>
                                 <label htmlFor="type5" className='cursor-pointer relative inline-flex items-center' >
-                                    <input type="radio" name="status" id="status5" value="private" onChange={handleChange} className='sr-only peer h-full w-full' checked={filter.status === 'upcoming'} />
+                                    <input type="radio" name="status" id="status5" value="upcoming" onChange={handleChange} className='sr-only peer h-full w-full' checked={filter.status === 'upcoming'} />
                                     <div className={`py-2 rounded-full cursor-pointer mt-2 w-full flex justify-center items-center peer-checked:bg-primary bg-dark px-5`}>
                                         <p>Upcoming</p>
                                     </div>
                                 </label>
                                 <label htmlFor="status1" className='cursor-pointer relative inline-flex items-center' >
-                                    <input type="radio" name="status" id="status1" value="public" onChange={handleChange} className='sr-only peer h-full w-full' checked={filter.status === 'completed'} />
+                                    <input type="radio" name="status" id="status1" value="completed" onChange={handleChange} className='sr-only peer h-full w-full' checked={filter.status === 'completed'} />
                                     <div className={`py-2 rounded-full cursor-pointer mt-2 w-full flex justify-center items-center peer-checked:bg-primary bg-dark px-5`}>
                                         <p>Completed</p>
                                     </div>
                                 </label>
                                 <label htmlFor="status2" className='cursor-pointer relative inline-flex items-center' >
-                                    <input type="radio" name="status" id="status2" value='workshop' onChange={handleChange} className='sr-only peer h-full w-full' checked={filter.status === 'cancelled'} />
+                                    <input type="radio" name="status" id="status2" value='cancelled' onChange={handleChange} className='sr-only peer h-full w-full' checked={filter.status === 'cancelled'} />
                                     <div className={`py-2 rounded-full cursor-pointer mt-2 w-full flex justify-center items-center peer-checked:bg-primary bg-dark px-5`}>
                                         <p>Cancelled</p>
                                     </div>
                                 </label>
                                 <label htmlFor="status3" className='cursor-pointer relative inline-flex items-center' >
-                                    <input type="radio" name="status" id="status3" value='ticket' onChange={handleChange} className='sr-only peer h-full w-full' checked={filter.status === 'draft'} />
+                                    <input type="radio" name="status" id="status3" value='draft' onChange={handleChange} className='sr-only peer h-full w-full' checked={filter.status === 'draft'} />
                                     <div className={`py-2 rounded-full cursor-pointer mt-2 w-full flex justify-center items-center peer-checked:bg-primary bg-dark px-5`}>
                                         <p>Draft</p>
                                     </div>

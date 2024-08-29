@@ -22,6 +22,8 @@ import workshopEvent from './workshopevent.png'
 import ticket from './ticket.png'
 import businessEvent from './businessevent.png'
 import event_main_1 from "./event_main_1.png"
+import done from "./done.gif"
+import loading from "./loading.gif"
 
 export default {
     happy,
@@ -47,5 +49,7 @@ export default {
     workshopEvent,
     ticket,
     businessEvent,
-    event_main_1
+    event_main_1,
+    done,
+    loading
 }

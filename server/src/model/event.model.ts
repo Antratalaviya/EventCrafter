@@ -78,7 +78,6 @@ const eventSchema = new mongoose.Schema({
     pdfFile: [{
         url: {
             type: String,
-            required: true
         }
     }],
     videoFile: {
@@ -91,8 +90,17 @@ const eventSchema = new mongoose.Schema({
         type: String,
         required: true
     },
-    price: {
+    vip: {
         type: String,
+    },
+    economy: {
+        type: String
+    },
+    vip_price: {
+        type: String,
+    },
+    economy_price: {
+        type: String
     },
     status: {
         type: String,

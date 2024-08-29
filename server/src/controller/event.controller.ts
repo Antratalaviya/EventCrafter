@@ -22,17 +22,17 @@ const createEvent = asyncHandler(async (req: Request, res: Response) => {
         }
 
         let newEvent = await eventService.createEvent(user._id, event);
-
         if (!newEvent) {
             return res.status(status.INTERNAL_SERVER_ERROR)
                 .json(
                     new ApiError(status.INTERNAL_SERVER_ERROR, AppString.EVENT_CREATION_FAILED)
                 );
         }
+        const eventCreated = await eventService.getFullEventByEventId(newEvent._id.toString())
 
         return res.status(status.OK)
             .json(
-                new ApiResponse(status.OK, {}, AppString.EVENT_CREATED)
+                new ApiResponse(status.OK, eventCreated, AppString.EVENT_CREATED)
             );
 
     } catch (error) {
@@ -79,7 +79,6 @@ const getOwnEvents = asyncHandler(async (req: Request, res: Response) => {
         // }
         // await eventExist.save();
         let event = await eventService.getOwnEventsByUserId(req.user._id, page, limit, keyword, eventStatus, eventType, sortby);
-
         return res.status(status.OK)
             .json(
                 new ApiResponse(status.OK, event, AppString.EVENT_RETRIEVED)

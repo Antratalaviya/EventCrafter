@@ -1,18 +1,26 @@
 import React, { useEffect, useRef, useState } from 'react'
 import Button from '../component/Button';
-import { AddCircleIcon, CalenderIcon, CrossIcon, CurrectIcon, DownIcon, FileIcon, GalleryIcon, InviteIcon, LinkIcon, PdfIcon, SelectIcon, TimeIcon, VideoIcon } from '../assets/svg/Icon';
+import { AddCircleIcon, CalenderIcon, CrossIcon, CurrectIcon, DownIcon, FileIcon, GalleryIcon, PdfIcon, SelectIcon, TimeIcon, VideoIcon } from '../assets/svg/Icon';
 import '../index.css'
 import Modal from '../component/Modal/Modal';
 import Input from '../component/Input';
 import { EventCategory, offers } from '../lib/consts';
+import { uploadImg } from '../Firebase/upload';
+import { useCreateEventMutation } from '../api/api';
+import Spinner from "../component/Spinner"
 import { img } from '../assets/assets';
+import { Link } from 'react-router-dom';
+import { toast } from 'react-toastify';
 
 function CreatePriEvent() {
     const [progress, setProgress] = useState(1);
     const [openSelect, setOpenSelect] = useState(false);
     const [openConsent, setOpenConsent] = useState(false);
     const [openCat, setOpenCat] = useState(false);
+    const [eventCreated, setEventCreated] = useState();
+    const [create, setCreate] = useState(false);
     const [acceptConcent, setAcceptConcent] = useState(false);
+
     const fileInputRef = useRef(null);
     const videoInputRef = useRef(null);
     const imgInputRef = useRef(null);
@@ -21,8 +29,6 @@ function CreatePriEvent() {
         subtitle1: "",
         subtitle2: "",
         category: "Select private event category",
-        createDate: "",
-        expiresIn: "",
         startDate: "",
         endDate: "",
         startTime: "",
@@ -37,8 +43,9 @@ function CreatePriEvent() {
         pdfFile: [],
         photos: [],
     });
-
     const [offersToSelect, setOfferToSelect] = useState(offers);
+
+    const [createEvent, { isLoading, error }] = useCreateEventMutation()
 
     const handleChange = (e) => {
         setEvent({
@@ -47,14 +54,52 @@ function CreatePriEvent() {
         })
     }
 
-    useEffect(() => {
-        console.log(event)
-    }, [event])
+    const handleCreateEvent = async () => {
+        try {
+            const urlPhotos = await Promise.all(event.photos.map(uploadImg));
+            console.log(urlPhotos);
 
-    const increaseProgress = () => {
-        setProgress((prev) => Math.min(prev + 1, 4));
+
+            if (urlPhotos.every((url) => url !== undefined)) {
+                const updatedEvent = {
+                    ...event,
+                    photos: urlPhotos.map((url) => ({ url }))
+                };
+                setEvent(updatedEvent);
+                if (urlPhotos.every((url) => url && typeof url === 'string')) {
+                    const result = await createEvent({ ...updatedEvent, type: "private" }).unwrap();
+                    console.log(result);
+                    setEventCreated(result?.data[0]);
+                    console.log("Event Created: ", result?.data);
+
+                    if (result.success) {
+                        return 1;
+                    }
+                }
+            }
+        } catch (error) {
+            console.error("Error creating event:", error);
+            toast.error("All Fields are required")
+        }
+        return 0;
+    };
+
+    const increaseProgress = async () => {
+        console.log(event)
         if (progress === 4) {
             setOpenConsent(true);
+        } else if (progress === 3) {
+            setCreate(true)
+            const res = await handleCreateEvent();
+            if (res === 1) {
+                toast("Event created successfully")
+                setCreate(false)
+                setProgress((prev) => Math.min(prev + 1, 4));
+            } else {
+                setProgress(1);
+            }
+        } else {
+            setProgress((prev) => Math.min(prev + 1, 4));
         }
     };
 
@@ -63,13 +108,16 @@ function CreatePriEvent() {
         if (acceptConcent) {
             setAcceptConcent(false)
         }
+        if (progress === 3) {
+            setCreate(false)
+        }
     };
     return (
         <div className='overflow-y-scroll overflow-x-hidden h-screen'>
             <div style={{ boxShadow: "0px 4px 4px 0px #00000040" }} className={`bg-black-light p-5 m-5 rounded-xl border-2 border-stroke relative text-white ${progress > 4 && "hidden"}`}>
                 <ProgressBar progress={progress} />
                 <div className="p-4 border-b-2 border-body-text">
-                    <form className='flex justify-start'>
+                    <form name='eventPrivate' className='flex justify-start'>
                         {progress === 1 &&
                             <div className='w-full space-y-5 '>
                                 <div className='grid grid-cols-3 gap-5'>
@@ -107,40 +155,6 @@ function CreatePriEvent() {
                                         </div>
                                     </div>
                                 </div>
-                                {/* <div className=''>
-                                    <div className='flex justify-start items-center gap-3'>
-                                        <label htmlFor="eventCat1" className='cursor-pointer relative inline-flex items-center' >
-                                            <input type="radio" name="category" id="eventCat1" value='Adventure' onChange={handleChange} className='sr-only peer h-full w-full' checked={event.category === 'Adventure'} />
-                                            <div className={`py-2 rounded-full cursor-pointer mt-2 w-full flex justify-center items-center peer-checked:bg-primary bg-dark px-5`}>
-                                                <p>Adventure</p>
-                                            </div>
-                                        </label>
-                                        <label htmlFor="eventCat2" className='cursor-pointer relative inline-flex items-center' >
-                                            <input type="radio" name="category" id="eventCat2" value='Webinar' onChange={handleChange} className='sr-only peer h-full w-full' />
-                                            <div className={`py-2 rounded-full cursor-pointer mt-2 w-full flex justify-center items-center peer-checked:bg-primary bg-dark px-5`}>
-                                                <p>Webinar</p>
-                                            </div>
-                                        </label>
-                                        <label htmlFor="eventCat3" className='cursor-pointer relative inline-flex items-center' >
-                                            <input type="radio" name="category" id="eventCat3" value='Festival' onChange={handleChange} className='sr-only peer h-full w-full' />
-                                            <div className={`py-2 rounded-full cursor-pointer mt-2 w-full flex justify-center items-center peer-checked:bg-primary bg-dark px-5`}>
-                                                <p>Festival</p>
-                                            </div>
-                                        </label>
-                                        <label htmlFor="eventCat4" className='cursor-pointer relative inline-flex items-center' >
-                                            <input type="radio" name="category" id="eventCat4" value='Music' onChange={handleChange} className='sr-only peer h-full w-full' />
-                                            <div className={`py-2 rounded-full cursor-pointer mt-2 w-full flex justify-center items-center peer-checked:bg-primary bg-dark px-5`}>
-                                                <p>Music</p>
-                                            </div>
-                                        </label>
-                                        <label htmlFor="eventCat5" className='cursor-pointer relative inline-flex items-center' >
-                                            <input type="radio" name="category" id="eventCat5" value='Movie' onChange={handleChange} className='sr-only peer h-full w-full' />
-                                            <div className={`py-2 rounded-full cursor-pointer mt-2 w-full flex justify-center items-center peer-checked:bg-primary bg-dark px-5`}>
-                                                <p>Movie</p>
-                                            </div>
-                                        </label>
-                                    </div>
-                                </div> */}
                                 <div className='grid grid-cols-3 text-body-text gap-5'>
                                     <Input
                                         type={'text'}
@@ -163,19 +177,6 @@ function CreatePriEvent() {
                                         onChange={handleChange}
                                         className={'col-span-1'}
                                     />
-
-                                    <Input
-                                        type={'text'}
-                                        placeholder={'Invitation expires in'}
-                                        name={'expiresIn'}
-                                        onChange={handleChange}
-                                        onFocus={(e) => e.target.type = 'time'}
-                                        onBlur={(e) => e.target.type = 'text'}
-                                        className={'col-span-1 flex items-center relative'}
-                                        InputClassName={'datepicker-input'}
-                                    >
-                                        <TimeIcon className="mr-3" />
-                                    </Input>
                                     <div className='col-span-1 flex gap-5'>
                                         <Input
                                             type={'text'}
@@ -228,6 +229,7 @@ function CreatePriEvent() {
                                             <TimeIcon className="mr-3" />
                                         </Input>
                                     </div>
+                                    <div className='col-span-1' />
                                     <div className='space-y-2'>
                                         <p className='text-white'>Event Offer</p>
                                         <div className='bg-[#252A30] rounded-lg ring-1 col-span-1 ring-gray flex items-center'>
@@ -357,136 +359,138 @@ function CreatePriEvent() {
                                 />
                             </div>}
                         {progress === 3 &&
-                            <div className='w-full grid grid-cols-1 text-white gap-5 py-5'>
-                                <div className='bg-[#252A30] flex flex-col items-center space-y-5 p-5 rounded-lg border-dashed border-2 border-primary'>
-                                    <div onClick={() => videoInputRef.current.click()}>
-                                        <VideoIcon />
-                                    </div>
-                                    <input
-                                        type="file"
-                                        name='videoFile'
-                                        ref={videoInputRef}
-                                        onChange={(e) => {
-                                            setEvent({
-                                                ...event,
-                                                [e.target.name]: e.target.files[0]
-                                            })
+                            <>
+                                {create ? (<Spinner className="absolute top-0 left-0 h-full w-full backdrop-blur-sm" />) : (<div className='w-full grid grid-cols-1 text-white gap-5 py-5'>
+                                    <div className='bg-[#252A30] flex flex-col items-center space-y-5 p-5 rounded-lg border-dashed border-2 border-primary'>
+                                        <div onClick={() => videoInputRef.current.click()}>
+                                            <VideoIcon />
+                                        </div>
+                                        <input
+                                            type="file"
+                                            name='videoFile'
+                                            ref={videoInputRef}
+                                            onChange={(e) => {
+                                                setEvent({
+                                                    ...event,
+                                                    [e.target.name]: e.target.files[0]
+                                                })
 
-                                        }}
-                                        accept='video/*'
-                                        className='hidden'
-                                    />
-                                    <div className='text-center'>
-                                        <p>Choose Video File</p>
-                                        <p className='text-body-text'>Maximum video 30 sec video upload</p>
+                                            }}
+                                            accept='video/*'
+                                            className='hidden'
+                                        />
+                                        <div className='text-center'>
+                                            <p>Choose Video File</p>
+                                            <p className='text-body-text'>Maximum video 30 sec video upload</p>
+                                        </div>
                                     </div>
-                                </div>
-                                <div className='bg-[#252A30] flex flex-col items-center space-y-5 p-5 rounded-lg border-dashed border-2 border-primary'>
-                                    <div onClick={() => fileInputRef.current.click()}>
-                                        <FileIcon />
+                                    <div className='bg-[#252A30] flex flex-col items-center space-y-5 p-5 rounded-lg border-dashed border-2 border-primary'>
+                                        <div onClick={() => fileInputRef.current.click()}>
+                                            <FileIcon />
+                                        </div>
+                                        <input
+                                            type="file"
+                                            name='pdfFile'
+                                            ref={fileInputRef}
+                                            onChange={(e) => {
+                                                setEvent((prev) => (
+                                                    { ...prev, pdfFile: [...prev.pdfFile, ...e.target.files] }
+                                                ))
+                                            }}
+                                            accept='application/pdf, application/msword'
+                                            className='hidden'
+                                            multiple
+                                        />
+                                        <div className='text-center'>
+                                            <p>Choose File</p>
+                                            <p className='text-body-text'>Select PDF file to  upload</p>
+                                        </div>
                                     </div>
-                                    <input
-                                        type="file"
-                                        name='pdfFile'
-                                        ref={fileInputRef}
-                                        onChange={(e) => {
-                                            setEvent((prev) => (
-                                                { ...prev, pdfFile: [...prev.pdfFile, ...e.target.files] }
-                                            ))
-                                        }}
-                                        accept='application/pdf, application/msword'
-                                        className='hidden'
-                                        multiple
-                                    />
-                                    <div className='text-center'>
-                                        <p>Choose File</p>
-                                        <p className='text-body-text'>Select PDF file to  upload</p>
-                                    </div>
-                                </div>
-                                {
-                                    event.pdfFile.length > 0 && (
-                                        <>
-                                            <div className='grid grid-cols-2 gap-5'>
-                                                {event.pdfFile.map((file, index) => (
-                                                    <div className='relative flex items-center justify-start gap-5 bg-[#252A30] rounded-lg w-full py-3 px-5' key={index}>
-                                                        <PdfIcon />
-                                                        <div>
-                                                            <p>{file.name}</p>
-                                                            {Math.floor(file.size / 1000) > 1024 ? (<p className='text-sm'>{Math.floor(file.size / 1000000)}mb</p>) : <p className='text-sm'>{Math.floor(file.size / 1000)}kb</p>}
+                                    {
+                                        event.pdfFile.length > 0 && (
+                                            <>
+                                                <div className='grid grid-cols-2 gap-5'>
+                                                    {event.pdfFile.map((file, index) => (
+                                                        <div className='relative flex items-center justify-start gap-5 bg-[#252A30] rounded-lg w-full py-3 px-5' key={index}>
+                                                            <PdfIcon />
+                                                            <div>
+                                                                <p>{file.name}</p>
+                                                                {Math.floor(file.size / 1000) > 1024 ? (<p className='text-sm'>{Math.floor(file.size / 1000000)}mb</p>) : <p className='text-sm'>{Math.floor(file.size / 1000)}kb</p>}
+                                                            </div>
+                                                            <button
+                                                                type="button"
+                                                                onClick={() => setEvent((prev) => ({ ...prev, pdfFile: prev.pdfFile.filter((_, i) => i !== index) }))}
+                                                                className="absolute top-4 right-2 rounded-full bg-stroke/50 size-10 flex items-center justify-center"
+                                                            >
+                                                                <CrossIcon className="size-5" />
+                                                            </button>
                                                         </div>
+                                                    ))}
+                                                </div>
+                                            </>
+                                        )
+                                    }
+                                    <div className='bg-[#252A30] rounded-lg ring-1 ring-gray'>
+                                        <textarea
+                                            type="text"
+                                            placeholder='Please describe your event in more detail so that you arouse curiosity and your visitors know what to expect at yours. Upload an agenda if you have one. Think of the images you can use too. Maybe also pictures of the location or what you think what could be interesting'
+                                            name='description'
+                                            onChange={handleChange}
+                                            maxLength={200}
+                                            style={{ resize: "none" }}
+                                            className='bg-transperent focus:outline-none w-full text-body-text p-3 text-sm'
+                                        />
+                                        <div className='float-right text-body-text pr-3'>
+                                            <span >{event.description.length}</span>
+                                            <span >/ 200</span>
+                                        </div>
+                                    </div>
+                                    <div className={`bg-[#252A30] flex flex-col items-center space-y-5 p-5 rounded-lg border-dashed border-2 border-primary`}>
+                                        <div onClick={() => imgInputRef.current.click()}>
+                                            <GalleryIcon />
+                                        </div>
+                                        <input
+                                            type="file"
+                                            name='photos'
+                                            ref={imgInputRef}
+                                            onChange={(e) => {
+                                                setEvent((prev) => ({ ...prev, photos: [...e.target.files, ...prev.photos].slice(0, 6) }))
+
+                                            }}
+                                            accept='image/*'
+                                            className='hidden'
+                                            multiple
+                                        />
+                                        <div className='text-center'>
+                                            <p>Upload Photos</p>
+                                            <p className='text-body-text'>Maximum 6 photos upload</p>
+                                        </div>
+                                    </div>
+                                    {event.photos.length > 0 && (
+                                        <div className={`bg-[#252A30] flex flex-col items-center space-y-5 p-5 rounded-lg border-dashed border-2 border-primary`}>
+                                            <div className='grid grid-cols-3 grid-rows-2 gap-5 transition-all'>
+                                                {event.photos.map((img, index) => (
+                                                    <div className='relative' key={index}>
+                                                        <img
+                                                            src={URL.createObjectURL(img)}
+                                                            alt={`Selected ${index}`}
+                                                            className='h-48 w-full object-cover rounded'
+                                                        />
                                                         <button
                                                             type="button"
-                                                            onClick={() => setEvent((prev) => ({ ...prev, pdfFile: prev.pdfFile.filter((_, i) => i !== index) }))}
-                                                            className="absolute top-4 right-2 rounded-full bg-stroke/50 size-10 flex items-center justify-center"
+                                                            onClick={() => setEvent((prev) => ({ ...prev, photos: prev.photos.filter((_, i) => i !== index) }))}
+                                                            className="absolute top-0 right-1 rounded-full bg-stroke/50 size-10 flex items-center justify-center"
                                                         >
                                                             <CrossIcon className="size-5" />
                                                         </button>
                                                     </div>
                                                 ))}
                                             </div>
-                                        </>
-                                    )
-                                }
-                                <div className='bg-[#252A30] rounded-lg ring-1 ring-gray'>
-                                    <textarea
-                                        type="text"
-                                        placeholder='Please describe your event in more detail so that you arouse curiosity and your visitors know what to expect at yours. Upload an agenda if you have one. Think of the images you can use too. Maybe also pictures of the location or what you think what could be interesting'
-                                        name='description'
-                                        onChange={handleChange}
-                                        maxLength={200}
-                                        style={{ resize: "none" }}
-                                        className='bg-transperent focus:outline-none w-full text-body-text p-3 text-sm'
-                                    />
-                                    <div className='float-right text-body-text pr-3'>
-                                        <span >{event.description.length}</span>
-                                        <span >/ 200</span>
-                                    </div>
-                                </div>
-                                <div className={`bg-[#252A30] flex flex-col items-center space-y-5 p-5 rounded-lg border-dashed border-2 border-primary`}>
-                                    <div onClick={() => imgInputRef.current.click()}>
-                                        <GalleryIcon />
-                                    </div>
-                                    <input
-                                        type="file"
-                                        name='photos'
-                                        ref={imgInputRef}
-                                        onChange={(e) => {
-                                            setEvent((prev) => ({ ...prev, photos: [...e.target.files, ...prev.photos].slice(0, 6) }))
-
-                                        }}
-                                        accept='image/*'
-                                        className='hidden'
-                                        multiple
-                                    />
-                                    <div className='text-center'>
-                                        <p>Upload Photos</p>
-                                        <p className='text-body-text'>Maximum 6 photos upload</p>
-                                    </div>
-                                </div>
-                                {event.photos.length > 0 && (
-                                    <div className={`bg-[#252A30] flex flex-col items-center space-y-5 p-5 rounded-lg border-dashed border-2 border-primary`}>
-                                        <div className='grid grid-cols-3 grid-rows-2 gap-5 transition-all'>
-                                            {event.photos.map((img, index) => (
-                                                <div className='relative' key={index}>
-                                                    <img
-                                                        src={URL.createObjectURL(img)}
-                                                        alt={`Selected ${index}`}
-                                                        className='h-48 w-full object-cover rounded'
-                                                    />
-                                                    <button
-                                                        type="button"
-                                                        onClick={() => setEvent((prev) => ({ ...prev, photos: prev.photos.filter((_, i) => i !== index) }))}
-                                                        className="absolute top-0 right-1 rounded-full bg-stroke/50 size-10 flex items-center justify-center"
-                                                    >
-                                                        <CrossIcon className="size-5" />
-                                                    </button>
-                                                </div>
-                                            ))}
                                         </div>
-                                    </div>
-                                )}
+                                    )}
 
-                            </div>
+                                </div>)}
+                            </>
                         }
                         {progress === 4 &&
                             <div className='w-full grid grid-cols-1 text-white space-y-3 gap-5 py-5'>
@@ -515,56 +519,6 @@ function CreatePriEvent() {
                                         <li>In order to create a private event, you must select “Private event - Without promotion”.</li>
                                     </div>
                                 </div>
-                                {/* <div className='space-y-2'>
-                                    <p>Are you looking for sponsors?</p>
-                                    <div className='flex items-center gap-3'>
-                                        <label htmlFor="confirm1" className='flex gap-2 cursor-pointer'>
-                                            <input type="radio" name="confirm" id="confirm1"
-                                                className='appearance-none peer' />
-                                            <div className='size-4 rounded-full border-2 border-white 
-                                            peer-checked:ring-2  peer-checked:ring-primary peer-checked:bg-primary peer-checked:border-dark'/>
-                                            Yes
-                                        </label>
-                                        <label htmlFor="confirm2" className='flex gap-2 cursor-pointer'>
-                                            <input type="radio" name="confirm" id="confirm2" className='appearance-none peer' />
-                                            <div className='size-4 rounded-full border-2 border-white 
-                                            peer-checked:ring-2  peer-checked:ring-primary peer-checked:bg-primary peer-checked:border-dark'/>
-                                            No
-                                        </label>
-                                    </div>
-                                </div> */}
-                                {/* <div className='grid grid-cols-3 gap-5'>
-                                    <div className='col-span-1 space-y-2'>
-                                        <p>Time for sponsorship</p>
-                                        <Input
-                                            type={'text'}
-                                            placeholder={'24hr'}
-                                            name={'time'}
-                                            onChange={handleChange}
-                                            className={'flex items-center pr-4'}
-                                        >
-                                            <DownIcon />
-                                        </Input>
-                                    </div>
-                                    <div className='col-span-1 space-y-2'>
-                                        <p>Maximum sponsors</p>
-                                        <Input
-                                            type={'text'}
-                                            placeholder={'No limit'}
-                                            name={'sponsors'}
-                                            onChange={handleChange}
-                                        />
-                                    </div>
-                                    <div className='col-span-1 space-y-2'>
-                                        <p>Maximum Offer</p>
-                                        <Input
-                                            type={'text'}
-                                            placeholder={'20$'}
-                                            name={'sponsors'}
-                                            onChange={handleChange}
-                                        />
-                                    </div>
-                                </div> */}
                             </div>
                         }
                     </form>
@@ -578,9 +532,8 @@ function CreatePriEvent() {
                     </Button>
                     <Button
                         onEvent={increaseProgress}
-                    >
-                        Next
-                    </Button>
+                        text={isLoading ? "Loading..." : "Next"}
+                    />
                 </div>
             </div>
             <Modal open={openConsent} ModalClassName={'w-1/3'} className={'overflow-y-scroll'}>
@@ -607,97 +560,23 @@ function CreatePriEvent() {
                     </div>
                 </div>
             </Modal>
-            {acceptConcent && (
-                <div className='w-full text-white p-5 space-y-5'>
-                    <div className='flex gap-5'>
-                        <Input
-                            placeholder="Invite to event via link"
-                            className="col-span-1 w-full flex items-center pr-5"
-                        >
-                            <LinkIcon />
-                        </Input>
-                        <Input
-                            placeholder="Add Participants"
-                            className="col-span-1 w-full flex items-center pr-5"
-                        >
-                            <InviteIcon />
-                        </Input>
-                    </div>
-                    <div className='flex flex-col gap-5 w-full rounded-lg bg-black-light p-5' >
-                        <h1>Participate Members</h1>
-                        <div className='flex gap-5 items-center'>
-                            <div className='bg-public rounded-md flex items-center gap-2 p-2'>
-                                <SelectIcon />
-                                <p>{`Accepted(14)`}</p>
-                            </div>
-                            <div className='bg-red rounded-md flex items-center gap-2 p-2'>
-                                <AddCircleIcon className="rotate-45 fill-white stroke-red" />
-                                <p>{`Rejected(14)`}</p>
-                            </div>
-                            <div className='bg-yellow rounded-md flex items-center gap-2 p-2'>
-                                <TimeIcon />
-                                <p>{`Pending(14)`}</p>
-                            </div>
-                        </div>
-                        <div className='flex flex-col justify-start space-y-5'>
-                            <div className='flex items-center justify-between'>
-                                <div className='flex items-center gap-5 w-[70%]'>
-                                    <div className='rounded-full size-16 overflow-hidden'>
-                                        <img src={img.p3} alt="profile_img" className='h-16 w-24' />
-                                    </div>
-                                    <div className='flex flex-col w-[80%]'>
-                                        <p className='text-white font-medium'>Clara Tolson </p>
-                                    </div>
-                                </div>
-                                <div className='bg-public/10 rounded-md flex items-center gap-2 py-2 px-4 text-public'>
-                                    <SelectIcon fill="#25d695" />
-                                    <p>{`Accepted`}</p>
-                                </div>
-                            </div>
-                            <div className='flex items-center justify-between'>
-                                <div className='flex items-center gap-5 w-[70%]'>
-                                    <div className='rounded-full size-16 overflow-hidden'>
-                                        <img src={img.p2} alt="profile_img" className='h-16 w-24' />
-                                    </div>
-                                    <div className='flex flex-col w-[80%]'>
-                                        <p className='text-white font-medium'>Clara Tolson </p>
-                                    </div>
-                                </div>
-                                <div className='bg-yellow/10 rounded-md flex items-center gap-2 py-2 px-5 text-yellow'>
-                                    <TimeIcon className="stroke-yellow" />
-                                    <p>{`Pending`}</p>
-                                </div>
-                            </div>
-                            <div className='flex items-center justify-between'>
-                                <div className='flex items-center gap-5 w-[70%]'>
-                                    <div className='rounded-full size-16 overflow-hidden'>
-                                        <img src={img.p4} alt="profile_img" className='h-16 w-24' />
-                                    </div>
-                                    <div className='flex flex-col w-[80%]'>
-                                        <p className='text-white font-medium'>Clara Tolson </p>
-                                    </div>
-                                </div>
-                                <div className='bg-red/10 rounded-md flex items-center gap-2 py-2 px-5 text-red'>
-                                    <AddCircleIcon className="rotate-45 fill-red stroke-black-light" />
-                                    <p>{`Rejected`}</p>
-                                </div>
-                            </div>
+            {eventCreated && (
+                <Modal open={acceptConcent}>
+                    <div className='text-white text-center flex flex-col items-center'>
+                        <img src={img.done} alt="done" className='w-4/5 h-3/5' />
+                        <div className='flex flex-col items-center gap-3'>
+                            <h1 className='text-3xl'>Bingo !</h1>
+                            <p className='text-body-text'>Your event has been created successfully .</p>
+                            <Link to={`/event/${eventCreated._id}`} className='w-full'>
+                                <Button
+                                    text='View Event'
+                                    className="h-14"
+                                    onClick={() => setAcceptConcent(false)}
+                                />
+                            </Link>
                         </div>
                     </div>
-                    <div className="mt-4 ml-auto w-1/5 gap-2 flex">
-                        <Button
-                            onEvent={decreaseProgress}
-                            className="bg-dark"
-                        >
-                            Cancel
-                        </Button>
-                        <Button
-
-                        >
-                            Next
-                        </Button>
-                    </div>
-                </div>
+                </Modal>
             )}
         </div>
     );
@@ -706,7 +585,7 @@ function CreatePriEvent() {
 
 export default CreatePriEvent
 
-const ProgressBar = ({ progress }) => {
+export const ProgressBar = ({ progress }) => {
     return (
         <div className="w-full rounded-full h-2 overflow-hidden bg-dark mt-5">
             <div
