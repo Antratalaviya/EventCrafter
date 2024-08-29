@@ -1,6 +1,6 @@
 import { getDownloadURL, ref, uploadBytes } from "firebase/storage"
 import { v4 } from "uuid"
-import { storage } from "./firebase.config"
+import { storage } from "../../firebase.config"
 
 export const uploadImg = async (file) => {
     const imgRef = ref(storage, `img/${v4()}`);
