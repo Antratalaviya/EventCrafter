@@ -9,7 +9,7 @@ function SettingPage() {
     const user = useSelector(state => state.auth.userData)
     return (
         <div className='grid grid-cols-4 h-screen'>
-            <div className="overflow-hidden text-white bg-black-light p-5 col-span-1 ">
+            <div className="overflow-hidden text-white bg-black-light p-5 col-span-1">
                 <div className="flex p-5 gap-3 flex-col items-center">
                     <div className='rounded-full overflow-hidden ring-2 ring-white size-20'>
                         <img src={img.p3} alt="User Avatar" className="avatar" />
@@ -25,8 +25,12 @@ function SettingPage() {
                     <Link to={'/settings/edit/avatar'}>
                         <SettingsItem icon={<UserIcon />} title="Avatar" />
                     </Link>
-                    <SettingsItem icon={<SaveIcon />} title="Save Events" />
-                    <SettingsItem icon={<LikeIcon />} title="Liked Events" />
+                    <Link to={'/settings/saved/events'}>
+                        <SettingsItem icon={<SaveIcon />} title="Save Events" />
+                    </Link>
+                    <Link to={'/settings/liked/events'}>
+                        <SettingsItem icon={<LikeIcon />} title="Liked Events" />
+                    </Link>
                     <SettingsItem icon={<CalenderIcon />} title="Joined Events" />
                     <SettingsItem icon={<BellIcon />} title="Notification" />
                 </div>

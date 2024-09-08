@@ -13,9 +13,12 @@ export enum AppString {
   USER_RETRIEVED = "user retrieved successfully",
   PASSWORD_UPDATED = "password updated successfully",
 
+  ACTION_FAILED = "action failed !! please try again",
+
   INVALID_SESSION = "your session is not valid",
   INVALID_TOKEN = "token is invalid",
-  TOKEN_EXPIRE = "session expire",
+  TOKEN_EXPIRE = "session expire !! Please login again",
+  TOKEN_REGISTERED = "access token generated successfully",
 
   OTP_ERR = "please resend the otp",
   OTP_SEND = "otp send successfully",
@@ -63,6 +66,10 @@ export enum AppString {
   NO_PARTICIPANT = "no new participants",
   PARTICIPANTS = 'all participantss retrieved',
 
+  AVATAR_RETRIEVED = 'avatar retrieved successfully',
+  AVATAR_CREATED = "avatar created successfully",
+  AVATAR_UPDATED = "avatar updated successfully",
+  AVATAR_DELETED = "avatar deleted successfully",
 };
 
 export enum Collection {

@@ -21,6 +21,8 @@ import EventPage from './pages/EventPage.jsx'
 import SendInvitation from './pages/SendInvitation.jsx'
 import SettingPage from './pages/SettingPage.jsx'
 import EditAvatar from './pages/EditAvatar.jsx'
+import SavedEvents from './pages/SavedEvents.jsx'
+import LikedEvents from './pages/LikedEvents.jsx'
 
 const router = createBrowserRouter(
   createRoutesFromElements(
@@ -38,6 +40,8 @@ const router = createBrowserRouter(
         <Route path='event/send/invitation/:eventId' element={<SendInvitation />} />
         <Route path='settings' element={<SettingPage />} >
           <Route path='edit/avatar' element={<EditAvatar />} />
+          <Route path='saved/events' element={<SavedEvents />} />
+          <Route path='liked/events' element={<LikedEvents />} />
         </Route>
       </Route>
       <Route path='/sign-in' element={<Login />} />

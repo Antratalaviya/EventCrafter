@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from 'react'
 import { img } from '../../assets/assets'
-import { SearchIcon } from '../../assets/svg/Icon'
 import { Max } from '../max'
 import Button from '../Button'
 import { useCurrLocation } from "../../context/useCurrLocation"
@@ -11,6 +10,7 @@ import { useMemo } from 'react'
 import { getTime } from '../../utils/customUtility'
 import NotificationComponent from '../Notification/NotificationComponent'
 import Location from '../Location/Location'
+import { toast } from 'react-toastify'
 
 function Header() {
   const [notifications, setNotifications] = useState([]);
@@ -18,7 +18,7 @@ function Header() {
   const { pageName } = useCurrLocation();
   const authStatus = useSelector((state) => state.auth.status)
   const navigate = useNavigate();
-  const { data } = useGetUserQuery();
+  const { data, isError: userProfileIsError, error: userProfileError } = useGetUserQuery();
   const { data: notification, isSuccess, isLoading } = useGetAllNotificationQuery();
 
   const time = useMemo(() => {
@@ -35,6 +35,10 @@ function Header() {
     }
   }, [isSuccess, notification, data]);
 
+  if (userProfileIsError) {
+    toast.error(userProfileError.message);
+    // location.replace('/sign-in')
+  }
 
   return (
     <div className='bg-black-light grid grid-cols-12 text-white py-4 px-3 border-b border-body-text'>

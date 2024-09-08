@@ -4,6 +4,7 @@ import cors from "cors";
 import authRoutes from "./router/auth.router";
 import userRoutes from "./router/user.router";
 import eventRoutes from "./router/event.router";
+import avatarRoutes from "./router/avatar.router";
 
 const app = express();
 
@@ -37,5 +38,6 @@ app.get("/test", (_, res: Response) => {
 app.use("/auth", authRoutes);
 app.use("/user", userRoutes);
 app.use("/event", eventRoutes);
+app.use("/avatar", avatarRoutes);
 
 export { app };

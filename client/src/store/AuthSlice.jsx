@@ -16,7 +16,7 @@ export const authSlicer = createSlice({
             state.userData = action.payload;
         },
         authLogout: (state) => {
-            removeItem(CONSTS.AUTH_TOKEN)
+            // removeItem(CONSTS.ACCESS_TOKEN)
             state.status = false;
             state.userData = null;
         }

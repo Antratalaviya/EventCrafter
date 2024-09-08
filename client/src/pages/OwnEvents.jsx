@@ -7,7 +7,6 @@ import { useGetAllOwnEventsQuery } from '../api/api';
 import Search from '../component/Search/Search';
 import { CrossIcon, FoodIcon } from '../assets/svg/Icon';
 import Spinner from '../component/Spinner';
-import { Link } from 'react-router-dom';
 
 function OwnEvents() {
     const [search, setSearch] = useState(true);
@@ -69,24 +68,23 @@ function OwnEvents() {
 
             <div className='grid grid-cols-2 gap-5'>
                 {filterEvents && filterEvents.length > 0 && filterEvents.map((event, index) => (
-                    <Link to={`/event/${event._id}`} key={index}>
-                        <SingleEvent
-                            key={index}
-                            eventId={event._id}
-                            date={date[index]}
-                            img={event.photos.url}
-                            add={`${event.street}, ${event.city}, ${event.country}`}
-                            title={event.title}
-                            rating={event.likedBy}
-                            participants={event.participants}
-                            likedBy={event.likedBy}
-                            type={event.type}
-                            participating={event.participating}
-                            status={event.status}
-                            liked={event.liked}
-                            saved={event.saved}
-                        />
-                    </Link>
+                    <SingleEvent
+                        key={index}
+                        eventId={event._id}
+                        date={date[index]}
+                        img={event.photos.url}
+                        add={`${event.street}, ${event.city}, ${event.country}`}
+                        title={event.title}
+                        rating={event.likedBy}
+                        participants={event.participants}
+                        likedBy={event.likedBy}
+                        type={event.type}
+                        participating={event.participating}
+                        status={event.status}
+                        liked={event.liked}
+                        saved={event.saved}
+                        own={true}
+                    />
                 ))}
                 <SingleEvent eventId='66c87da83c2e7bb657c929bn' img={img.eventImg} add="Suite 577 44666 O'Keefe Turnpike, New Marianobury, SC 66348" />
                 <SingleEvent eventId='66c87da83c2e7bb657c929bn' img={img.eventImg1} add="01040 Duncan Vista" />

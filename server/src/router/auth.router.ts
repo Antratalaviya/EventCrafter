@@ -8,6 +8,8 @@ router.post("/sign-up", authController.register);
 
 router.post("/sign-in", authController.login);
 
+router.post("/refresh", authController.refreshToken);
+
 router.patch("/sign-out", authMiddleware.verifyUserAccess, authController.logout);
 
 router.post("/send-otp", authMiddleware.verifyUserAccess, authController.sendOtp);

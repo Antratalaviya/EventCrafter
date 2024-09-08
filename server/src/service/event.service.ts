@@ -72,14 +72,14 @@ const getOwnEventsByUserId = async (userId: string, page: number, limit: number,
         {
             $lookup: {
                 from: "users",
-                localField: "_id",
-                foreignField: "savedEvent",
-                as: "eventSavedUser"
+                localField: "owner",
+                foreignField: "_id",
+                as: "user"
             }
         },
         {
             $unwind: {
-                path: '$eventSavedUser',
+                path: '$user',
                 preserveNullAndEmptyArrays: true
             }
         },
@@ -87,24 +87,24 @@ const getOwnEventsByUserId = async (userId: string, page: number, limit: number,
             $project: {
                 _id: 1,
                 type: 1,
-                status: 1,
                 title: 1,
                 street: 1,
                 city: 1,
                 country: 1,
+                status: 1,
                 startDate: 1,
                 photos: { $first: "$photos" },
-                price: 1,
                 likedBy: {
                     $size: {
                         $ifNull: ["$likedBy", []]
                     }
                 },
+                price: 1,
                 liked: {
                     $cond: {
                         if: {
                             $in: [
-                                new mongoose.Types.ObjectId(userId),
+                                { $toObjectId: userId },
                                 { $ifNull: ["$likedBy", []] }
                             ]
                         },
@@ -115,7 +115,7 @@ const getOwnEventsByUserId = async (userId: string, page: number, limit: number,
                 saved: {
                     $cond: {
                         if: {
-                            $eq: [new mongoose.Types.ObjectId(userId), "$eventSavedUser._id"]
+                            $in: ["$_id", { $ifNull: ["$user.savedEvent", []] }]
                         },
                         then: true,
                         else: false
@@ -303,10 +303,15 @@ const getAllEvents = async (userId: string, page: number, limit: number, keyword
     }
     pipeline.push(
         {
+            $addFields: {
+                userId: mongoose.Types.ObjectId.isValid(userId) ? new mongoose.Types.ObjectId(userId) : null
+            }
+        },
+        {
             $lookup: {
                 from: "users",
-                localField: "_id",
-                foreignField: "savedEvent",
+                localField: "userId",
+                foreignField: "_id",
                 as: "user"
             }
         },
@@ -347,7 +352,9 @@ const getAllEvents = async (userId: string, page: number, limit: number, keyword
                 },
                 saved: {
                     $cond: {
-                        if: { $ne: ["$user", null] },
+                        if: {
+                            $in: ["$_id", { $ifNull: ["$user.savedEvent", []] }]
+                        },
                         then: true,
                         else: false
                     }

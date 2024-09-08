@@ -110,8 +110,6 @@ const login = asyncHandler(async (req: Request, res: Response) => {
         )
       );
   } catch (error) {
-    console.log(error)
-
     return res
       .status(status.INTERNAL_SERVER_ERROR)
       .json(
@@ -119,6 +117,43 @@ const login = asyncHandler(async (req: Request, res: Response) => {
       );
   }
 });
+
+const refreshToken = asyncHandler(async (req: Request, res: Response) => {
+  try {
+    const { refreshToken } = req.body;
+    const user = await userService.getUserByRefresh(refreshToken);
+    if (!user) {
+      return res.status(status.UNAUTHORIZED).json(new ApiError(status.UNAUTHORIZED, AppString.TOKEN_EXPIRE));
+    }
+
+    const accessToken = await user?.generateAccessToken();
+    const option = {
+      httpOnly: true,
+      secure: true,
+    };
+
+    return res
+      .status(status.OK)
+      .cookie("accessToken", accessToken, option)
+      .json(
+        new ApiResponse(
+          status.OK,
+          {
+            accessToken: accessToken,
+            refreshToken: refreshToken,
+          },
+          AppString.TOKEN_REGISTERED
+        )
+      );
+
+  } catch (error) {
+    return res
+      .status(status.INTERNAL_SERVER_ERROR)
+      .json(
+        new ApiError(status.INTERNAL_SERVER_ERROR, (error as Error).message)
+      );
+  }
+})
 
 const logout = asyncHandler(async (req: Request, res: Response) => {
   try {
@@ -249,4 +284,5 @@ export default {
   logout,
   sendOtp,
   verifyOtp,
+  refreshToken
 };

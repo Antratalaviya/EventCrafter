@@ -6,12 +6,26 @@ const getUserById = async (id: string | mongoose.Types.ObjectId) => {
   return await User.findById(id).select("-__v");
 };
 
+const getUserByRefresh = async (refreshToken: string) => {
+  return await User.findOne({ refreshToken, refreshTokenExpiry: { $gte: new Date() } });
+};
+
 const getUserByEmail = async (email: string) => {
   return await User.findOne({ email }).select("-__v");
 };
 
 const register = async (body: UserInput) => {
   return await User.create(body);
+};
+
+const updateAvatar = async (id: string, url: string) => {
+  return await User.findByIdAndUpdate(id, {
+    $set: {
+      avatar: url
+    }
+  }, {
+    new: true
+  });
 };
 
 const likeEventByUser = async (eventId: string, userId: string) => {
@@ -74,7 +88,7 @@ const getSavedEventByUser = async (userId: string) => {
     },
     {
       $project: {
-        _id: 0,
+        _id: "$savedEvents._id",
         type: "$savedEvents.type",
         title: '$savedEvents.title',
         street: "$savedEvents.street",
@@ -82,9 +96,39 @@ const getSavedEventByUser = async (userId: string) => {
         country: "$savedEvents.country",
         startDate: "$savedEvents.startDate",
         photos: { $first: "$savedEvents.photos" },
+        status: "$savedEvents.status",
         likedBy: {
           $size: {
             $ifNull: ["$savedEvents.likedBy", []]
+          }
+        },
+        price: 1,
+        liked: {
+          $cond: {
+            if: {
+              $in: [
+                new mongoose.Types.ObjectId(userId),
+                { $ifNull: ["$savedEvents.likedBy", []] }
+              ]
+            },
+            then: true,
+            else: false
+          }
+        },
+        participating: {
+          $cond: {
+            if: {
+              $in: [new mongoose.Types.ObjectId(userId), {
+                $ifNull: ["$savedEvents.participants", []]
+              }]
+            },
+            then: true,
+            else: false
+          }
+        },
+        participants: {
+          $size: {
+            $ifNull: ["$savedEvents.participants", []]
           }
         }
       }
@@ -114,17 +158,53 @@ const getLikedEventByUser = async (userId: string) => {
       }
     },
     {
+      $addFields: {
+        saved: {
+          $cond: {
+            if: {
+              $in: [
+                { $toObjectId: "$eventLiked._id" },
+                { $ifNull: ["$savedEvent", []] }
+              ]
+            },
+            then: true,
+            else: false
+          }
+        }
+      }
+    },
+    {
       $project: {
-        _id: 0,
+        _id: "$eventLiked._id",
         type: "$eventLiked.type",
         title: '$eventLiked.title',
         street: "$eventLiked.street",
         city: "$eventLiked.city",
         country: "$eventLiked.country",
         startDate: "$eventLiked.startDate",
+        photos: { $first: "$eventLiked.photos" },
         likedBy: {
           $size: {
             $ifNull: ["$eventLiked.likedBy", []]
+          }
+        },
+        status: "$eventLiked.status",
+        price: 1,
+        saved: 1,
+        participating: {
+          $cond: {
+            if: {
+              $in: [new mongoose.Types.ObjectId(userId), {
+                $ifNull: ["$eventLiked.participants", []]
+              }]
+            },
+            then: true,
+            else: false
+          }
+        },
+        participants: {
+          $size: {
+            $ifNull: ["$eventLiked.participants", []]
           }
         }
       }
@@ -200,6 +280,8 @@ const getUserProfile = async (userId: string) => {
         email: 1,
         name: 1,
         surname: 1,
+        profileImg: 1,
+        avatar: 1,
         subscriber: {
           $size: {
             $ifNull: ["$subscriber", []]
@@ -231,5 +313,7 @@ export default {
   getLikedEventByUser,
   addEventToJoinedEvent,
   getAllUsers,
-  getUserProfile
+  getUserProfile,
+  getUserByRefresh,
+  updateAvatar
 };

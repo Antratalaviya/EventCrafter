@@ -2,29 +2,61 @@ import config from "../config/config";
 import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react'
 import { getItem, removeItem, setItem } from "../utils/localStorageUtility";
 import { CONSTS } from "../utils/consts";
-import { authLogin } from "../store/AuthSlice";
+import { authLogin, authLogout } from "../store/AuthSlice";
 import { postEvents } from "../store/EventSlice";
 
 export const baseQueryIntercepter = (args) => {
   const baseQuery = fetchBaseQuery(args);
 
-  return async (args, api, options) => {
-    const result = await baseQuery(args, api, options);
+  return async (args, api, extraOptions) => {
+    let result;
 
-    if (result?.error?.status === 401) {
-      removeItem(CONSTS.AUTH_TOKEN);
-      location.replace('/sign-in');
+    try {
+      result = await baseQuery(args, api, extraOptions);
+
+      if (result?.error?.status === 401) {
+        const refreshToken = getItem(CONSTS.REFRESH_TOKEN);
+
+        if (!refreshToken) {
+          api.dispatch(authLogout());
+          location.replace('/sign-in');
+          return result;
+        }
+        const refreshResult = await baseQuery(
+          {
+            url: `/auth/refresh`,
+            method: 'POST',
+            body: { refreshToken }
+          },
+          api,
+          extraOptions
+        );
+
+        console.log('Refresh Result:', refreshResult);
+
+        if (refreshResult?.data) {
+          setItem(CONSTS.ACCESS_TOKEN, refreshResult.data.data.accessToken);
+          setItem(CONSTS.REFRESH_TOKEN, refreshResult.data.data.refreshToken);
+
+          result = await baseQuery(args, api, extraOptions);
+        } else {
+          api.dispatch(authLogout());
+          location.replace('/sign-in');
+        }
+      }
+    } catch (error) {
+      console.error('Error in baseQueryIntercepter:', error);
     }
-    return result
-  }
-}
+    return result;
+  };
+};
 
 export const api = createApi({
   reducerPath: "api",
   baseQuery: baseQueryIntercepter({
     baseUrl: `${config.apiUrl}`,
     prepareHeaders: (headers) => {
-      const token = getItem(CONSTS.AUTH_TOKEN);
+      const token = getItem(CONSTS.ACCESS_TOKEN);
 
       if (token) {
         headers.set("Authorization", `Bearer ${token}`)
@@ -33,7 +65,7 @@ export const api = createApi({
     },
   },
   ),
-  tagTypes: ['Auth', "Notification", "Event"],
+  tagTypes: ['Auth', "Notification", "Refresh", "EventUpdate"],
   endpoints: (builder) => ({
     register: builder.mutation({
       query: (userDetails) => ({
@@ -51,14 +83,14 @@ export const api = createApi({
       onQueryStarted: async (args, { dispatch, queryFulfilled }) => {
         try {
           const { data } = await queryFulfilled;
-          setItem(CONSTS.AUTH_TOKEN, data.data.accessToken);
+          setItem(CONSTS.ACCESS_TOKEN, data.data.accessToken);
+          setItem(CONSTS.REFRESH_TOKEN, data.data.refreshToken);
           dispatch(authLogin())
         } catch (error) {
           console.log("Login failed !! ", error);
         }
       },
-      invalidatesTags: ['Auth'],
-      providesTags: ["Notification"]
+      invalidatesTags: ['Auth', "Notification"],
     }),
     getUser: builder.query({
       query: () => ({
@@ -90,7 +122,7 @@ export const api = createApi({
         url: "/user/notifications",
         method: "GET"
       }),
-      invalidatesTags: ["Notification"],
+      providesTags: ["Notification"],
     }),
     getAllEvents: builder.query({
       query: ({ keyword, filter }) => {
@@ -151,13 +183,15 @@ export const api = createApi({
       query: (eventId) => ({
         url: `/event/like/${eventId}`,
         method: "POST"
-      })
+      }),
+      invalidatesTags: ["EventUpdate"]
     }),
     saveEvent: builder.mutation({
       query: (eventId) => ({
         url: `/event/save/${eventId}`,
         method: "POST"
       }),
+      invalidatesTags: ["EventUpdate"]
     }),
     getAllSendParticipants: builder.query({
       query: (eventId) => ({
@@ -171,14 +205,12 @@ export const api = createApi({
         method: "POST",
         body
       }),
-      invalidatesTags: ["Event"]
     }),
     getFullEvent: builder.query({
       query: (eventId) => ({
         url: `/event/${eventId}`,
         method: "GET"
       }),
-      providesTags: ['Event']
     }),
     sendInvitation: builder.mutation({
       query: ({ eventId, userId }) => ({
@@ -189,7 +221,27 @@ export const api = createApi({
           recipientId: userId
         }
       })
-    })
+    }),
+    getAllAvatars: builder.query({
+      query: () => ({
+        url: "/avatar",
+        method: "GET"
+      })
+    }),
+    getSavedEvents: builder.query({
+      query: () => ({
+        url: "/user/saved",
+        method: "GET"
+      }),
+      providesTags: ["EventUpdate"]
+    }),
+    getLikedEvents: builder.query({
+      query: () => ({
+        url: "/user/liked",
+        method: "GET"
+      }),
+      providesTags: ["EventUpdate"]
+    }),
   })
 })
 // /send/invitations/:eventId
@@ -207,4 +259,7 @@ export const {
   useGetAllSendParticipantsQuery,
   useCreateEventMutation,
   useSendInvitationMutation,
+  useGetAllAvatarsQuery,
+  useGetSavedEventsQuery,
+  useGetLikedEventsQuery,
 } = api;

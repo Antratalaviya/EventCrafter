@@ -15,6 +15,7 @@ export interface UserDocument extends UserInput, Document {
   passcode: number;
   profileImg: string;
   refreshToken: string;
+  refreshTokenExpiry: Date;
   savedEvent: Array<mongoose.Types.ObjectId>;
   createdAt: Date;
   updatedAt: Date;

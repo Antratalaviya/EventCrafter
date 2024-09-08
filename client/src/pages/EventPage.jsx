@@ -17,7 +17,6 @@ function EventPage() {
     useEffect(() => {
         if (isSuccess) {
             setEvent({ ...data.data[0] })
-            console.log(data.data)
         }
     }, [data])
 

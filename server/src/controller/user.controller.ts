@@ -41,17 +41,17 @@ const savedEventsByUser = asyncHandler(async (req: Request, res: Response) => {
 })
 
 const likedEventsByUser = asyncHandler(async (req: Request, res: Response) => {
-    try {
-        const userId = req.user._id;
-        const eventLiked = await userService.getLikedEventByUser(userId);
-        return res.status(status.OK).json(new ApiResponse(status.OK, eventLiked, AppString.LIKED_EVENTS))
-    } catch (error) {
-        return res
-            .status(status.INTERNAL_SERVER_ERROR)
-            .json(
-                new ApiError(status.INTERNAL_SERVER_ERROR, (error as Error).message)
-            );
-    }
+    // try {
+    const userId = req.user._id;
+    const eventLiked = await userService.getLikedEventByUser(userId);
+    return res.status(status.OK).json(new ApiResponse(status.OK, eventLiked, AppString.LIKED_EVENTS))
+    // } catch (error) {
+    //     return res
+    //         .status(status.INTERNAL_SERVER_ERROR)
+    //         .json(
+    //             new ApiError(status.INTERNAL_SERVER_ERROR, (error as Error).message)
+    //         );
+    // }
 })
 
 const getAllNotification = asyncHandler(async (req: Request, res: Response) => {
@@ -136,6 +136,33 @@ const getAllUsers = asyncHandler(async (req: Request, res: Response) => {
             );
     }
 })
+
+const updateUserAvatar = asyncHandler(async (req: Request, res: Response) => {
+    try {
+        const { url } = req.body;
+        const updatedUser = await userService.updateAvatar(req.user._id, url);
+
+        if (!updatedUser) {
+            return res
+                .status(status.INTERNAL_SERVER_ERROR)
+                .json(
+                    new ApiError(status.INTERNAL_SERVER_ERROR, AppString.ACTION_FAILED)
+                );
+        }
+
+        return res.status(status.OK)
+            .json(
+                new ApiResponse(status.OK, {}, AppString.AVATAR_UPDATED)
+            );
+    } catch (error) {
+        return res
+            .status(status.INTERNAL_SERVER_ERROR)
+            .json(
+                new ApiError(status.INTERNAL_SERVER_ERROR, (error as Error).message)
+            );
+    }
+})
+
 export default {
     getUserProfile,
     savedEventsByUser,
@@ -143,5 +170,6 @@ export default {
     getAllInvitation,
     subscribeUser,
     likedEventsByUser,
-    getAllUsers
+    getAllUsers,
+    updateUserAvatar
 }

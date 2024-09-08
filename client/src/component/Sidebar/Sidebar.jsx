@@ -40,7 +40,7 @@ function Sidebar() {
                       return <BuildingIcon className={`${loc === item.key && 'stroke-white'}`} />;
 
                     case "settings":
-                      return <SettingIcon className={`${loc === item.key && 'stroke-white'}`} />;
+                      return <SettingIcon className={`${loc === item.key ? 'stroke-white fill-white' : "fill-transperent stroke-[#96989D]"}`} />;
                   }
                 })()}
               </NavLink>

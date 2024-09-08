@@ -11,8 +11,10 @@ router.get('/saved', authMiddleware.verifyUserAccess, userController.savedEvents
 router.get('/liked', authMiddleware.verifyUserAccess, userController.likedEventsByUser)
 
 router.get('/notifications', authMiddleware.verifyUserAccess, userController.getAllNotification)
-router.get('/invitations', authMiddleware.verifyUserAccess, userController.getAllInvitation)  //recipients information to sent
+router.get('/invitations', authMiddleware.verifyUserAccess, userController.getAllInvitation)
 
-router.get('/subscribe/:subscribedToId', authMiddleware.verifyUserAccess, userController.subscribeUser) //to test
+router.get('/subscribe/:subscribedToId', authMiddleware.verifyUserAccess, userController.subscribeUser)
+
+router.post('/edit/avatar', authMiddleware.verifyUserAccess, userController.updateUserAvatar);
 
 export default router;

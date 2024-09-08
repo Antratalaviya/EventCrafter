@@ -1,3 +1,4 @@
 export const CONSTS = {
-    AUTH_TOKEN: "authToken"
+    ACCESS_TOKEN: "accessToken",
+    REFRESH_TOKEN: "refreshToken"
 }

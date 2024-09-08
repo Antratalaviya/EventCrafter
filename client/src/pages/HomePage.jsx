@@ -24,7 +24,11 @@ function HomePage() {
   }, [data])
 
   const filterEvent = (key) => {
-    setFilterEvents(data?.data.filter((e) => (e.type === key)))
+    if (!key) {
+      setFilterEvents(data?.data)
+    } else {
+      setFilterEvents(data?.data.filter((e) => (e.type === key)))
+    }
   }
 
   return (
@@ -48,6 +52,9 @@ function HomePage() {
               </button>
               <button className='focus:bg-red-gradient focus:text-white focus:border-none bg-red-gradient/10 text-red-gradient border border-red-gradient/50 rounded-full px-4 py-1 text-sm' onClick={() => filterEvent('business')}>
                 Business
+              </button>
+              <button className='focus:bg-primary focus:text-white focus:border-none bg-primary/10 text-primary border border-primary/50 rounded-full px-4 py-1 text-sm' onClick={() => filterEvent('')}>
+                All
               </button>
             </div>
             {active ? <SecurityMode /> : <EventsHome events={filterEvents} />}

@@ -1,5 +1,6 @@
 import mongoose from "mongoose";
 import bcryptjs from "bcryptjs";
+import { v4 as uuid } from 'uuid'
 
 import { Collection } from "../utils/appString";
 import { UserDocument } from "../constants";
@@ -45,9 +46,16 @@ const userSchema = new mongoose.Schema(
       type: String,
       default: "abc"
     },
+    profileImg: {
+      type: String,
+      default: "abc"
+    },
     refreshToken: {
       type: String,
       default: "",
+    },
+    refreshTokenExpiry: {
+      type: Date,
     },
     likedEvent: [{
       type: mongoose.Schema.Types.ObjectId,
@@ -111,19 +119,12 @@ userSchema.methods.generateAccessToken = async function (this: UserDocument) {
 };
 
 userSchema.methods.generateRefreshToken = async function (this: UserDocument) {
-  const secret: Secret = process.env.REFRESH_TOKEN_SECRET as string;
-  const option: SignOptions = {
-    expiresIn: process.env.REFRESH_TOKEN_EXPIRE as string,
-    algorithm: "HS512",
-  };
-
-  const payload = {
-    _id: this._id,
-  };
-
-  const refreshToken = jwt.sign(payload, secret, option);
+  const refreshToken = uuid();
   this.refreshToken = refreshToken;
-  await this.save();
+  const expiry = new Date();
+  expiry.setDate(expiry.getDate() + 30);
+  this.refreshTokenExpiry = expiry;
+  this.save();
   return refreshToken;
 };
 

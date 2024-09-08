@@ -1,10 +1,11 @@
 import React, { useState } from 'react'
 import ProfilesComponent from '../ProfilesComponent'
-import { EditIcon, LikeIcon, LocationFillIcon, SaveIcon, ShareIcon, StarIcon } from '../../assets/svg/Icon'
+import { DropDownIcon, EditIcon, LikeIcon, LocationFillIcon, SaveIcon, ShareIcon, StarIcon } from '../../assets/svg/Icon'
 import { capitalize } from '../../utils/customUtility'
 import { useLikeEventMutation, useSaveEventMutation } from '../../api/api'
+import { Link } from 'react-router-dom'
 
-function SingleEvent({ date = '1 Apr', likedBy = "0", img, eventId, add, title = 'California Art Festival', rating = '4.5', participants = "29,378", type = 'public', participating = false, status = "draft", liked = false, saved = false }) {
+function SingleEvent({ date = '1 Apr', likedBy = "0", img, eventId, add, title = 'California Art Festival', rating = '4.5', participants = "29,378", type = 'public', participating = false, status = "draft", liked = false, saved = false, own = false }) {
     const [likeEvent] = useLikeEventMutation();
     const [saveEvent] = useSaveEventMutation();
     const [likedEvent, setLikedEvent] = useState(liked);
@@ -33,7 +34,6 @@ function SingleEvent({ date = '1 Apr', likedBy = "0", img, eventId, add, title =
     }
 
     return (
-
         <div className={`grid grid-cols-12 shadow-custom-black bg-white/[3%] rounded-lg overflow-hidden relative`}>
             {status === "draft" && (
                 <div className='w-full h-full bg-white/20 absolute flex justify-center items-center z-20 backdrop-blur-sm'>
@@ -50,7 +50,7 @@ function SingleEvent({ date = '1 Apr', likedBy = "0", img, eventId, add, title =
                 <img className='w-full h-full object-cover' src={img} alt="event_img" />
             </div>
             <div className='col-span-8 flex flex-col justify-evenly px-5'>
-                <div className='flex justify-between items-center py-3 '>
+                <div className='flex justify-between items-center py-3'>
                     <div className='flex gap-3 items-center text-white'>
                         {type === 'private' && (
                             <div className='rounded-md bg-orange text-white px-5 py-2 col-span-1 flex items-center justify-center'>
@@ -63,7 +63,7 @@ function SingleEvent({ date = '1 Apr', likedBy = "0", img, eventId, add, title =
                             </div>
                         )}
                         {type === 'workshop' && (
-                            <div className='rounded-md bg-workshop text-white px-5 py-2 col-span-1 flex items-center justify-center'>
+                            <div className='rounded-md bg-workshop text-white px-3 py-2 col-span-1 flex items-center justify-center'>
                                 <p>Workshop</p>
                             </div>
                         )}
@@ -88,6 +88,9 @@ function SingleEvent({ date = '1 Apr', likedBy = "0", img, eventId, add, title =
                         <div onClick={() => handleSave(eventId)}>
                             {savedEvent ? (<SaveIcon className=" stroke-white fill-white" />) : (<SaveIcon className=" stroke-white" />)}
                         </div>
+                        <Link to={`/event/${eventId}`}>
+                            <DropDownIcon className="stroke-white size-5" />
+                        </Link>
                     </div>
                 </div>
                 <p className='text-white tracking-wider'>{capitalize(title)}</p>
@@ -111,22 +114,25 @@ function SingleEvent({ date = '1 Apr', likedBy = "0", img, eventId, add, title =
                         <p className='text-white/75 leading-6 font-normal tracking-wider font-sans'>{add}</p>
                     </div>
                 </div>
-                <div className='flex items-center text-white gap-5'>
-                    <div className='flex items-center gap-2'>
-                        <EditIcon />
-                        <p className='text-body-text font-light'>Edit</p>
+                {own && (
+                    <div className='flex items-center text-white gap-5'>
+                        <div className='flex items-center gap-2'>
+                            <EditIcon />
+                            <p className='text-body-text font-light'>Edit</p>
+                        </div>
+                        <p className='text-body-text font-light'>|</p>
+                        <div className='flex items-center gap-2'>
+                            <ShareIcon />
+                            <p className='text-body-text font-light'>Share</p>
+                        </div>
                     </div>
-                    <p className='text-body-text font-light'>|</p>
-                    <div className='flex items-center gap-2'>
-                        <ShareIcon />
-                        <p className='text-body-text font-light'>Share</p>
-                    </div>
-                </div>
+                )}
                 {participating && (
                     <div className='rounded-full bg-red text-white px-5 py-1 w-2/4 flex items-center justify-center'>
                         <p>participating</p>
                     </div>
                 )}
+
             </div>
         </div>
     )
