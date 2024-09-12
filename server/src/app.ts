@@ -5,6 +5,7 @@ import authRoutes from "./router/auth.router";
 import userRoutes from "./router/user.router";
 import eventRoutes from "./router/event.router";
 import avatarRoutes from "./router/avatar.router";
+// import { redisClient } from "./dbConnection/redisConfig";
 
 const app = express();
 
@@ -31,8 +32,8 @@ app.use(
   })
 );
 
-app.get("/test", (_, res: Response) => {
-  res.json("Api is running");
+app.get("/", async (_, res: Response) => {
+  res.status(200).send({ message: "Api is running" });
 });
 
 app.use("/auth", authRoutes);

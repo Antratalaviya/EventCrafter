@@ -16,7 +16,6 @@ function HomePage() {
   const { data, isSuccess } = useGetAllEventsQuery("");
   const { setPageName } = useCurrLocation();
   const [filterEvents, setFilterEvents] = useState([])
-
   useEffect(() => {
     if (isSuccess) {
       setFilterEvents(data?.data)
@@ -39,10 +38,10 @@ function HomePage() {
         </div>
         <div className='bg-black-light w-full h-auto rounded-lg relative'>
           <div className='shadow-custom-black flex flex-col p-4 space-y-5'>
-            <p className='text-white text-base tracking-wider'>Events</p>
+            <p className='text-white text-base tracking-wider'>Events </p>
             <div className='flex gap-x-2'>
               <button className='focus:bg-public focus:text-white focus:border-none bg-public/10 text-public border border-public/50 rounded-full px-4 py-1 text-sm' onClick={() => filterEvent('public')}>
-                Public
+                Publics
               </button>
               <button className='focus:bg-workshop focus:text-white focus:border-none bg-workshop/10 text-workshop border border-workshop/50 rounded-full px-4 py-1 text-sm' onClick={() => filterEvent('workshop')}>
                 Workshop

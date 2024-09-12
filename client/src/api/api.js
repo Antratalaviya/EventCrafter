@@ -143,7 +143,7 @@ export const api = createApi({
 
         return `/event?${queryString}`;
       },
-      providesTags: ['Auth']
+      providesTags: ['Auth', "EventUpdate"]
     }),
     getFullEvent: builder.query({
       query: (eventId) => ({
@@ -178,6 +178,7 @@ export const api = createApi({
           console.log("event retrieve failed !! ", error);
         }
       },
+      providesTags: ["EventUpdate"]
     }),
     likeEvent: builder.mutation({
       query: (eventId) => ({
