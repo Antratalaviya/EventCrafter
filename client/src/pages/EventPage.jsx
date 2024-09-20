@@ -171,10 +171,20 @@ function EventPage() {
                         text="Back"
                         onClick={() => navigate(-1)}
                     />
-                    <Button
-                        className="bg-red text-sm hover:bg-red/80 w-2/12"
-                        text="Cancel Event"
-                    />
+                    {event.status === 'draft' ? (
+                        <Link to={`/create-event/create-${event.type}-event/4?status=${event.status}`}>
+                            <Button
+                                className="bg-red text-sm hover:bg-red/80 w-2/12"
+                                text="Continue Payment"
+                            />
+                        </Link>
+                    ) : (
+                        <Button
+                            className="bg-red text-sm hover:bg-red/80 w-2/12"
+                            text="Cancel Event"
+                        />
+                    )}
+
                 </div>
             </div>
         </div>
