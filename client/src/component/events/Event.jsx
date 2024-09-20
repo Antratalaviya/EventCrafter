@@ -13,7 +13,7 @@ function Event({ className, btnText, btnClr, title, img, idx, des = "Et eum ut l
                 <p className='text-xl font-semibold'>{title}</p>
                 <p>{des}</p>
 
-                <NavLink to={`${EventsLinks[idx].path}`}>
+                <NavLink to={`${EventsLinks[idx].path}/1`}>
                     <div className='w-2/5 py-3'>
                         <Button
                             text='Create Now'

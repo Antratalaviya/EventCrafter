@@ -66,9 +66,9 @@ export const getFilterNotification = (strDate) => {
     const timeDiff = now.getTime() - date.getTime();
     const diffDays = Math.floor(timeDiff / (1000 * 60 * 60 * 24));
 
-    if (diffDays < 1) {
+    if (diffDays === 0) {
         return 0;
-    } else if (diffDays < 2) {
+    } else if (diffDays === 1) {
         return 1;
     }
 }

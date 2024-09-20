@@ -26,25 +26,27 @@ function SavedEvents() {
         return <Spinner />;
     }
     return (
-        <div className='grid xl:grid-cols-2 grid-cols-1 gap-5 p-5 '>
-            {savedEvents && savedEvents.map((event, index) => (
-                <SingleEvent
-                    key={index}
-                    eventId={event._id}
-                    date={date[index]}
-                    img={event.photos.url}
-                    add={`${event.street}, ${event.city}, ${event.country}`}
-                    title={event.title}
-                    rating={event.likedBy}
-                    participants={event.participants}
-                    likedBy={event.likedBy}
-                    type={event.type}
-                    participating={event.participating}
-                    status={event.status}
-                    liked={event.liked}
-                    saved={true}
-                />
-            ))}
+        <div className='h-[77%] p-5 overflow-y-scroll'>
+            <div className='grid grid-cols-1 gap-5'>
+                {savedEvents && savedEvents.map((event, index) => (
+                    <SingleEvent
+                        key={index}
+                        eventId={event._id}
+                        date={date[index]}
+                        img={event.photos.url}
+                        add={`${event.street}, ${event.city}, ${event.country}`}
+                        title={event.title}
+                        rating={event.likedBy}
+                        participants={event.participants}
+                        likedBy={event.likedBy}
+                        type={event.type}
+                        participating={event.participating}
+                        status={event.status}
+                        liked={event.liked}
+                        saved={true}
+                    />
+                ))}
+            </div>
         </div>
     )
 }

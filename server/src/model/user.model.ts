@@ -15,9 +15,11 @@ const userSchema = new mongoose.Schema(
     },
     orgName: {
       type: String,
+      default: ""
     },
     postcode: {
       type: Number,
+      default: ""
     },
     name: {
       type: String,

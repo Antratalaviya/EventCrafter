@@ -199,7 +199,8 @@ const getFullEventByEventId = async (eventId: string) => {
                     $size: {
                         $ifNull: ["$participants", []]
                     }
-                }
+                },
+                status: 1
             }
         }
     ];
@@ -264,7 +265,7 @@ const getAllEvents = async (userId: string, page: number, limit: number, keyword
     const pipeline: PipelineStage[] = [];
     pipeline.push({
         $match: {
-            status: { $ne: "cancelled" },
+            status: { $nin: ["cancelled", "draft"] },
             type: { $ne: "private" }
         }
     });
@@ -304,7 +305,7 @@ const getAllEvents = async (userId: string, page: number, limit: number, keyword
     pipeline.push(
         {
             $addFields: {
-                userId: mongoose.Types.ObjectId.isValid(userId) ? new mongoose.Types.ObjectId(userId) : null
+                userId: new mongoose.Types.ObjectId(userId)
             }
         },
         {

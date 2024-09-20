@@ -14,7 +14,7 @@ function SettingsItem({ icon, title, badge, toggle }) {
                     <label htmlFor={title}></label>
                 </div>
             )}
-            <DropDownIcon className="stroke-white" />
+            <DropDownIcon fill="white" />
         </div>
     )
 }

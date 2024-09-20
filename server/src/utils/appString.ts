@@ -70,6 +70,8 @@ export enum AppString {
   AVATAR_CREATED = "avatar created successfully",
   AVATAR_UPDATED = "avatar updated successfully",
   AVATAR_DELETED = "avatar deleted successfully",
+
+  CLIENT_SECRET_RETRIEVED = "client secret retrieved successfully",
 };
 
 export enum Collection {

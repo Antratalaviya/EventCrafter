@@ -43,7 +43,7 @@ export const LogoutLink = [
         key: "logout",
         label: "Logout",
         icon: <LogoutIcon />,
-        path: "/logout",
+        path: "/sign-in",
     },
 ];
 

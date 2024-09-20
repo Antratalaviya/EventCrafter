@@ -8,6 +8,7 @@ import Spinner from '../component/Spinner';
 import { img } from '../assets/assets';
 import { offers as EventOffer } from '../lib/consts';
 import Button from '../component/Button';
+import { toast } from 'react-toastify';
 
 function EventPage() {
     const { eventId } = useParams();
@@ -16,6 +17,7 @@ function EventPage() {
     const navigate = useNavigate()
     useEffect(() => {
         if (isSuccess) {
+            toast.success(data.message)
             setEvent({ ...data.data[0] })
         }
     }, [data])

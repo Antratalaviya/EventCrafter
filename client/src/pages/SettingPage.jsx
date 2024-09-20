@@ -10,20 +10,22 @@ function SettingPage() {
     return (
         <div className='grid grid-cols-4 h-screen'>
             <div className="overflow-hidden text-white bg-black-light p-5 col-span-1">
-                <div className="flex p-5 gap-3 flex-col items-center">
-                    <div className='rounded-full overflow-hidden ring-2 ring-white size-20'>
-                        <img src={img.p3} alt="User Avatar" className="avatar" />
-                    </div>
-                    <div className='flex flex-col items-center'>
+                <div className="flex p-5 gap-3 items-center justify-around">
+                    <Link to={'/settings/profile'}>
+                        <div className='rounded-full overflow-hidden ring-2 ring-white size-16 cursor-pointer'>
+                            <img src={img.p3} alt="User Avatar" className="avatar" />
+                        </div>
+                    </Link>
+                    <div className='flex flex-col items-end'>
                         <p>{`${user.name} ${user.surname}`}</p>
-                        <p>{user.email}</p>
+                        <p className='text-body-text'>{user.email}</p>
                     </div>
                 </div>
 
 
                 <div className="flex flex-col space-y-4">
                     <Link to={'/settings/edit/avatar'}>
-                        <SettingsItem icon={<UserIcon />} title="Avatar" />
+                        <SettingsItem icon={<UserIcon fill="#ffffff" />} title="Avatar" />
                     </Link>
                     <Link to={'/settings/saved/events'}>
                         <SettingsItem icon={<SaveIcon />} title="Save Events" />
@@ -31,8 +33,15 @@ function SettingPage() {
                     <Link to={'/settings/liked/events'}>
                         <SettingsItem icon={<LikeIcon />} title="Liked Events" />
                     </Link>
-                    <SettingsItem icon={<CalenderIcon />} title="Joined Events" />
-                    <SettingsItem icon={<BellIcon />} title="Notification" />
+                    <Link to={'/settings/your-friends/request'}>
+                        <SettingsItem icon={<UserIcon fill="#ffffff" />} title="Your Friends" />
+                    </Link>
+                    <Link to={'/settings/your-friends'}>
+                        <SettingsItem icon={<UserIcon fill="#ffffff" />} title="My Booking" />
+                    </Link>
+                    <Link to={'/settings/your-friends'}>
+                        <SettingsItem icon={<UserIcon fill="#ffffff" />} title="Delete My Account" />
+                    </Link>
                 </div>
             </div>
             <div className='col-span-3'>

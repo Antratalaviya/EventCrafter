@@ -5,7 +5,7 @@ import authRoutes from "./router/auth.router";
 import userRoutes from "./router/user.router";
 import eventRoutes from "./router/event.router";
 import avatarRoutes from "./router/avatar.router";
-// import { redisClient } from "./dbConnection/redisConfig";
+import paymentRoutes from "./router/payment.router";
 
 const app = express();
 
@@ -40,5 +40,6 @@ app.use("/auth", authRoutes);
 app.use("/user", userRoutes);
 app.use("/event", eventRoutes);
 app.use("/avatar", avatarRoutes);
+app.use("/payment", paymentRoutes);
 
 export { app };

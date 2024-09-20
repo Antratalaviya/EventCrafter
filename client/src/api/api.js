@@ -3,7 +3,7 @@ import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react'
 import { getItem, removeItem, setItem } from "../utils/localStorageUtility";
 import { CONSTS } from "../utils/consts";
 import { authLogin, authLogout } from "../store/AuthSlice";
-import { postEvents } from "../store/EventSlice";
+import { setClientSecret } from "../store/GlobalSlice";
 
 export const baseQueryIntercepter = (args) => {
   const baseQuery = fetchBaseQuery(args);
@@ -92,6 +92,12 @@ export const api = createApi({
       },
       invalidatesTags: ['Auth', "Notification"],
     }),
+    logout: builder.mutation({
+      query: () => ({
+        url: "/auth/sign-out",
+        method: "PATCH"
+      })
+    }),
     getUser: builder.query({
       query: () => ({
         url: "/user/profile",
@@ -170,14 +176,6 @@ export const api = createApi({
 
         return `/event/own?${queryString}`;
       },
-      onQueryStarted: async (args, { dispatch, queryFulfilled }) => {
-        try {
-          const { data } = await queryFulfilled;
-          dispatch(postEvents(data.data))
-        } catch (error) {
-          console.log("event retrieve failed !! ", error);
-        }
-      },
       providesTags: ["EventUpdate"]
     }),
     likeEvent: builder.mutation({
@@ -243,6 +241,33 @@ export const api = createApi({
       }),
       providesTags: ["EventUpdate"]
     }),
+    createCheckoutSession: builder.mutation({
+      query: ({ amount, description, quantity, name }) => ({
+        url: "/payment/create-checkout-session",
+        method: "POST",
+        body: {
+          amount: amount,
+          description: description,
+          quantity: quantity,
+          name: name,
+        }
+      }),
+      onQueryStarted: async (args, { dispatch, queryFulfilled }) => {
+        try {
+          const { data } = await queryFulfilled;
+          console.log("data", data)
+          dispatch(setClientSecret(data.data.client_secret))
+        } catch (error) {
+          console.log("client secret failed !! ", error);
+        }
+      },
+    }),
+    sessionStatus: builder.mutation({
+      query: ({ session_id }) => ({
+        url: `/payment/session-status?session_id=${session_id}`,
+        method: 'GET'
+      })
+    }),
   })
 })
 // /send/invitations/:eventId
@@ -263,4 +288,7 @@ export const {
   useGetAllAvatarsQuery,
   useGetSavedEventsQuery,
   useGetLikedEventsQuery,
+  useLogoutMutation,
+  useCreateCheckoutSessionMutation,
+  useSessionStatusMutation,
 } = api;

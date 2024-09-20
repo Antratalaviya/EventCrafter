@@ -3,17 +3,32 @@ import { NavLink } from 'react-router-dom'
 import { AddCircleIcon, BuildingIcon, HomeIcon, LogoIcon, LogoutIcon, MoneyIcon, MsgIcon, SettingIcon } from '../../assets/svg/Icon'
 import { SidebarLinks, LogoutLink } from "../../lib/consts"
 import { useCurrLocation } from '../../context/useCurrLocation'
+import { useLogoutMutation } from '../../api/api'
+import { toast } from 'react-toastify'
 
 function Sidebar() {
   const { setPageName, loc, setLoc } = useCurrLocation();
+  const [logout, { isLoading }] = useLogoutMutation();
   const handleChange = (page, location) => {
     setPageName(page)
     setLoc(location)
   }
+
+  const handleLogout = async () => {
+    try {
+      const response = await logout().unwrap();
+      if (response.success) {
+        toast.success(response.message);
+      }
+    } catch (error) {
+      toast.error(error.data.message);
+    }
+  }
+
   return (
     <div className='border bg-gray border-stroke flex flex-col items-center gap-3'>
       <div>
-        <NavLink to={'/'} className={({ isActive }) => `w-full py-5 flex justify-center items-center ${isActive ? "" : ""}`}>
+        <NavLink to={'/'} className={`w-full py-5 flex justify-center items-center`}>
           <LogoIcon />
         </NavLink>
       </div>
@@ -53,7 +68,7 @@ function Sidebar() {
         <ul>
           <li>
             {LogoutLink && LogoutLink.map((item) => (
-              <NavLink to={item.path} key={item.key} className={({ isActive }) => `${isActive ? "bg-primary border-r-2 border-white" : ""} mb-5 py-4 px-8 flex justify-center items-center`}>
+              <NavLink to={isLoading ? "/" : item.path} key={item.key} className={({ isActive }) => `${isActive ? "bg-primary border-r-2 border-white" : ""} mb-5 py-4 px-8 flex justify-center items-center`} onClick={handleLogout}>
 
                 {item.icon}
               </NavLink>

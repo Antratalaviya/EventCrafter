@@ -5,6 +5,8 @@ import Button from '../component/Button'
 import { Link, useNavigate } from 'react-router-dom'
 import { useForm } from 'react-hook-form'
 import { useLoginMutation } from '../api/api'
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 function Login() {
   const [passType, setPassType] = useState('password')
@@ -14,17 +16,19 @@ function Login() {
 
   const handleLogin = async (data) => {
     try {
-      let responce = await loginUser({ email: data.email, password: data.password }).unwrap();
-      if (responce.success) {
+      const response = await loginUser({ email: data.email, password: data.password }).unwrap();
+      if (response.success) {
+        toast.success(response.message)
         navigate('/');
       }
     } catch (error) {
-      console.log("error : ", error)
+      toast.error(error.data.message);
     }
   }
 
   return (
-    <div className='bg-background h-screen w-screen overflow-y-scroll grid place-items-center text-white'>
+    <div className='bg-background h-screen w-screen overflow-y-scroll flex flex-col justify-center items-center text-white'>
+      <ToastContainer theme="dark" limit={1} />
       <div className='w-1/3 bg-background shadow shadow-gray rounded-2xl p-8 space-y-5'>
         <div className='space-y-5 grid place-items-center'>
           <NamedLogoIcon />

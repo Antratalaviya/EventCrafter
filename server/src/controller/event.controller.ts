@@ -7,6 +7,7 @@ import eventService from "../service/event.service";
 import userService from "../service/user.service";
 import notificationService from "../service/notification.service";
 import invitationService from "../service/invitation.service";
+import { redisClient } from "../dbConnection/redisConfig";
 
 
 const createEvent = asyncHandler(async (req: Request, res: Response) => {
@@ -79,6 +80,19 @@ const getOwnEvents = asyncHandler(async (req: Request, res: Response) => {
         // }
         // await eventExist.save();
         let event = await eventService.getOwnEventsByUserId(req.user._id, page, limit, keyword, eventStatus, eventType, sortby);
+
+        if (!event || event.length === 0) {
+            return res.status(status.OK)
+                .json(
+                    new ApiResponse(status.OK, [], AppString.EVENT_RETRIEVED)
+                );
+        }
+
+        await redisClient.set(`ownEvents?page=${page}&limit=${limit}&keyword=${keyword}&status=${eventStatus}&type=${eventType}&sortby=${sortby}`, JSON.stringify(event), {
+            EX: 60 * 60,
+            NX: true
+        })
+
         return res.status(status.OK)
             .json(
                 new ApiResponse(status.OK, event, AppString.EVENT_RETRIEVED)
@@ -139,6 +153,8 @@ const likeEvent = asyncHandler(async (req: Request, res: Response) => {
                 .json(new ApiError(status.INTERNAL_SERVER_ERROR, AppString.EVENT_NOT_LIKED));
         }
 
+        await redisClient.del("allEvents?page=1&limit=10&keyword=&type=&sortby=");
+
         return res.status(status.OK)
             .json(
                 new ApiResponse(status.OK, {}, AppString.EVENT_LIKED)
@@ -172,6 +188,8 @@ const saveEvent = asyncHandler(async (req: Request, res: Response) => {
                 .status(status.INTERNAL_SERVER_ERROR)
                 .json(new ApiError(status.INTERNAL_SERVER_ERROR, AppString.EVENT_NOT_SAVED));
         }
+
+        await redisClient.del("allEvents?page=1&limit=10&keyword=&type=&sortby=");
 
         return res.status(status.OK)
             .json(
@@ -375,12 +393,24 @@ const getAllEvents = asyncHandler(async (req: Request, res: Response) => {
         //         eventExist.status = "completed"
         //     }
         // }
-        let event = await eventService.getAllEvents(req.user._id, page, limit, keyword, eventType, sortby);
+        let events = await eventService.getAllEvents(req.user._id, page, limit, keyword, eventType, sortby);
+        if (!events || events.length === 0) {
+            return res.status(status.OK)
+                .json(
+                    new ApiResponse(status.OK, [], AppString.EVENT_RETRIEVED)
+                );
+        }
+
+        await redisClient.set(`allEvents?page=${page}&limit=${limit}&keyword=${keyword}&type=${eventType}&sortby=${sortby}`, JSON.stringify(events), {
+            EX: 60 * 60,
+            NX: true
+        });
 
         return res.status(status.OK)
             .json(
-                new ApiResponse(status.OK, event, AppString.EVENT_RETRIEVED)
+                new ApiResponse(status.OK, events, AppString.EVENT_RETRIEVED)
             );
+
     } catch (error) {
         return res
             .status(status.INTERNAL_SERVER_ERROR)

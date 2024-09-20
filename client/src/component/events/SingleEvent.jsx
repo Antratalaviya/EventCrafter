@@ -1,9 +1,12 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import ProfilesComponent from '../ProfilesComponent'
 import { DropDownIcon, EditIcon, LikeIcon, LocationFillIcon, SaveIcon, ShareIcon, StarIcon } from '../../assets/svg/Icon'
 import { capitalize } from '../../utils/customUtility'
 import { useLikeEventMutation, useSaveEventMutation } from '../../api/api'
 import { Link } from 'react-router-dom'
+import { toast } from 'react-toastify'
+import { useDispatch } from 'react-redux'
+import { setProgress } from '../../store/GlobalSlice'
 
 function SingleEvent({ date = '1 Apr', likedBy = "0", img, eventId, add, title = 'California Art Festival', rating = '4.5', participants = "29,378", type = 'public', participating = false, status = "draft", liked = false, saved = false, own = false }) {
     const [likeEvent] = useLikeEventMutation();
@@ -11,14 +14,21 @@ function SingleEvent({ date = '1 Apr', likedBy = "0", img, eventId, add, title =
     const [likedEvent, setLikedEvent] = useState(liked);
     const [savedEvent, setSavedEvent] = useState(saved);
 
+    const dispatch = useDispatch();
+
     const handleLike = async (eventId) => {
         try {
             const response = await likeEvent(eventId).unwrap();
             if (response.success) {
+                if (likedEvent) {
+                    toast.success("event unliked successfully");
+                } else {
+                    toast.success(response.message);
+                }
                 setLikedEvent((prev) => !prev)
             }
         } catch (error) {
-            console.error('Failed to like event:', error);
+            toast.error(error.data.message);
         }
     }
 
@@ -26,21 +36,26 @@ function SingleEvent({ date = '1 Apr', likedBy = "0", img, eventId, add, title =
         try {
             const response = await saveEvent(eventId).unwrap();
             if (response.success) {
-                setSavedEvent((prev) => !prev)
+                if (savedEvent) {
+                    toast.success("event unsaved successfully");
+                } else {
+                    toast.success(response.message);
+                }
+                setSavedEvent((prev) => !prev);
             }
         } catch (error) {
-            console.error('Failed to save event:', error);
+            toast.error(error.data.message);
         }
     }
 
     return (
         <div className={`grid grid-cols-12 shadow-custom-black bg-white/[3%] rounded-lg overflow-hidden relative`}>
             {status === "draft" && (
-                <div className='w-full h-full bg-white/20 absolute flex justify-center items-center z-20 backdrop-blur-sm'>
+                <Link to={`/create-event/create-${type}-event/4?status=${status}`} className='w-full h-full bg-white/20 absolute flex justify-center items-center z-20 backdrop-blur-sm'>
                     <div className='rounded-full px-8 py-2 bg-white/25 text-white'>
                         Draft
                     </div>
-                </div>
+                </Link>
             )}
             <div className='col-span-4 h-60 relative'>
 
@@ -52,6 +67,7 @@ function SingleEvent({ date = '1 Apr', likedBy = "0", img, eventId, add, title =
             <div className='col-span-8 flex flex-col justify-evenly px-5'>
                 <div className='flex justify-between items-center py-3'>
                     <div className='flex gap-3 items-center text-white'>
+
                         {type === 'private' && (
                             <div className='rounded-md bg-orange text-white px-5 py-2 col-span-1 flex items-center justify-center'>
                                 <p>Private</p>
@@ -89,7 +105,7 @@ function SingleEvent({ date = '1 Apr', likedBy = "0", img, eventId, add, title =
                             {savedEvent ? (<SaveIcon className=" stroke-white fill-white" />) : (<SaveIcon className=" stroke-white" />)}
                         </div>
                         <Link to={`/event/${eventId}`}>
-                            <DropDownIcon className="stroke-white size-5" />
+                            <DropDownIcon fill="white" className="size-5" />
                         </Link>
                     </div>
                 </div>

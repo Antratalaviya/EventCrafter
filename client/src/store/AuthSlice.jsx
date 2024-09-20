@@ -1,9 +1,9 @@
 import { createSlice } from '@reduxjs/toolkit';
-import { removeItem } from '../utils/localStorageUtility';
+import { getItem, removeItem, setItem } from '../utils/localStorageUtility';
 import { CONSTS } from '../utils/consts';
 
 const initialState = {
-    userData: null,
+    userData: getItem("user") ? JSON.parse(getItem("user")) : null,
     status: false
 }
 
@@ -14,11 +14,12 @@ export const authSlicer = createSlice({
         authLogin: (state, action) => {
             state.status = true
             state.userData = action.payload;
+            setItem("user", JSON.stringify(state.userData));
         },
         authLogout: (state) => {
-            // removeItem(CONSTS.ACCESS_TOKEN)
             state.status = false;
             state.userData = null;
+            setItem('user', "")
         }
     }
 })

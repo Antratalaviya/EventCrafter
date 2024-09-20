@@ -1,5 +1,5 @@
 import React, { useState } from 'react'
-import { BellIcon } from '../../assets/svg/Icon'
+import { BellIcon, LogoIcon } from '../../assets/svg/Icon'
 import Drawer from '../Drawer/Drawer'
 import Notification from './Notification'
 import Button from '../Button'
@@ -35,7 +35,7 @@ function NotificationComponent({ notifications, setNotifications, isNewMsg, isLo
                             <React.Fragment key={n._id}>
                                 {i === 0 && todayCount > 0 && <h1 className='text-xl py-3'>Today</h1>}
                                 {i === todayCount && yesterDayCount > 0 && <h1 className='text-xl py-3'>YesterDay</h1>}
-                                {i === todayCount + 1 && <h1 className='text-xl py-3'>Few days ago</h1>}
+                                {i === (todayCount + yesterDayCount) && <h1 className='text-xl py-3'>Few days ago</h1>}
                                 <Notification
                                     message={n.message}
                                     time={time[i]}
@@ -75,6 +75,12 @@ function NotificationComponent({ notifications, setNotifications, isNewMsg, isLo
                             </div>
                         </div>
                         <hr />
+                        {notifications.length === 0 && (
+                            <div className='grid place-items-center mt-80 gap-3'>
+                                <LogoIcon />
+                                <p>No New Notification !!!</p>
+                            </div>
+                        )}
                     </div>
                 </div>
             </Drawer>

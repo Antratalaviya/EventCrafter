@@ -280,6 +280,10 @@ const getUserProfile = async (userId: string) => {
         email: 1,
         name: 1,
         surname: 1,
+        orgType: 1,
+        orgName: 1,
+        postcode: 1,
+        dob: 1,
         profileImg: 1,
         avatar: 1,
         subscriber: {

@@ -1,13 +1,14 @@
 import express from 'express'
 import authMiddleware from '../middleware/auth.middleware';
 import eventController from '../controller/event.controller';
+import cacheData from '../cache/cacheData';
 
 const router = express.Router();
 
 router.post('/', authMiddleware.verifyUserAccess, eventController.createEvent)
 
-router.get('/', authMiddleware.verifyUserAccess, eventController.getAllEvents);
-router.get('/own', authMiddleware.verifyUserAccess, eventController.getOwnEvents);
+router.get('/', authMiddleware.verifyUserAccess, cacheData.allEvents, eventController.getAllEvents);
+router.get('/own', authMiddleware.verifyUserAccess, cacheData.ownEvents, eventController.getOwnEvents);
 router.get('/:eventId', authMiddleware.verifyUserAccess, eventController.getFullEvent);
 
 

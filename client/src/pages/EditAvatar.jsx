@@ -11,8 +11,8 @@ function EditAvatar() {
         }
     }, [data])
     return (
-        <div className='h-screen overflow-y-scroll'>
-            <div className='grid grid-cols-3 gap-10 p-10 place-items-center'>
+        <div className='h-[65%] overflow-y-scroll p-10'>
+            <div className='grid xl:grid-cols-3 grid-cols-2 gap-10 place-items-center'>
                 {avatars && avatars.map((item) => (
                     <div key={item._id} className='col-span-1 rounded-md overflow-hidden'>
                         <img src={item.url} alt={`avatar_${item._id}`} className='' />

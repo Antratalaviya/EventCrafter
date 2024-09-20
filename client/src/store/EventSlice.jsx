@@ -1,19 +1,38 @@
 import { createSlice } from '@reduxjs/toolkit';
 
 const initialState = {
-    events: [],
+    event: {
+        type: "",
+        title: "",
+        subtitle1: "",
+        subtitle2: "",
+        category: "Select event category",
+        startDate: "",
+        endDate: "",
+        startTime: "",
+        endTime: "",
+        offers: [],
+        carCapacity: "10",
+        street: "",
+        city: "",
+        country: "",
+        description: "",
+        videoFile: "",
+        pdfFile: [],
+        photos: [],
+    },
 }
 
 export const eventSlicer = createSlice({
     name: 'event',
     initialState,
     reducers: {
-        postEvents: (state, action) => {
-            state.events = action.payload;
+        setEvent: (state, action) => {
+            state.event = { ...state.event, ...action.payload };
         },
     }
 })
 
-export const { postEvents } = eventSlicer.actions;
+export const { setEvent } = eventSlicer.actions;
 
 export default eventSlicer.reducer;

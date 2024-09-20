@@ -6,6 +6,7 @@ import userService from "../service/user.service";
 import notificationService from "../service/notification.service";
 import invitationService from "../service/invitation.service";
 import eventService from "../service/event.service";
+import { redisClient } from "../dbConnection/redisConfig";
 
 
 const getUserProfile = asyncHandler(async (req: Request, res: Response) => {
@@ -16,6 +17,10 @@ const getUserProfile = asyncHandler(async (req: Request, res: Response) => {
             ...user[0],
             events: eventsCreated.length
         }
+        await redisClient.set("user", JSON.stringify(newUser), {
+            NX: true
+        });
+
         return res.status(status.OK).json(new ApiResponse(status.OK, newUser, AppString.USER_RETRIEVED));
     } catch (error) {
         return res
@@ -30,6 +35,7 @@ const savedEventsByUser = asyncHandler(async (req: Request, res: Response) => {
     try {
         const userId = req.user._id;
         const eventSaved = await userService.getSavedEventByUser(userId);
+
         return res.status(status.OK).json(new ApiResponse(status.OK, eventSaved, AppString.SAVED_EVENTS))
     } catch (error) {
         return res
