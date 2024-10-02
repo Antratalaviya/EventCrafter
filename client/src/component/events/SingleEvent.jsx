@@ -51,7 +51,7 @@ function SingleEvent({ date = '1 Apr', likedBy = "0", img, eventId, add, title =
     return (
         <div className={`grid grid-cols-12 shadow-custom-black bg-white/[3%] rounded-lg overflow-hidden relative`}>
             {status === "draft" && (
-                <Link to={`/create-event/create-${type}-event/4?status=${status}`} className='w-full h-full bg-white/20 absolute flex justify-center items-center z-20 backdrop-blur-sm'>
+                <Link to={`/create-event/create-${type}-event/4?status=${status}&eventId=${eventId}`} className='w-full h-full bg-white/20 absolute flex justify-center items-center z-20 backdrop-blur-sm'>
                     <div className='rounded-full px-8 py-2 bg-white/25 text-white'>
                         Draft
                     </div>
@@ -84,7 +84,7 @@ function SingleEvent({ date = '1 Apr', likedBy = "0", img, eventId, add, title =
                             </div>
                         )}
                         {type === 'ticket' && (
-                            <div className='rounded-md bg-ticket text-white px-5 py-2 col-span-1 flex items-center justify-center'>
+                            <div className='rounded-md bg-yellow text-white px-5 py-2 col-span-1 flex items-center justify-center'>
                                 <p>Ticket</p>
                             </div>
                         )}
@@ -113,9 +113,9 @@ function SingleEvent({ date = '1 Apr', likedBy = "0", img, eventId, add, title =
                 <div className='flex gap-x-5 items-center'>
                     <div className='h-7 px-7 grid place-items-center bg-white/10 rounded-full text-white text-[12px]'>{likedBy}+Likes
                     </div>
-                    <div className='relative flex items-center'>
+                    <div className='flex -space-x-2 overflow-hidden'>
                         <ProfilesComponent />
-                        <div className="rounded-full overflow-hidden text-white/75 flex justify-center items-center bg-[#1E232D] p-2 -translate-x-9 z-10">
+                        <div className="rounded-full overflow-hidden text-white/75 flex justify-center items-center bg-[#1E232D] p-2">
                             <p className='text-[12px]'>{participants}+Going</p>
                         </div>
                     </div>

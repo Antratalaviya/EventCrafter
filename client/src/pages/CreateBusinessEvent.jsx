@@ -11,17 +11,20 @@ import { Link, Outlet, useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import { useDispatch, useSelector } from 'react-redux';
 import { setEvent } from '../store/EventSlice';
+import { setAcceptConcent, setProgress } from '../store/GlobalSlice';
+import { getItem } from '../utils/localStorageUtility';
 
 function CreateBusinessEvent() {
-    const [progress, setProgress] = useState(1);
     const [openConsent, setOpenConsent] = useState(false);
 
     const [eventCreated, setEventCreated] = useState();
     const [create, setCreate] = useState(false);
-    const [acceptConcent, setAcceptConcent] = useState(false);
 
     const navigate = useNavigate();
 
+    const acceptConcent = useSelector((state) => state.global.acceptConcent);
+    const progress = useSelector((state) => state.global.progress);
+    const eventId = JSON.parse(getItem("eventId"))
     const event = useSelector((state) => state.event.event);
     const dispatch = useDispatch();
 
@@ -58,30 +61,38 @@ function CreateBusinessEvent() {
     };
 
     useEffect(() => {
-        if (progress > 0 && progress <= 4) {
+        if (progress > 0 && progress < 4) {
             navigate(`/create-event/create-business-event/${progress}`);
+        } else if (progress === 4) {
+            navigate(`/create-event/create-business-event/${progress}?eventId=${eventCreated ? eventCreated._id : eventId}`);
         }
     }, [progress]);
 
+    useEffect(() => {
+        if (acceptConcent) {
+            navigate('/payment');
+        }
+    }, [acceptConcent, navigate]);
+
     const increaseProgress = async () => {
-        console.log(event)
+        console.log(event);
 
         if (progress === 4) {
             setOpenConsent(true);
         } else if (progress === 3) {
-            setCreate(true)
+            setCreate(true);
 
             try {
                 const res = await handleCreateEvent();
                 if (res === 1) {
                     toast("Event created successfully");
                     setCreate(false);
-                    setProgress((prev) => Math.min(prev + 1, 4));
+                    dispatch(setProgress(Math.min(progress + 1, 4)));
                     dispatch(setEvent(null));
 
                 } else {
                     toast("Event creation failed");
-                    setProgress(1);
+                    dispatch(setProgress(1));
                 }
             } catch (error) {
                 toast("Something went wrong. Please try again.");
@@ -89,40 +100,32 @@ function CreateBusinessEvent() {
             }
 
         } else {
-            setProgress((prev) => Math.min(prev + 1, 4));
+            dispatch(setProgress(Math.min(progress + 1, 4)));
         }
     };
 
+
     const decreaseProgress = () => {
-        setProgress((prevProgress) => {
-            const newProgress = Math.max(prevProgress - 1, 1);
-
-            if (newProgress === 2) {
-                setCreate(false);
-            }
-
-            if (acceptConcent) {
-                setAcceptConcent(false);
-            }
-
-            return newProgress;
-        });
+        dispatch(setProgress(Math.max(progress - 1, 1)));
+        if (acceptConcent) {
+            dispatch(setAcceptConcent(false));
+        }
+        if (progress === 3) {
+            setCreate(false)
+        }
     };
 
     return (
-        <div className='overflow-y-scroll overflow-x-hidden h-screen'>
-            <div style={{ boxShadow: "0px 4px 4px 0px #00000040" }} className="bg-black-light p-5 m-5 rounded-xl border-2 border-stroke relative text-white">
+        <div className='overflow-y-scroll overflow-x-hidden h-screen w-full p-5'>
+            <div className={`container-style p-5 space-y-5 border-2 border-stroke relative text-white ${progress > 4 && "hidden"}`}>
                 <ProgressBar progress={progress} />
                 <div className="p-4 border-b-2 border-body-text">
-                    <form className='flex justify-start'>
-                        {
-                            create ?
-                                <Spinner className="absolute top-0 left-0 h-full w-full backdrop-blur-sm" />
-                                :
-                                <Outlet />
-                        }
-                    </form>
-
+                    {
+                        create ?
+                            <Spinner className="absolute top-0 left-0 h-full w-full backdrop-blur-sm" />
+                            :
+                            <Outlet />
+                    }
                 </div>
                 <div className="mt-4 ml-auto w-1/5 gap-2 flex">
                     <Button
@@ -133,12 +136,12 @@ function CreateBusinessEvent() {
                     </Button>
                     <Button
                         onEvent={increaseProgress}
-                        text={isLoading ? "Loading..." : "Next"}
+                        text={isLoading ? "Loading..." : (progress === 4 ? "Continue" : "Next")}
                     />
                 </div>
             </div>
             <Modal open={openConsent} ModalClassName={'w-1/3'} className={'overflow-y-scroll'}>
-                <div className='w-full h-full flex items-center flex-col space-y-2 text-white'>
+                <div className='w-full h-full col-center space-y-2 text-white'>
                     <p>Declaration of consent</p>
                     <div className='h-1 border-b border-body-text w-full' />
                     <div className={`w-full space-y-4 p-2 text-body-text `}>
@@ -152,17 +155,31 @@ function CreateBusinessEvent() {
                     </div>
                     <div className='w-full space-y-3'>
                         <p className='text-body-text'>You accept this declaration of consent?</p>
-                        <Button text={'I Accept'} onEvent={() => { setOpenConsent(false); setAcceptConcent(true) }} />
-                        <Button text={'I Do not accept'} className='bg-dark' onEvent={() => setOpenConsent(false)} />
+                        <Button
+                            text={'I Accept'}
+                            onEvent={() => {
+                                setOpenConsent(false);
+                                dispatch(setAcceptConcent(true));
+                            }}
+                        />
+                        <Button
+                            text={'I Do not accept'}
+                            className='bg-dark'
+                            onEvent={() => {
+                                setOpenConsent(false);
+                                dispatch(setAcceptConcent(false));
+                                navigate('/');
+                            }}
+                        />
                     </div>
                 </div>
             </Modal>
 
             {eventCreated && (
                 <Modal open={acceptConcent}>
-                    <div className='text-white text-center flex flex-col items-center'>
+                    <div className='text-white col-center'>
                         <img src={img.done} alt="done" className='w-4/5 h-3/5' />
-                        <div className='flex flex-col items-center gap-3'>
+                        <div className='col-center gap-3'>
                             <h1 className='text-3xl'>Bingo !</h1>
                             <p className='text-body-text'>Your event has been created successfully .</p>
                             <Link to={`/event/${eventCreated._id}`} className='w-full'>

@@ -5,7 +5,7 @@ const Button = React.forwardRef(({ onEvent = () => { }, text, children, classNam
     return (
         <button
             onClick={onEvent}
-            className={twMerge(`py-2 rounded-full cursor-pointer text-center mt-2 w-full hover:bg-primary/80 ${variant}`, className)}
+            className={twMerge(`py-2 rounded-full cursor-pointer text-center w-full hover:bg-primary/80 ${variant}`, className)}
             ref={ref}
             {...props}
         >

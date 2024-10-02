@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react'
 import { Link, useNavigate, useParams } from 'react-router-dom'
-import { useGetFullEventQuery } from '../api/api';
+import { useAcceptInvitationsMutation, useGetFullEventQuery, useRejectInvitationsMutation } from '../api/api';
 import { capitalize, getDay, getFullDay, getFullTime, getMonth } from '../utils/customUtility';
 import { CalenderIcon, CarIcon, DropDownIcon, LikeIcon, LocationIcon } from '../assets/svg/Icon';
 import ProfilesComponent from '../component/ProfilesComponent';
@@ -14,13 +14,43 @@ function EventPage() {
     const { eventId } = useParams();
     const { data, isSuccess } = useGetFullEventQuery(eventId);
     const [event, setEvent] = useState();
+    const queryString = window.location.search;
+    const urlParams = new URLSearchParams(queryString);
+    const invitation = urlParams.get("invitation");
+    const [acceptInvitation, { isLoading: acceptLoading }] = useAcceptInvitationsMutation();
+    const [rejectedInvitation, { isLoading: rejectLoading }] = useRejectInvitationsMutation();
+
     const navigate = useNavigate()
     useEffect(() => {
         if (isSuccess) {
-            toast.success(data.message)
             setEvent({ ...data.data[0] })
+            console.log(data.data)
         }
     }, [data])
+
+    const handleAccept = async () => {
+        try {
+            const response = await acceptInvitation({ invitationId: invitation }).unwrap();
+            if (response.success) {
+                toast.success(response.message)
+            }
+            navigate("/settings/your-friends/invitation/received")
+        } catch (error) {
+            toast.error(error.message)
+        }
+    }
+
+    const handleReject = async () => {
+        try {
+            const response = await rejectedInvitation({ invitationId: invitation }).unwrap();
+            if (response.success) {
+                toast.success(response.message)
+            }
+            navigate("/settings/your-friends/invitation/received")
+        } catch (error) {
+            toast.error(error.message)
+        }
+    }
 
     if (!event) {
         return <Spinner />
@@ -88,18 +118,20 @@ function EventPage() {
                     )}
                 </div>
                 <div className='flex items-center gap-10'>
-                    <div className='flex items-center gap-2'>
-                        <div className='rounded-full size-10 overflow-hidden'>
-                            <img src={img.p4} alt="profile_img" className='h-10 w-16' />
+                    <Link to={`/organizer/${event.userId}`}>
+                        <div className='flex items-center gap-2'>
+                            <div className='rounded-full size-10 overflow-hidden'>
+                                <img src={event.avatar} alt="profile_img" className='h-10 w-16' />
+                            </div>
+                            <div className='flex flex-col'>
+                                <p className='text-white'>{`${capitalize(event.name)} ${capitalize(event.surname)}`}</p>
+                                <p>{`${event.subscriber} Subscribers`}</p>
+                            </div>
+                            <div className='rounded-md bg-primary text-white px-5 py-2 col-span-1 flex items-center justify-center ml-5'>
+                                <p>Subscribe</p>
+                            </div>
                         </div>
-                        <div className='flex flex-col'>
-                            <p className='text-white'>{`${capitalize(event.name)} ${capitalize(event.surname)}`}</p>
-                            <p>{`${event.subscriber} Subscribers`}</p>
-                        </div>
-                        <div className='rounded-md bg-primary text-white px-5 py-2 col-span-1 flex items-center justify-center ml-5'>
-                            <p>Subscribe</p>
-                        </div>
-                    </div>
+                    </Link>
                     <div className='flex items-center gap-2'>
                         <div className='rounded-full size-10 overflow-hidden flex items-center justify-center bg-white/20'>
                             <CalenderIcon className="size-5 fill-white" />
@@ -120,25 +152,20 @@ function EventPage() {
                     </div>
                 </div>
                 <div className='space-y-5 w-1/3'>
-                    <Link to={`/event/send/invitation/${eventId}`}>
-                        <Button
-                            text="Invite User"
-                            className="bg-primary/20 border border-primary"
-                        />
-                    </Link>
-                    <div className='shadow-custom-black p-4 flex items-center justify-around bg-new-card/50 rounded-lg'>
-                        <div>
-                            <p className='text-white/70 text-base'>Event Attendance List</p>
-                        </div>
-                        <div className="relative flex items-center">
-                            <ProfilesComponent />
-                            <div className="rounded-full overflow-hidden w-8 h-8 border border-icon-bg -translate-x-9 z-10">
-                                <img src={img.p4} alt="profile2" />
+                    <Link to={`/event/participants/${eventId}`}>
+                        <div className='shadow-custom-black p-4 flex items-center justify-around bg-new-card/50 rounded-lg'>
+                            <div>
+                                <p className='text-white/70 text-base'>Event Attendance List</p>
                             </div>
-                            <DropDownIcon fill="white" className="w-4 h-4" />
+                            <div className="relative flex items-center ">
+                                <div className="-space-x-2 flex overflow-hidden">
+                                    <ProfilesComponent />
+                                    <img src={img.p4} alt="profile1" className='inline-block size-8 rounded-full ring-2 ring-icon-bg' />
+                                </div>
+                                <DropDownIcon fill="white" className="w-4 h-4" />
+                            </div>
                         </div>
-
-                    </div>
+                    </Link>
                 </div>
                 <div className='p-2'>
                     <h1>About Event</h1>
@@ -166,15 +193,29 @@ function EventPage() {
                 </div>
                 <hr className='text-body-text' />
                 <div className='flex justify-between '>
-                    <Button
-                        className="w-2/12"
-                        text="Back"
-                        onClick={() => navigate(-1)}
-                    />
-                    {event.status === 'draft' ? (
-                        <Link to={`/create-event/create-${event.type}-event/4?status=${event.status}`}>
+                    {invitation ? (
+                        <Button
+                            className="w-2/12 bg-red hover:bg-red/80"
+                            text={rejectLoading ? "Loading..." : "Reject"}
+                            onClick={handleReject}
+                        />
+                    ) : (
+                        <Button
+                            className="w-2/12 bg-dark hover:bg-dark/80"
+                            text="Back"
+                            onClick={() => navigate(-1)}
+                        />
+                    )
+                    }
+                    {invitation ? (
+                        <Button
+                            onClick={handleAccept}
+                            className="w-2/12"
+                            text={acceptLoading ? "Loading..." : "Accept"}
+                        />
+                    ) : event.status === 'draft' ? (
+                        <Link to={`/create-event/create-${event.type}-event/4?status=${event.status}`} className="w-2/12">
                             <Button
-                                className="bg-red text-sm hover:bg-red/80 w-2/12"
                                 text="Continue Payment"
                             />
                         </Link>
@@ -183,11 +224,13 @@ function EventPage() {
                             className="bg-red text-sm hover:bg-red/80 w-2/12"
                             text="Cancel Event"
                         />
-                    )}
+                    )
+                    }
+
 
                 </div>
             </div>
-        </div>
+        </div >
     )
 }
 

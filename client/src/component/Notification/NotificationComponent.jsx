@@ -6,7 +6,7 @@ import Button from '../Button'
 import { img } from '../../assets/assets'
 import { getFilterNotification } from '../../utils/customUtility'
 
-function NotificationComponent({ notifications, setNotifications, isNewMsg, isLoading, time, setIsNewMsg }) {
+function NotificationComponent({ notifications, setNotifications, isNewMsg, isLoading, time, setIsNewMsg, handleReadNotification }) {
     const [todayCount, setTodayCount] = useState(0);
     const [yesterDayCount, setYesterDayCount] = useState(0);
     const [notiDrawer, setNotiDrawer] = useState(false);
@@ -21,12 +21,16 @@ function NotificationComponent({ notifications, setNotifications, isNewMsg, isLo
     }
     return (
         <>
-            <div onClick={handleOpen} className='relative'>
+            <div onClick={() => {
+                handleOpen();
+                handleReadNotification();
+            }
+            } className='relative'>
                 <BellIcon className="pr-3 w-10 cursor-pointer" />
                 {isNewMsg && (
                     <div className='size-2 rounded-full bg-red absolute top-0 right-3' />
                 )}
-            </div>
+            </div >
             <Drawer open={notiDrawer} onClose={() => setNotiDrawer(false)} className="ml-[60rem] col-span-12 overflow-y-scroll">
                 <div className='text-white'>
                     <p className='-pt-5 text-center text-black text-2xl font-bold tracking-wider sticky left-16 top-0 bg-white py-5 rounded-full mb-5'>Notification</p>

@@ -19,22 +19,22 @@ export const SidebarLinks = [
         path: "/message",
     },
     {
-        key: "money",
-        label: "Money",
+        key: "news",
+        label: "News",
         icon: <MoneyIcon />,
-        path: "/money",
+        path: "/news",
     },
     {
-        key: "building",
-        label: "Building",
+        key: "property",
+        label: "Property",
         icon: <BuildingIcon />,
-        path: "/building",
+        path: "/property",
     },
     {
         key: "settings",
         label: "Settings",
         icon: <SettingIcon />,
-        path: "/settings",
+        path: "/settings/profile",
     },
 ];
 

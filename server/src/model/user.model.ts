@@ -78,6 +78,10 @@ const userSchema = new mongoose.Schema(
     joinedEvent: [{
       type: mongoose.Schema.Types.ObjectId,
       ref: "Event"
+    }],
+    friends: [{
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "User"
     }]
   },
   {

@@ -188,17 +188,17 @@ const logout = asyncHandler(async (req: Request, res: Response) => {
 
 const sendOtp = asyncHandler(async (req: Request, res: Response) => {
   try {
-    let user = req.user;
+    const { email } = req.body;
 
-    let otpExist = await otpService.getOtp(user.email);
+    let otpExist = await otpService.getOtp(email);
 
     let otp = await otpService.generateOtp();
 
     if (otpExist) {
-      await otpService.deleteOtp(user.email);
+      await otpService.deleteOtp(email);
     }
 
-    let newOtpSchema = await otpService.createOtp(user.email, otp);
+    let newOtpSchema = await otpService.createOtp(email, otp);
 
     if (!newOtpSchema) {
       return res
@@ -206,7 +206,7 @@ const sendOtp = asyncHandler(async (req: Request, res: Response) => {
         .json(new ApiError(status.INTERNAL_SERVER_ERROR, AppString.OTP_ERR));
     }
 
-    let to = user.email;
+    let to = email;
     let subject = "Verify your email";
     let text = "Your email verified Succesfully";
 
@@ -216,7 +216,7 @@ const sendOtp = asyncHandler(async (req: Request, res: Response) => {
 
     return res
       .status(status.OK)
-      .json(new ApiResponse(status.OK, {}, AppString.OTP_SEND));
+      .json(new ApiResponse(status.OK, { otp }, AppString.OTP_SEND));
   } catch (error) {
     return res
       .status(status.INTERNAL_SERVER_ERROR)
@@ -246,19 +246,16 @@ const sendMail = async (
 
 const verifyOtp = asyncHandler(async (req: Request, res: Response) => {
   try {
-    let otp = req.body.otp;
-    let user = req.user;
+    let { otp, email } = req.body;
 
-    let otpExist = await otpService.getOtp(user.email);
+
+    let otpExist = await otpService.getOtp(email);
 
     if (!otpExist) {
       return res
         .status(status.NOT_FOUND)
         .json(new ApiError(status.NOT_FOUND, AppString.OTP_EXPIRED));
     }
-
-    console.log(typeof otp);
-    console.log(typeof otpExist.otp.toString())
 
     if (otp !== otpExist.otp.toString()) {
       return res

@@ -3,7 +3,7 @@ import { Request, Response } from 'express';
 import status from 'http-status';
 import avatarService from "../service/avatar.service";
 import { AppString } from "../utils/appString";
-import { redisClient } from "../dbConnection/redisConfig";
+// import { redisClient } from "../dbConnection/redisConfig";
 
 const getAllAvatar = asyncHandler(async (req: Request, res: Response) => {
     try {
@@ -16,7 +16,7 @@ const getAllAvatar = asyncHandler(async (req: Request, res: Response) => {
                 );
         }
 
-        await redisClient.set("avatar", JSON.stringify(avatars));
+        // await redisClient.set("avatar", JSON.stringify(avatars));
 
         return res.status(status.OK)
             .json(

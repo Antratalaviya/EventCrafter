@@ -110,8 +110,8 @@ function Search({ filter, setFilter, search, setSearch, events, setEvents }) {
                         <div className='w-full overflow-hidden space-y-3'>
                             <p>EventClasses</p>
                             <div className='flex justify-start items-center flex-wrap gap-3'>
-                                <label htmlFor="type5" className='cursor-pointer relative inline-flex items-center' >
-                                    <input type="radio" name="status" id="status5" value="upcoming" onChange={handleChange} className='sr-only peer h-full w-full' checked={filter.status === 'upcoming'} />
+                                <label htmlFor="status4" className='cursor-pointer relative inline-flex items-center' >
+                                    <input type="radio" name="status" id="status4" value="upcoming" onChange={handleChange} className='sr-only peer h-full w-full' checked={filter.status === 'upcoming'} />
                                     <div className={`py-2 rounded-full cursor-pointer mt-2 w-full flex justify-center items-center peer-checked:bg-primary bg-dark px-5`}>
                                         <p>Upcoming</p>
                                     </div>

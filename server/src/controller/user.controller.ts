@@ -6,7 +6,7 @@ import userService from "../service/user.service";
 import notificationService from "../service/notification.service";
 import invitationService from "../service/invitation.service";
 import eventService from "../service/event.service";
-import { redisClient } from "../dbConnection/redisConfig";
+// import { redisClient } from "../dbConnection/redisConfig";
 
 
 const getUserProfile = asyncHandler(async (req: Request, res: Response) => {
@@ -17,9 +17,32 @@ const getUserProfile = asyncHandler(async (req: Request, res: Response) => {
             ...user[0],
             events: eventsCreated.length
         }
-        await redisClient.set("user", JSON.stringify(newUser), {
-            NX: true
-        });
+        // await redisClient.set("user", JSON.stringify(newUser), {
+        //     NX: true
+        // });
+
+        return res.status(status.OK).json(new ApiResponse(status.OK, newUser, AppString.USER_RETRIEVED));
+    } catch (error) {
+        return res
+            .status(status.INTERNAL_SERVER_ERROR)
+            .json(
+                new ApiError(status.INTERNAL_SERVER_ERROR, (error as Error).message)
+            );
+    }
+})
+
+const getUserById = asyncHandler(async (req: Request, res: Response) => {
+    try {
+        const { userId } = req.params;
+        const user = await userService.getUserProfile(userId)
+        const eventsCreated = await eventService.getEventByUserId(userId)
+        const newUser = {
+            ...user[0],
+            events: eventsCreated.length
+        }
+        // await redisClient.set("user", JSON.stringify(newUser), {
+        //     NX: true
+        // });
 
         return res.status(status.OK).json(new ApiResponse(status.OK, newUser, AppString.USER_RETRIEVED));
     } catch (error) {
@@ -33,6 +56,9 @@ const getUserProfile = asyncHandler(async (req: Request, res: Response) => {
 
 const savedEventsByUser = asyncHandler(async (req: Request, res: Response) => {
     try {
+        if (req.user.savedEvent.length === 0) {
+            return res.status(status.OK).json(new ApiResponse(status.OK, [], AppString.SAVED_EVENTS));
+        }
         const userId = req.user._id;
         const eventSaved = await userService.getSavedEventByUser(userId);
 
@@ -47,17 +73,20 @@ const savedEventsByUser = asyncHandler(async (req: Request, res: Response) => {
 })
 
 const likedEventsByUser = asyncHandler(async (req: Request, res: Response) => {
-    // try {
-    const userId = req.user._id;
-    const eventLiked = await userService.getLikedEventByUser(userId);
-    return res.status(status.OK).json(new ApiResponse(status.OK, eventLiked, AppString.LIKED_EVENTS))
-    // } catch (error) {
-    //     return res
-    //         .status(status.INTERNAL_SERVER_ERROR)
-    //         .json(
-    //             new ApiError(status.INTERNAL_SERVER_ERROR, (error as Error).message)
-    //         );
-    // }
+    try {
+        if (req.user.likedEvent.length === 0) {
+            return res.status(status.OK).json(new ApiResponse(status.OK, [], AppString.LIKED_EVENTS));
+        }
+        const userId = req.user._id;
+        const eventLiked = await userService.getLikedEventByUser(userId);
+        return res.status(status.OK).json(new ApiResponse(status.OK, eventLiked, AppString.LIKED_EVENTS))
+    } catch (error) {
+        return res
+            .status(status.INTERNAL_SERVER_ERROR)
+            .json(
+                new ApiError(status.INTERNAL_SERVER_ERROR, (error as Error).message)
+            );
+    }
 })
 
 const getAllNotification = asyncHandler(async (req: Request, res: Response) => {
@@ -65,7 +94,7 @@ const getAllNotification = asyncHandler(async (req: Request, res: Response) => {
         const userId = req.user._id;
         const notifications = await notificationService.getAllNotification(userId)
         if (!notifications) {
-            return res.status(status.OK).json(new ApiResponse(status.OK, {}, AppString.NO_NOTIF))
+            return res.status(status.OK).json(new ApiResponse(status.OK, [], AppString.NO_NOTIF))
         }
         return res.status(status.OK).json(new ApiResponse(status.OK, notifications, AppString.NOTIFICATIONS))
     } catch (error) {
@@ -77,14 +106,14 @@ const getAllNotification = asyncHandler(async (req: Request, res: Response) => {
     }
 })
 
-const getAllInvitation = asyncHandler(async (req: Request, res: Response) => {
+const readAllNotification = asyncHandler(async (req: Request, res: Response) => {
     try {
         const userId = req.user._id;
-        const invitations = await invitationService.getAllInvitation(userId)
-        if (!invitations) {
-            return res.status(status.OK).json(new ApiResponse(status.OK, {}, AppString.NO_INVITATION))
+        const notifications = await notificationService.readAllNotification(userId)
+        if (!notifications) {
+            return res.status(status.OK).json(new ApiResponse(status.OK, [], AppString.ACTION_FAILED))
         }
-        return res.status(status.OK).json(new ApiResponse(status.OK, invitations, AppString.INVITAIIONS))
+        return res.status(status.OK).json(new ApiResponse(status.OK, notifications, AppString.NOTIFICATION_UPDATED))
     } catch (error) {
         return res
             .status(status.INTERNAL_SERVER_ERROR)
@@ -145,8 +174,8 @@ const getAllUsers = asyncHandler(async (req: Request, res: Response) => {
 
 const updateUserAvatar = asyncHandler(async (req: Request, res: Response) => {
     try {
-        const { url } = req.body;
-        const updatedUser = await userService.updateAvatar(req.user._id, url);
+        const { avatar } = req.body;
+        const updatedUser = await userService.updateUser(req.user._id, { avatar });
 
         if (!updatedUser) {
             return res
@@ -169,13 +198,160 @@ const updateUserAvatar = asyncHandler(async (req: Request, res: Response) => {
     }
 })
 
+const updateUserProfileImage = asyncHandler(async (req: Request, res: Response) => {
+    try {
+        const { profileImg } = req.body;
+        const updatedUser = await userService.updateUser(req.user._id, { profileImg });
+
+        if (!updatedUser) {
+            return res
+                .status(status.INTERNAL_SERVER_ERROR)
+                .json(
+                    new ApiError(status.INTERNAL_SERVER_ERROR, AppString.ACTION_FAILED)
+                );
+        }
+
+        return res.status(status.OK)
+            .json(
+                new ApiResponse(status.OK, {}, AppString.USER_UPDATED)
+            );
+    } catch (error) {
+        return res
+            .status(status.INTERNAL_SERVER_ERROR)
+            .json(
+                new ApiError(status.INTERNAL_SERVER_ERROR, (error as Error).message)
+            );
+    }
+})
+
+const updateUserEmail = asyncHandler(async (req: Request, res: Response) => {
+    try {
+        const { email } = req.body;
+        const updatedUser = await userService.updateUser(req.user._id, { email });
+
+        if (!updatedUser) {
+            return res
+                .status(status.INTERNAL_SERVER_ERROR)
+                .json(
+                    new ApiError(status.INTERNAL_SERVER_ERROR, AppString.ACTION_FAILED)
+                );
+        }
+
+        return res.status(status.OK)
+            .json(
+                new ApiResponse(status.OK, {}, AppString.EMAIL_UPDATED)
+            );
+    } catch (error) {
+        return res
+            .status(status.INTERNAL_SERVER_ERROR)
+            .json(
+                new ApiError(status.INTERNAL_SERVER_ERROR, (error as Error).message)
+            );
+    }
+})
+
+const updateUserProfile = asyncHandler(async (req: Request, res: Response) => {
+    try {
+        const { name, surname, postcode, orgName, dob } = req.body;
+        const updatedUser = await userService.updateUser(req.user._id, { name, surname, postcode, orgName, dob });
+
+        if (!updatedUser) {
+            return res
+                .status(status.INTERNAL_SERVER_ERROR)
+                .json(
+                    new ApiError(status.INTERNAL_SERVER_ERROR, AppString.ACTION_FAILED)
+                );
+        }
+
+        return res.status(status.OK)
+            .json(
+                new ApiResponse(status.OK, {}, AppString.USER_UPDATED)
+            );
+    } catch (error) {
+        return res
+            .status(status.INTERNAL_SERVER_ERROR)
+            .json(
+                new ApiError(status.INTERNAL_SERVER_ERROR, (error as Error).message)
+            );
+    }
+})
+
+const deleteUserAccount = asyncHandler(async (req: Request, res: Response) => {
+    try {
+        const deletedUser = await userService.deleteUser(req.user._id)
+
+        if (!deletedUser) {
+            return res
+                .status(status.INTERNAL_SERVER_ERROR)
+                .json(
+                    new ApiError(status.INTERNAL_SERVER_ERROR, AppString.ACTION_FAILED)
+                );
+        }
+
+        return res.status(status.OK)
+            .json(
+                new ApiResponse(status.OK, {}, AppString.USER_ACCOUNT_DEL)
+            );
+    } catch (error) {
+        return res
+            .status(status.INTERNAL_SERVER_ERROR)
+            .json(
+                new ApiError(status.INTERNAL_SERVER_ERROR, (error as Error).message)
+            );
+    }
+})
+
+const getAllFriends = asyncHandler(async (req: Request, res: Response) => {
+    try {
+
+        if (req.user.friends.length === 0) {
+            return res.status(status.OK).json(new ApiResponse(status.OK, [], AppString.USER_RETRIEVED));
+        }
+        const users = await userService.getAllUsersFriends(req.user._id)
+
+        return res.status(status.OK).json(new ApiResponse(status.OK, users, AppString.USER_RETRIEVED));
+    } catch (error) {
+        return res
+            .status(status.INTERNAL_SERVER_ERROR)
+            .json(
+                new ApiError(status.INTERNAL_SERVER_ERROR, (error as Error).message)
+            );
+    }
+})
+
+const getEventParticipants = asyncHandler(async (req: Request, res: Response) => {
+    try {
+        const { eventId } = req.params;
+
+        const users = await invitationService.getEventParticipants(eventId)
+
+        // if (req.user.joinedEvent.length === 0) {
+        //     return res.status(status.OK).json(new ApiResponse(status.OK, [], AppString.USER_RETRIEVED));
+        // }
+        return res.status(status.OK).json(new ApiResponse(status.OK, users, AppString.USER_RETRIEVED));
+    } catch (error) {
+        return res
+            .status(status.INTERNAL_SERVER_ERROR)
+            .json(
+                new ApiError(status.INTERNAL_SERVER_ERROR, (error as Error).message)
+            );
+    }
+})
+
 export default {
     getUserProfile,
     savedEventsByUser,
     getAllNotification,
-    getAllInvitation,
     subscribeUser,
     likedEventsByUser,
     getAllUsers,
-    updateUserAvatar
+    updateUserAvatar,
+    updateUserEmail,  //
+    updateUserProfile, //
+    updateUserProfileImage,//
+    readAllNotification,
+    deleteUserAccount, //
+    getAllFriends,
+    getEventParticipants,
+    getUserById
 }

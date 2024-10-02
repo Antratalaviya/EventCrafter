@@ -18,6 +18,12 @@ function Notification({ message = "Clara Tolson Join your Event Gala Music Festi
                                 <Button>Accept</Button>
                             </div>
                         )}
+                        {type === 'connection' && (
+                            <div className='flex gap-3 w-full'>
+                                <Button className="bg-stroke hover:bg-stroke/80">Decline</Button>
+                                <Button>Connect</Button>
+                            </div>
+                        )}
                     </div>
                 </div>
                 <div>

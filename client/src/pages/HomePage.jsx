@@ -31,45 +31,43 @@ function HomePage() {
   }
 
   return (
-    <div className='grid grid-flow-col grid-cols-12 bg-background p-5 gap-5 overflow-y-scroll'>
+    <div className='grid grid-flow-col grid-cols-12 p-5 gap-5 overflow-y-scroll'>
       <div className='col-span-8 space-y-5'>
-        <div className='shadow-custom-black bg-black-light w-full h-auto rounded-lg'>
+        <div className='container-style'>
           <MaxHome />
         </div>
-        <div className='bg-black-light w-full h-auto rounded-lg relative'>
-          <div className='shadow-custom-black flex flex-col p-4 space-y-5'>
-            <p className='text-white text-base tracking-wider'>Events </p>
-            <div className='flex gap-x-2'>
-              <button className='focus:bg-public focus:text-white focus:border-none bg-public/10 text-public border border-public/50 rounded-full px-4 py-1 text-sm' onClick={() => filterEvent('public')}>
-                Publics
-              </button>
-              <button className='focus:bg-workshop focus:text-white focus:border-none bg-workshop/10 text-workshop border border-workshop/50 rounded-full px-4 py-1 text-sm' onClick={() => filterEvent('workshop')}>
-                Workshop
-              </button>
-              <button className='focus:bg-ticket focus:text-white focus:border-none bg-ticket/10 text-ticket border border-ticket/50 rounded-full px-4 py-1 text-sm' onClick={() => filterEvent('ticket')}>
-                Ticket
-              </button>
-              <button className='focus:bg-red-gradient focus:text-white focus:border-none bg-red-gradient/10 text-red-gradient border border-red-gradient/50 rounded-full px-4 py-1 text-sm' onClick={() => filterEvent('business')}>
-                Business
-              </button>
-              <button className='focus:bg-primary focus:text-white focus:border-none bg-primary/10 text-primary border border-primary/50 rounded-full px-4 py-1 text-sm' onClick={() => filterEvent('')}>
-                All
-              </button>
-            </div>
-            {active ? <SecurityMode /> : <EventsHome events={filterEvents} />}
+        <div className='container-style relative flex flex-col p-4 space-y-5'>
+          <p className='text-white text-base tracking-wider'>Events </p>
+          <div className='flex gap-x-2'>
+            <button className='focus:bg-public focus:text-white focus:border-none bg-public/10 text-public border border-public/50 rounded-full px-4 py-1 text-sm' onClick={() => filterEvent('public')}>
+              Publics
+            </button>
+            <button className='focus:bg-workshop focus:text-white focus:border-none bg-workshop/10 text-workshop border border-workshop/50 rounded-full px-4 py-1 text-sm' onClick={() => filterEvent('workshop')}>
+              Workshop
+            </button>
+            <button className='focus:bg-ticket focus:text-white focus:border-none bg-ticket/10 text-ticket border border-ticket/50 rounded-full px-4 py-1 text-sm' onClick={() => filterEvent('ticket')}>
+              Ticket
+            </button>
+            <button className='focus:bg-red-gradient focus:text-white focus:border-none bg-red-gradient/10 text-red-gradient border border-red-gradient/50 rounded-full px-4 py-1 text-sm' onClick={() => filterEvent('business')}>
+              Business
+            </button>
+            <button className='focus:bg-primary focus:text-white focus:border-none bg-primary/10 text-primary border border-primary/50 rounded-full px-4 py-1 text-sm' onClick={() => filterEvent('')}>
+              All
+            </button>
           </div>
+          {active ? <SecurityMode /> : <EventsHome events={filterEvents} />}
         </div>
 
       </div>
       <div className='col-span-4 h-full space-y-10'>
-        <div className='shadow-custom-black p-4 w-full flex items-center justify-around bg-black-light rounded-lg'>
+        <div className='container-style p-4 flex items-center justify-around'>
           <div>
             <p className='text-white/70 text-base'>EventCrafter Moments</p>
           </div>
-          <div className="relative flex items-center">
-            <ProfilesComponent />
-            <div className="rounded-full overflow-hidden w-8 h-8 border border-icon-bg -translate-x-9 z-10">
-              <img src={img.p4} alt="profile2" />
+          <div className="relative flex items-center ">
+            <div className="-space-x-2 flex overflow-hidden">
+              <ProfilesComponent />
+              <img src={img.p4} alt="profile1" className='inline-block size-8 rounded-full ring-2 ring-icon-bg' />
             </div>
             <DropDownIcon fill="white" className="w-4 h-4" />
           </div>
@@ -88,8 +86,6 @@ function HomePage() {
           <Link to={'/'}>
             <EventTypeBox img={img.eventType4} event="News" />
           </Link>
-
-
         </div>
       </div>
     </div>

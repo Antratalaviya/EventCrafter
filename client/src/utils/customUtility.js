@@ -17,7 +17,7 @@ export const getDay = (index) => {
 
 export const getFullDay = (index) => {
     const days = [
-        "Sunday", "Monday", "Tueday", "Wedday", "Thuday", "Friday", "Satday"
+        "Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"
     ];
     return days[index];
 };
@@ -59,6 +59,11 @@ export const getTime = (strDate) => {
     return `${date.getDate()}/${date.getMonth() + 1}/${date.getFullYear()}`;
 }
 
+export const getDate = (strDate) => {
+    const date = new Date(strDate);
+    return `${date.getDate()}.${date.getMonth() + 1}.${date.getFullYear()}`;
+}
+
 export const getFilterNotification = (strDate) => {
     const date = new Date(strDate);
     const now = new Date();
@@ -72,16 +77,15 @@ export const getFilterNotification = (strDate) => {
         return 1;
     }
 }
+export const formatTime = (time) => {
+    const hours = parseInt(time.substring(0, 2), 10);
+    const minutes = time.substring(3, 5);
+    const suffix = hours >= 12 ? 'PM' : 'AM';
+    const formattedHours = hours % 12 === 0 ? 12 : hours % 12;
+    return `${formattedHours}:${minutes} ${suffix}`;
+};
 
 export const getFullTime = (startTime, endTime) => {
-    const formatTime = (time) => {
-        const hours = parseInt(time.substring(0, 2), 10);
-        const minutes = time.substring(3, 5);
-        const suffix = hours >= 12 ? 'PM' : 'AM';
-        const formattedHours = hours % 12 === 0 ? 12 : hours % 12; // Convert 24-hour to 12-hour format
-        return `${formattedHours}:${minutes} ${suffix}`;
-    };
-
     const formattedStartTime = formatTime(startTime);
     const formattedEndTime = formatTime(endTime);
 

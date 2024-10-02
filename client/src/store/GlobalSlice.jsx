@@ -7,7 +7,7 @@ const initialState = {
         amount: 0.99,
         name: "Private event purchase",
         description: "Selected Silver Package",
-        quantity: 1
+        quantity: 1,
     },
     clientSecret: "",
 }
@@ -23,7 +23,7 @@ export const globalSlicer = createSlice({
             state.acceptConcent = action.payload;
         },
         setPayment: (state, action) => {
-            state.payment = action.payload;
+            state.payment = { ...state.payment, ...action.payload };
         },
         setClientSecret: (state, action) => {
             state.clientSecret = action.payload;

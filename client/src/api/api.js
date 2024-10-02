@@ -65,8 +65,9 @@ export const api = createApi({
     },
   },
   ),
-  tagTypes: ['Auth', "Notification", "Refresh", "EventUpdate"],
+  tagTypes: ['Auth', "Notification", "Refresh", "EventUpdate", "Invitation", "Connection", "Users"],
   endpoints: (builder) => ({
+    /************************************************************* Auth APIs ************************************************************** */
     register: builder.mutation({
       query: (userDetails) => ({
         url: "/auth/sign-up",
@@ -98,6 +99,21 @@ export const api = createApi({
         method: "PATCH"
       })
     }),
+    sendOtp: builder.mutation({
+      query: ({ email }) => ({
+        url: "/auth/send-otp",
+        method: "POST",
+        body: { email }
+      })
+    }),
+    verifyOtp: builder.mutation({
+      query: ({ otp, email }) => ({
+        url: "/auth/verify-otp",
+        method: "POST",
+        body: { otp, email }
+      })
+    }),
+    /************************************************************* User APIs ************************************************************** */
     getUser: builder.query({
       query: () => ({
         url: "/user/profile",
@@ -112,6 +128,12 @@ export const api = createApi({
         }
       },
       providesTags: ['Auth']
+    }),
+    getUserById: builder.query({
+      query: (userId) => ({
+        url: `/user/${userId}`,
+        method: "GET"
+      }),
     }),
     getAllUser: builder.query({
       query: ({ keyword }) => {
@@ -130,27 +152,89 @@ export const api = createApi({
       }),
       providesTags: ["Notification"],
     }),
-    getAllEvents: builder.query({
-      query: ({ keyword, filter }) => {
-        let queryString = '';
-
-        if (keyword) {
-          queryString += `keyword=${keyword}`;
-        }
-
-        if (filter) {
-          Object.keys(filter).forEach((key) => {
-            const value = filter[key];
-            if (value) {
-              queryString += `&${key}=${value}`;
-            }
-          });
-        }
-
-        return `/event?${queryString}`;
-      },
-      providesTags: ['Auth', "EventUpdate"]
+    readNotification: builder.mutation({
+      query: () => ({
+        url: "/user/notifications/read",
+        method: "POST"
+      }),
     }),
+    getSavedEvents: builder.query({
+      query: () => ({
+        url: "/user/saved",
+        method: "GET"
+      }),
+      providesTags: ["EventUpdate"]
+    }),
+    getLikedEvents: builder.query({
+      query: () => ({
+        url: "/user/liked",
+        method: "GET"
+      }),
+      providesTags: ["EventUpdate"]
+    }),
+    updateAvatar: builder.mutation({
+      query: ({ avatar }) => ({
+        url: "/user/edit/avatar",
+        method: "PUT",
+        body: {
+          avatar
+        }
+      }),
+      invalidatesTags: ["Auth"]
+    }),
+    updateProfileImage: builder.mutation({
+      query: ({ profileImg }) => ({
+        url: "/user/edit/profile-image",
+        method: "PUT",
+        body: {
+          profileImg
+        }
+      }),
+      invalidatesTags: ["Auth"]
+    }),
+    updateProfile: builder.mutation({
+      query: ({ name, surname, postcode, orgName, dob }) => ({
+        url: "/user/edit/profile",
+        method: "PUT",
+        body: {
+          name,
+          surname,
+          postcode,
+          orgName,
+          dob
+        }
+      }),
+      invalidatesTags: ["Auth"]
+    }),
+    updateEmail: builder.mutation({
+      query: ({ email }) => ({
+        url: "/user/edit/email",
+        method: "PUT",
+        body: {
+          email
+        }
+      }),
+      invalidatesTags: ["Auth"]
+    }),
+    deleteAccount: builder.query({
+      query: () => ({
+        url: "/user/delete/account",
+        method: "DELETE"
+      }),
+    }),
+    getAllFriends: builder.query({
+      query: () => ({
+        url: "/user/friends",
+        method: "GET"
+      }),
+    }),
+    getEventParticipants: builder.query({
+      query: (eventId) => ({
+        url: `/user/participants/${eventId}`,
+        method: "GET"
+      }),
+    }),
+    /************************************************************* Event APIs ************************************************************** */
     getFullEvent: builder.query({
       query: (eventId) => ({
         url: `/event/${eventId}`,
@@ -178,6 +262,23 @@ export const api = createApi({
       },
       providesTags: ["EventUpdate"]
     }),
+    getOwnPublicEvents: builder.query({
+      query: ({ filter, userId }) => {
+        let queryString = '';
+
+        if (filter) {
+          Object.keys(filter).forEach((key) => {
+            const value = filter[key];
+            if (value) {
+              queryString += `${key}=${value}&`;
+            }
+          });
+        }
+
+        return `/event/own/public/${userId}?${queryString}`;
+      },
+      providesTags: ["EventUpdate"]
+    }),
     likeEvent: builder.mutation({
       query: (eventId) => ({
         url: `/event/like/${eventId}`,
@@ -192,12 +293,6 @@ export const api = createApi({
       }),
       invalidatesTags: ["EventUpdate"]
     }),
-    getAllSendParticipants: builder.query({
-      query: (eventId) => ({
-        url: `/event/send/invitations/${eventId}`,
-        method: "GET"
-      }),
-    }),
     createEvent: builder.mutation({
       query: (body) => ({
         url: "/event",
@@ -211,36 +306,134 @@ export const api = createApi({
         method: "GET"
       }),
     }),
+    updateEventStatus: builder.mutation({
+      query: ({ eventId, status }) => ({
+        url: `/event/status/${eventId}`,
+        method: "PUT",
+        body: {
+          eventStatus: status
+        }
+      }),
+      invalidatesTags: ["EventUpdate"]
+    }),
+    getAllEvents: builder.query({
+      query: ({ keyword, filter }) => {
+        let queryString = '';
+
+        if (keyword) {
+          queryString += `keyword=${keyword}`;
+        }
+
+        if (filter) {
+          Object.keys(filter).forEach((key) => {
+            const value = filter[key];
+            if (value) {
+              queryString += `&${key}=${value}`;
+            }
+          });
+        }
+
+        return `/event?${queryString}`;
+      },
+      providesTags: ['Auth', "EventUpdate"]
+    }),
+    /************************************************************* Invitation APIs************************************************************** */
     sendInvitation: builder.mutation({
       query: ({ eventId, userId }) => ({
-        url: '/event/invite',
+        url: '/invitation/send',
         method: 'POST',
         body: {
           eventId,
           recipientId: userId
         }
+      }),
+      invalidatesTags: ["Users"]
+    }),
+    getAllSendParticipants: builder.query({
+      query: (eventId) => ({
+        url: `/invitation/sent/${eventId}`,
+        method: "GET"
+      }),
+      providesTags: ["Users"]
+    }),
+    getAllInvitations: builder.query({
+      query: () => ({
+        url: `/invitation`,
+        method: "GET"
+      }),
+      providesTags: ["Invitation"]
+    }),
+    getAllSentInvitations: builder.query({
+      query: () => ({
+        url: `/invitation/sent`,
+        method: "GET"
+      }),
+      providesTags: ["Invitation"]
+    }),
+    getAllReceivedInvitations: builder.query({
+      query: () => ({
+        url: `/invitation/received`,
+        method: "GET"
+      }),
+      providesTags: ["Invitation"]
+    }),
+    acceptInvitations: builder.mutation({
+      query: ({ invitationId }) => ({
+        url: `/invitation/accept/${invitationId}`,
+        method: "POST"
+      }),
+      invalidatesTags: ["Invitation"]
+    }),
+    rejectInvitations: builder.mutation({
+      query: ({ invitationId }) => ({
+        url: `/invitation/reject/${invitationId}`,
+        method: "POST"
+      }),
+      invalidatesTags: ["Invitation"]
+    }),
+    /************************************************************* Connection APIs ************************************************************** */
+    sendConnectionRequest: builder.mutation({
+      query: ({ recipientId }) => ({
+        url: `/connection/send/${recipientId}`,
+        method: 'POST',
       })
     }),
+    getAllConnectionRequest: builder.query({
+      query: () => ({
+        url: `/connection`,
+        method: "GET"
+      }),
+      providesTags: ["Connection"]
+    }),
+    getConnectionExist: builder.query({
+      query: (recipientId) => ({
+        url: `/connection/exist/${recipientId}`,
+        method: "GET"
+      }),
+      providesTags: ["Connection"]
+    }),
+    acceptConnectionRequest: builder.mutation({
+      query: ({ connectionId }) => ({
+        url: `/connection/accept/${connectionId}`,
+        method: "POST"
+      }),
+      invalidatesTags: ["Connection"]
+    }),
+    rejectConnectionRequest: builder.mutation({
+      query: ({ connectionId }) => ({
+        url: `/connection/reject/${connectionId}`,
+        method: "POST"
+      }),
+      invalidatesTags: ["Connection"]
+    }),
+    /************************************************************* Avatar APIs ************************************************************** */
     getAllAvatars: builder.query({
       query: () => ({
         url: "/avatar",
         method: "GET"
       })
     }),
-    getSavedEvents: builder.query({
-      query: () => ({
-        url: "/user/saved",
-        method: "GET"
-      }),
-      providesTags: ["EventUpdate"]
-    }),
-    getLikedEvents: builder.query({
-      query: () => ({
-        url: "/user/liked",
-        method: "GET"
-      }),
-      providesTags: ["EventUpdate"]
-    }),
+    /************************************************************* Payment APIs ************************************************************** */
     createCheckoutSession: builder.mutation({
       query: ({ amount, description, quantity, name }) => ({
         url: "/payment/create-checkout-session",
@@ -270,25 +463,54 @@ export const api = createApi({
     }),
   })
 })
-// /send/invitations/:eventId
+
 export const {
   useRegisterMutation,
   useLoginMutation,
+  useLogoutMutation,
+  useSendOtpMutation,
+  useVerifyOtpMutation,
+
   useGetUserQuery,
-  useGetAllEventsQuery,
-  useLikeEventMutation,
-  useSaveEventMutation,
   useGetAllNotificationQuery,
-  useGetAllOwnEventsQuery,
-  useGetFullEventQuery,
   useGetAllUserQuery,
-  useGetAllSendParticipantsQuery,
-  useCreateEventMutation,
-  useSendInvitationMutation,
-  useGetAllAvatarsQuery,
   useGetSavedEventsQuery,
   useGetLikedEventsQuery,
-  useLogoutMutation,
+  useReadNotificationMutation,
+  useUpdateAvatarMutation,
+  useUpdateProfileImageMutation,
+  useUpdateProfileMutation,
+  useUpdateEmailMutation,
+  useDeleteAccountMutation,
+  useGetAllFriendsQuery,
+  useGetEventParticipantsQuery,
+  useGetUserByIdQuery,
+
+  useGetAllEventsQuery,
+  useSaveEventMutation,
+  useLikeEventMutation,
+  useGetAllOwnEventsQuery,
+  useGetFullEventQuery,
+  useCreateEventMutation,
+  useUpdateEventStatusMutation,
+  useGetOwnPublicEventsQuery,
+
+  useGetAllSendParticipantsQuery,
+  useSendInvitationMutation,
+  useGetAllInvitationsQuery,
+  useGetAllSentInvitationsQuery,
+  useGetAllReceivedInvitationsQuery,
+  useAcceptInvitationsMutation,
+  useRejectInvitationsMutation,
+
+  useSendConnectionRequestMutation,
+  useGetAllConnectionRequestQuery,
+  useAcceptConnectionRequestMutation,
+  useRejectConnectionRequestMutation,
+  useGetConnectionExistQuery,
+
+  useGetAllAvatarsQuery,
+
   useCreateCheckoutSessionMutation,
   useSessionStatusMutation,
 } = api;

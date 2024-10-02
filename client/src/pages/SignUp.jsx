@@ -8,24 +8,30 @@ import { useForm } from 'react-hook-form';
 import { useRegisterMutation } from '../api/api';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import Otp from '../component/Otp/Otp';
 
 function SignUp() {
     const [passType, setPassType] = useState('password');
     const [currPassType, setCurrPassType] = useState('password');
+    const [verify, setVerify] = useState(false);
+    const [email, setEmail] = useState("");
     const [orgType, setOrgType] = useState();
-    const { register, handleSubmit } = useForm();
+    const { register, handleSubmit, watch } = useForm();
     const navigate = useNavigate();
     const [regitserUser, { isLoading }] = useRegisterMutation();
 
-
     const handleRegister = async (data) => {
         try {
-            const response = await regitserUser({
-                ...data
-            })
-            if (response.success) {
-                toast.success(response.message)
-                navigate('/sign-in');
+            if (verify) {
+                const response = await regitserUser({
+                    ...data, email
+                })
+                if (response.success) {
+                    toast.success(response.message)
+                    navigate('/sign-in');
+                }
+            } else {
+                toast.error("verify email first")
             }
         } catch (error) {
             toast.error(error.data.message)
@@ -34,7 +40,7 @@ function SignUp() {
 
 
     return (
-        <div className='bg-background h-screen w-screen overflow-y-scroll flex flex-col justify-center items-center text-white'>
+        <div className='bg-background h-screen w-screen overflow-y-scroll col-center text-white'>
             <ToastContainer theme="dark" limit={1} />
             <div className='w-1/3 bg-background shadow shadow-gray rounded-2xl p-8 space-y-5'>
                 <div className='space-y-5 grid place-items-center'>
@@ -82,10 +88,9 @@ function SignUp() {
                                         type={'number'}
                                         placeholder="******"
                                         className={'pl-8 flex justify-evenly items-center appearance-none'}
-                                        max={6}
+                                        maxLength={6}
                                         {...register('postcode', {
                                             required: true,
-                                            // pattern: /^\d{1,6}$/
                                         })}
                                     >
                                         <p className='w-1/2'>postcode please</p>
@@ -133,18 +138,12 @@ function SignUp() {
                                 <CalenderIcon />
                             </Input>
                         </div>
-                        <div className='relative w-full'>
-                            <EmailIcon className="absolute top-1/2 left-2 transform -translate-y-1/2" />
-                            <Input
-                                type={'email'}
-                                placeholder="Your Email Address"
-                                className={'pl-8 flex items-center pr-3'}
-                                {...register('email', {
-                                    required: true,
-                                    pattern: /^[^\s@]+@[^\s@]+\.[^\s@]+$/
-                                })}
-                            />
-                        </div>
+                        <Otp
+                            email={email}
+                            setEmail={setEmail}
+                            verify={verify}
+                            setVerify={setVerify}
+                        />
                         <div className='relative w-full'>
                             <LockIcon className="absolute top-1/2 left-2 transform -translate-y-1/2" />
                             <Input
@@ -177,7 +176,7 @@ function SignUp() {
                             </Input>
                         </div>
                         <p className='text-body-text'>By creating an account, you agree our <span className='text-white'>terms of Service</span> and <span className='text-white'>privacy policy</span></p>
-                        <Button onSubmit={() => disabled}
+                        <Button
                             text={isLoading ? "Loading" : "Sign Up"}
                         />
                     </div>
@@ -191,7 +190,6 @@ function SignUp() {
                 </div>
             </div>
         </div>
-
     )
 }
 

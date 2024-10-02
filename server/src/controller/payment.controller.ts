@@ -18,7 +18,7 @@ const createCheckoutSession = asyncHandler(async (req: Request, res: Response) =
 
     const price = await stripe.prices.create({
         product: product.id,
-        unit_amount: parseInt(amount) * 100,
+        unit_amount: Math.floor(parseInt(amount)),
         currency: 'usd',
     });
 

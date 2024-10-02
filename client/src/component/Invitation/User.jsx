@@ -4,9 +4,9 @@ import { SelectIcon } from '../../assets/svg/Icon'
 import { capitalize } from "../../utils/customUtility"
 import { useSendInvitationMutation } from '../../api/api';
 import Spinner from '../Spinner';
+import { toast } from 'react-toastify';
 
 function User({ avatar = "abc", name = "name", surname = "surname", id, eventId, sendParticipants }) {
-    const [sent, setSent] = useState(false);
     const [sendInvitation, { isLoading, isSuccess }] = useSendInvitationMutation();
     const [isSend, setIsSend] = useState(false)
 
@@ -15,17 +15,18 @@ function User({ avatar = "abc", name = "name", surname = "surname", id, eventId,
         try {
             const response = await sendInvitation({ eventId, userId: id })
             if (response.success) {
-                setSent((prev) => !prev)
+                setIsSend(true)
             }
         } catch (error) {
-            console.log("send Invitation failer !! ", error)
+            toast.error(error)
         }
     }
 
     useEffect(() => {
         const sendSet = new Set(sendParticipants.map((s) => s._id));
         setIsSend(sendSet.has(id));
-    }, [sendParticipants, id]);
+    }, [sendParticipants]);
+
     if (!eventId) {
         return <Spinner />
     }

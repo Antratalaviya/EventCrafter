@@ -18,14 +18,29 @@ const register = async (body: UserInput) => {
   return await User.create(body);
 };
 
-const updateAvatar = async (id: string, url: string) => {
+interface updateUserDto {
+  avatar?: string;
+  profileImg?: string;
+  email?: string;
+  name?: string;
+  surname?: string;
+  postcode?: string;
+  orgName?: string;
+  dob?: string;
+}
+
+const updateUser = async (id: string, body: updateUserDto) => {
   return await User.findByIdAndUpdate(id, {
     $set: {
-      avatar: url
+      ...body
     }
   }, {
     new: true
   });
+};
+
+const deleteUser = async (id: string) => {
+  return await User.findByIdAndDelete(id);
 };
 
 const likeEventByUser = async (eventId: string, userId: string) => {
@@ -233,14 +248,18 @@ const subscribeUser = async (subscriberId: string, subscribedToId: string) => {
 }
 
 const addEventToJoinedEvent = async (userId: mongoose.Types.ObjectId, eventId: mongoose.Types.ObjectId) => {
-  await User.findByIdAndUpdate(userId,
-    {
-      $push: {
-        joinedEvent: eventId
-      }
-    },
+  const user = await User.findById(userId);
+
+  const update = user?.joinedEvent.includes(eventId)
+    ? { $pull: { joinedEvent: eventId } }
+    : { $push: { joinedEvent: eventId } };
+
+  await User.findByIdAndUpdate(
+    userId,
+    update,
     { new: true }
   );
+
   return;
 }
 
@@ -306,6 +325,66 @@ const getUserProfile = async (userId: string) => {
   return await User.aggregate(pipeline)
 }
 
+const addUserToFriend = async (sender: mongoose.Types.ObjectId, recipient: mongoose.Types.ObjectId) => {
+  const recipientUser = await User.findById(recipient);
+  const senderUser = await User.findById(sender);
+
+  const updateRecipient = recipientUser?.friends.includes(sender)
+    ? {}
+    : { $push: { friends: sender } };
+
+  const updateSender = senderUser?.friends.includes(recipient)
+    ? {}
+    : { $push: { friends: recipient } };
+
+  await User.findByIdAndUpdate(
+    recipient,
+    updateRecipient,
+    { new: true }
+  );
+
+  await User.findByIdAndUpdate(
+    sender,
+    updateSender,
+    { new: true }
+  );
+
+  return;
+}
+
+const getAllUsersFriends = async (userId: string) => {
+  const pipeline: PipelineStage[] = [
+    {
+      $match: { _id: new mongoose.Types.ObjectId(userId) }
+    },
+    {
+      $lookup: {
+        from: "users",
+        foreignField: "_id",
+        localField: "friends",
+        as: "friend"
+      }
+    },
+    {
+      $unwind: {
+        path: "$friend",
+        preserveNullAndEmptyArrays: true
+      }
+    },
+    {
+      $project: {
+        _id: "$friend._id",
+        avatar: "$friend.avatar",
+        name: "$friend.name",
+        surname: "$friend.surname"
+      }
+    }
+  ];
+
+  return await User.aggregate(pipeline);
+}
+
+
 export default {
   getUserById,
   getUserByEmail,
@@ -319,5 +398,8 @@ export default {
   getAllUsers,
   getUserProfile,
   getUserByRefresh,
-  updateAvatar
+  updateUser,
+  deleteUser,
+  addUserToFriend,
+  getAllUsersFriends,
 };

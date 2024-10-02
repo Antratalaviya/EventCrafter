@@ -1,10 +1,8 @@
-import React, { useEffect, useRef, useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import Button from '../component/Button';
-import { AddCircleIcon, CalenderIcon, CrossIcon, CurrectIcon, DownIcon, FileIcon, GalleryIcon, PdfIcon, SelectIcon, TimeIcon, VideoIcon } from '../assets/svg/Icon';
+import { CurrectIcon } from '../assets/svg/Icon';
 import '../index.css'
 import Modal from '../component/Modal/Modal';
-import Input from '../component/Input';
-import { EventCategory, offers } from '../lib/consts';
 import { uploadImg } from '../Firebase/upload';
 import { useCreateEventMutation } from '../api/api';
 import Spinner from "../component/Spinner"
@@ -14,6 +12,7 @@ import { toast } from 'react-toastify';
 import { useDispatch, useSelector } from 'react-redux';
 import { setEvent } from '../store/EventSlice';
 import { setAcceptConcent, setProgress } from '../store/GlobalSlice';
+import { getItem } from '../utils/localStorageUtility';
 
 function CreatePriEvent() {
     const [openConsent, setOpenConsent] = useState(false);
@@ -25,6 +24,7 @@ function CreatePriEvent() {
 
     const acceptConcent = useSelector((state) => state.global.acceptConcent);
     const progress = useSelector((state) => state.global.progress);
+    const eventId = JSON.parse(getItem("eventId"))
     const event = useSelector((state) => state.event.event);
     const dispatch = useDispatch();
 
@@ -33,10 +33,6 @@ function CreatePriEvent() {
     useEffect(() => {
         dispatch(setEvent({ type: "private" }))
     }, [])
-
-    useEffect(() => {
-        console.log(event);
-    }, [event])
 
     const handleCreateEvent = async () => {
         try {
@@ -54,6 +50,7 @@ function CreatePriEvent() {
                     setEventCreated(result?.data[0]);
 
                     if (result.success) {
+                        dispatch(setEvent(null))
                         return 1;
                     }
                 }
@@ -65,8 +62,10 @@ function CreatePriEvent() {
     };
 
     useEffect(() => {
-        if (progress > 0 && progress <= 4) {
+        if (progress > 0 && progress < 4) {
             navigate(`/create-event/create-private-event/${progress}`);
+        } else if (progress === 4) {
+            navigate(`/create-event/create-private-event/${progress}?eventId=${eventCreated ? eventCreated._id : eventId}`);
         }
     }, [progress]);
 
@@ -89,12 +88,12 @@ function CreatePriEvent() {
                 if (res === 1) {
                     toast("Event created successfully");
                     setCreate(false);
-                    dispatch(setProgress(Math.min(progress + 1, 4)));  //
+                    dispatch(setProgress(Math.min(progress + 1, 4)));
                     dispatch(setEvent(null));
 
                 } else {
                     toast("Event creation failed");
-                    dispatch(setProgress(1));  //
+                    dispatch(setProgress(1));
                 }
             } catch (error) {
                 toast("Something went wrong. Please try again.");
@@ -102,15 +101,15 @@ function CreatePriEvent() {
             }
 
         } else {
-            dispatch(setProgress(Math.min(progress + 1, 4)));  //
+            dispatch(setProgress(Math.min(progress + 1, 4)));
         }
     };
 
 
     const decreaseProgress = () => {
-        dispatch(setProgress(Math.max(prev - 1, 1)));  //
+        dispatch(setProgress(Math.max(progress - 1, 1)));
         if (acceptConcent) {
-            dispatch(setAcceptConcent(false));   //
+            dispatch(setAcceptConcent(false));
         }
         if (progress === 3) {
             setCreate(false)
@@ -118,21 +117,18 @@ function CreatePriEvent() {
     };
 
     return (
-        <div className='overflow-y-scroll overflow-x-hidden h-screen'>
-            <div style={{ boxShadow: "0px 4px 4px 0px #00000040" }} className={`bg-black-light p-5 m-5 rounded-xl border-2 border-stroke relative text-white ${progress > 4 && "hidden"}`}>
+        <div className='overflow-y-scroll overflow-x-hidden h-screen w-full p-5'>
+            <div className={`container-style p-5 space-y-5 border-2 border-stroke relative text-white ${progress > 4 && "hidden"}`}>
                 <ProgressBar progress={progress} />
                 <div className="p-4 border-b-2 border-body-text">
-                    <form name='eventPrivate' className='flex justify-start'>
-                        {
-                            create ?
-                                <Spinner className="absolute top-0 left-0 h-full w-full backdrop-blur-sm" />
-                                :
-                                <Outlet />
-                        }
-                    </form>
+                    {
+                        create ?
+                            <Spinner className="absolute top-0 left-0 h-full w-full backdrop-blur-sm" />
+                            :
+                            <Outlet />
+                    }
                 </div>
                 <div className="mt-4 ml-auto w-1/5 gap-2 flex">
-
                     <Button
                         onEvent={decreaseProgress}
                         className="bg-dark"
@@ -146,10 +142,10 @@ function CreatePriEvent() {
                 </div>
             </div>
             <Modal open={openConsent} ModalClassName={'w-1/3'} className={'overflow-y-scroll'}>
-                <div className='w-full h-full flex items-center flex-col space-y-2 text-white'>
+                <div className='w-full h-full col-center space-y-2 text-white'>
                     <p>Declaration of consent</p>
                     <div className='h-1 border-b border-body-text w-full' />
-                    <div className={`w-full space-y-4 p-2 text-body-text `}>
+                    <div className={`w-full space-y-4 p-2 text-body-text text-justify`}>
                         <p>In order for your event to be displayed throughout the eventCrafter for sponsorship purposes, please give us your permission. Only software belonging to eventCrafter. include your event, only with the sole purpose of advertising your event and finding sponsors for your event! You grant us this permission for all countries where eventCrafter. products are used.</p>
                         <p>Images, texts, descriptions can be used by eventCrafter. products without restriction, in the context of the event publication. The creator of the event is solely responsible for the uploaded images, texts and descriptions. Copyrights on images, texts and descriptions may not be violated and the organizer of the event is solely responsible for compliance. In the world of eventCrafter we would like to point out that no images may be copied, used or distributed.</p>
 
@@ -168,7 +164,7 @@ function CreatePriEvent() {
                             text={'I Accept'}
                             onEvent={() => {
                                 setOpenConsent(false);
-                                dispatch(setAcceptConcent(true));   //
+                                dispatch(setAcceptConcent(true));
                             }}
                         />
                         <Button
@@ -176,7 +172,7 @@ function CreatePriEvent() {
                             className='bg-dark'
                             onEvent={() => {
                                 setOpenConsent(false);
-                                dispatch(setAcceptConcent(false));   //
+                                dispatch(setAcceptConcent(false));
                                 navigate('/');
                             }}
                         />
@@ -186,9 +182,9 @@ function CreatePriEvent() {
 
             {eventCreated && (
                 <Modal open={acceptConcent}>
-                    <div className='text-white text-center flex flex-col items-center'>
+                    <div className='text-white col-center'>
                         <img src={img.done} alt="done" className='w-4/5 h-3/5' />
-                        <div className='flex flex-col items-center gap-3'>
+                        <div className='col-center gap-3'>
                             <h1 className='text-3xl'>Bingo !</h1>
                             <p className='text-body-text'>Your event has been created successfully .</p>
                             <Link to={`/event/${eventCreated._id}`} className='w-full'>

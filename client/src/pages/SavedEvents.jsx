@@ -4,6 +4,7 @@ import SingleEvent from '../component/events/SingleEvent';
 import { getMonth } from '../utils/customUtility';
 import { useGetSavedEventsQuery } from '../api/api';
 import { Spinner } from '@material-tailwind/react';
+import { SecurityModeIcon } from '../assets/svg/Icon';
 
 function SavedEvents() {
     const { data, isSuccess } = useGetSavedEventsQuery();
@@ -27,8 +28,8 @@ function SavedEvents() {
     }
     return (
         <div className='h-[77%] p-5 overflow-y-scroll'>
-            <div className='grid grid-cols-1 gap-5'>
-                {savedEvents && savedEvents.map((event, index) => (
+            <div className='grid grid-cols-1 gap-5 h-full'>
+                {savedEvents && savedEvents.length > 0 && savedEvents.map((event, index) => (
                     <SingleEvent
                         key={index}
                         eventId={event._id}
@@ -46,6 +47,12 @@ function SavedEvents() {
                         saved={true}
                     />
                 ))}
+                {savedEvents.length === 0 && (
+                    <div className='col-center text-white space-y-3'>
+                        <SecurityModeIcon />
+                        <h1>No Saved Events !!!</h1>
+                    </div>
+                )}
             </div>
         </div>
     )

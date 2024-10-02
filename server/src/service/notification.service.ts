@@ -37,14 +37,22 @@ const getAllNotification = async (userId: string) => {
                 message: 1,
                 isRead: 1,
                 createdAt: 1,
-                invitationId: 1
+                // invitationId: 1
             }
         }
     ]
     return await Notification.aggregate(pipeline)
 }
 
+const readAllNotification = async (userId: string) => {
+    return await Notification.updateMany(
+        { recipient: new mongoose.Types.ObjectId(userId) },
+        { $set: { isRead: true } }
+    )
+}
+
 export default {
     createNotification,
-    getAllNotification
+    getAllNotification,
+    readAllNotification,
 }

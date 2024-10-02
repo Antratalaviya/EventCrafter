@@ -15,11 +15,7 @@ const invitationSchema = new mongoose.Schema({
         type: mongoose.Schema.Types.ObjectId,
         ref: "Event"
     },
-    accepted: {
-        type: Boolean,
-        default: false
-    },
-    rejected: {
+    isAccepted: {
         type: Boolean,
         default: false
     },
@@ -27,6 +23,8 @@ const invitationSchema = new mongoose.Schema({
         type: Boolean,
         default: true
     }
+}, {
+    timestamps: true
 })
 
 export const Invitation = mongoose.model(Collection.MODEL_INVITATION, invitationSchema);

@@ -55,19 +55,149 @@ const getOwnEventsByUserId = async (userId: string, page: number, limit: number,
     }, {
         $limit: limit
     })
-    if (sortby === 'asc') {
-        pipeline.push({
-            $sort: {
-                createdAt: 1
+    pipeline.push(
+        {
+            $addFields: {
+                sortPriority: {
+                    $cond: {
+                        if: { $eq: ["$status", "upcoming"] },
+                        then: 0,
+                        else: 1
+                    }
+                }
             }
-        })
-    } else {
-        pipeline.push({
+        },
+        {
             $sort: {
-                createdAt: -1
+                sortPriority: 1,
+                status: 1
             }
-        })
-    }
+        },
+        {
+            $unset: "sortPriority"
+        }
+    );
+    // if (sortby === 'asc') {
+    //     pipeline.push({
+    //         $sort: {
+    //             createdAt: 1
+    //         }
+    //     })
+    // } else {
+    //     pipeline.push({
+    //         $sort: {
+    //             createdAt: -1
+    //         }
+    //     })
+    // }
+    pipeline.push(
+        {
+            $lookup: {
+                from: "users",
+                localField: "owner",
+                foreignField: "_id",
+                as: "user"
+            }
+        },
+        {
+            $unwind: {
+                path: '$user',
+                preserveNullAndEmptyArrays: true
+            }
+        },
+        {
+            $project: {
+                _id: 1,
+                type: 1,
+                title: 1,
+                street: 1,
+                city: 1,
+                country: 1,
+                status: 1,
+                startDate: 1,
+                photos: { $first: "$photos" },
+                likedBy: {
+                    $size: {
+                        $ifNull: ["$likedBy", []]
+                    }
+                },
+                price: 1,
+                liked: {
+                    $cond: {
+                        if: {
+                            $in: [
+                                { $toObjectId: userId },
+                                { $ifNull: ["$likedBy", []] }
+                            ]
+                        },
+                        then: true,
+                        else: false
+                    }
+                },
+                saved: {
+                    $cond: {
+                        if: {
+                            $in: ["$_id", { $ifNull: ["$user.savedEvent", []] }]
+                        },
+                        then: true,
+                        else: false
+                    }
+                },
+                participating: {
+                    $cond: {
+                        if: {
+                            $in: [new mongoose.Types.ObjectId(userId), {
+                                $ifNull: ["$participants", []]
+                            }]
+                        },
+                        then: true,
+                        else: false
+                    }
+                },
+                participants: {
+                    $size: {
+                        $ifNull: ["$participants", []]
+                    }
+                }
+            }
+        }
+    )
+
+    return await Event.aggregate(pipeline)
+}
+
+const getOwnPublicEventsByUserId = async (userId: string, page: number, limit: number) => {
+    const pipeline: PipelineStage[] = [];
+    pipeline.push({
+        $match: { owner: new mongoose.Types.ObjectId(userId), type: { $ne: "private" } }
+    })
+    pipeline.push({
+        $skip: (page - 1) * limit
+    }, {
+        $limit: limit
+    })
+    pipeline.push(
+        {
+            $addFields: {
+                sortPriority: {
+                    $cond: {
+                        if: { $eq: ["$status", "upcoming"] },
+                        then: 0,
+                        else: 1
+                    }
+                }
+            }
+        },
+        {
+            $sort: {
+                sortPriority: 1,
+                status: 1
+            }
+        },
+        {
+            $unset: "sortPriority"
+        }
+    );
     pipeline.push(
         {
             $lookup: {
@@ -179,6 +309,7 @@ const getFullEventByEventId = async (eventId: string) => {
                 category: 1,
                 type: 1,
                 photos: 1,
+                userId: '$user._id',
                 name: '$user.name',
                 surname: '$user.surname',
                 subscriber: {
@@ -186,6 +317,7 @@ const getFullEventByEventId = async (eventId: string) => {
                         $ifNull: ["$user.subscriber", []]
                     }
                 },
+                avatar: "$user.avatar",
                 startDate: 1,
                 startTime: 1,
                 endTime: 1,
@@ -240,12 +372,15 @@ const eventLikedByUser = async (eventId: string, userId: string) => {
 }
 
 const addUserToParticipants = async (eventId: mongoose.Types.ObjectId, userId: mongoose.Types.ObjectId) => {
-    await Event.findByIdAndUpdate(eventId,
-        {
-            $push: {
-                participants: userId
-            }
-        },
+    const event = await Event.findById(eventId);
+
+    const update = event?.participants.includes(userId)
+        ? { $pull: { participants: userId } }
+        : { $push: { participants: userId } };
+
+    await Event.findByIdAndUpdate(
+        eventId,
+        update,
         { new: true }
     );
     return;
@@ -265,7 +400,7 @@ const getAllEvents = async (userId: string, page: number, limit: number, keyword
     const pipeline: PipelineStage[] = [];
     pipeline.push({
         $match: {
-            status: { $nin: ["cancelled", "draft"] },
+            status: { $ne: "draft" },
             type: { $ne: "private" }
         }
     });
@@ -419,7 +554,13 @@ const getAllParticipants = async (userId: string, eventId: string) => {
     return await Event.aggregate(pipeline);
 }
 
-
+const updateEventStatus = async (eventId: string, status: string) => {
+    return await Event.findByIdAndUpdate(eventId, {
+        $set: {
+            status: status
+        }
+    }, { new: true })
+}
 
 export default {
     createEvent,
@@ -431,5 +572,7 @@ export default {
     addUserToParticipants,
     cancelEvent,
     getAllEvents,
-    getAllParticipants
+    getAllParticipants,
+    updateEventStatus,
+    getOwnPublicEventsByUserId
 }

@@ -9,16 +9,208 @@ const createInvitation = async (eventId: string, senderId: string, recipientId: 
     })
 }
 
-const getAllInvitation = async (userId: string) => {
-    return await Invitation.findOne({
-        recipient: userId
-    })
+const getAllInvitation = async (userId: string) => {   //accept/reject ? pending
+    const pipeline: PipelineStage[] = [
+        {
+            $match: {
+                recipient: new mongoose.Types.ObjectId(userId),
+                pending: { $ne: false }
+            }
+        },
+        {
+            $lookup: {
+                from: 'users',
+                localField: "sender",
+                foreignField: "_id",
+                as: "sender"
+            },
+        },
+        {
+            $unwind: {
+                path: "$sender",
+                preserveNullAndEmptyArrays: true
+            }
+
+        },
+        {
+            $lookup: {
+                from: "events",
+                localField: "event",
+                foreignField: "_id",
+                as: "event"
+            }
+        },
+        {
+            $unwind: {
+                path: "$event",
+                preserveNullAndEmptyArrays: true
+            }
+
+        },
+        {
+            $sort: {
+                createdAt: -1
+            }
+        },
+        {
+            $project: {
+                _id: 1,
+                isAccepted: 1,
+                event: "$event._id",
+                profileImg: "$sender.profileImg",
+                avatar: "$sender.avatar",
+                name: "$sender.name",
+                surname: "$sender.surname",
+                title: "$event.title",
+                type: "$event.type",
+                startDate: "$event.startDate",
+                startTime: "$event.startTime",
+                endTime: "$event.endTime",
+                participants: {
+                    $size: {
+                        $ifNull: ["$event.participants", []]
+                    }
+                },
+                updatedAt: 1
+            }
+        }
+    ]
+    return await Invitation.aggregate(pipeline);
 }
 
-const getAllInvitationSend = async (userId: string) => {
-    return await Invitation.findOne({
-        sender: userId
-    })
+const getAllReceivedInvitation = async (userId: string) => {   //received ? accepted and rejected  not pending
+    const pipeline: PipelineStage[] = [
+        {
+            $match: {
+                recipient: new mongoose.Types.ObjectId(userId),
+                pending: { $ne: true }
+            }
+        },
+        {
+            $lookup: {
+                from: 'users',
+                localField: "sender",
+                foreignField: "_id",
+                as: "sender"
+            },
+        },
+        {
+            $unwind: {
+                path: "$sender",
+                preserveNullAndEmptyArrays: true
+            }
+
+        },
+        {
+            $lookup: {
+                from: "events",
+                localField: "event",
+                foreignField: "_id",
+                as: "event"
+            }
+        },
+        {
+            $unwind: {
+                path: "$event",
+                preserveNullAndEmptyArrays: true
+            }
+
+        },
+        {
+            $sort: {
+                createdAt: -1
+            }
+        },
+        {
+            $project: {
+                _id: 1,
+                isAccepted: 1,
+                profileImg: "$sender.profileImg",
+                name: "$sender.name",
+                surname: "$sender.surname",
+                title: "$event.title",
+                type: "$event.type",
+                startDate: "$event.startDate",
+                startTime: "$event.startTime",
+                endTime: "$event.endTime",
+                participants: {
+                    $size: {
+                        $ifNull: ["$event.participants", []]
+                    }
+                },
+                updatedAt: 1
+            }
+        }
+    ]
+    return await Invitation.aggregate(pipeline);
+}
+
+const getAllSentInvitation = async (userId: string) => {  //sent invitation
+    const pipeline: PipelineStage[] = [
+        {
+            $match: {
+                sender: new mongoose.Types.ObjectId(userId),
+            }
+        },
+        {
+            $lookup: {
+                from: 'users',
+                localField: "recipient",
+                foreignField: "_id",
+                as: "recipient"
+            },
+        },
+        {
+            $unwind: {
+                path: "$recipient",
+                preserveNullAndEmptyArrays: true
+            }
+
+        },
+        {
+            $lookup: {
+                from: "events",
+                localField: "event",
+                foreignField: "_id",
+                as: "event"
+            }
+        },
+        {
+            $unwind: {
+                path: "$event",
+                preserveNullAndEmptyArrays: true
+            }
+
+        },
+        {
+            $sort: {
+                createdAt: -1
+            }
+        },
+        {
+            $project: {
+                _id: 1,
+                isAccepted: 1,
+                pending: 1,
+                profileImg: "$recipient.profileImg",
+                avatar: "$recipient.avatar",
+                name: "$recipient.name",
+                surname: "$recipient.surname",
+                title: "$event.title",
+                type: "$event.type",
+                startDate: "$event.startDate",
+                startTime: "$event.startTime",
+                endTime: "$event.endTime",
+                participants: {
+                    $size: {
+                        $ifNull: ["$event.participants", []]
+                    }
+                },
+                updatedAt: 1
+            }
+        }
+    ]
+    return await Invitation.aggregate(pipeline);
 }
 
 const getInvitationById = async (invitationId: string) => {
@@ -31,11 +223,12 @@ const getInvitationBySenderId = async (senderId: string) => {
     })
 }
 
-const getInvitationRecipientByEventId = async (eventId: string) => {
+const getInvitationRecipientByEventId = async (senderId: string, eventId: string) => {
     const pipeline: PipelineStage[] = [
         {
             $match: {
                 event: new mongoose.Types.ObjectId(eventId),
+                sender: new mongoose.Types.ObjectId(senderId),
             }
         },
         {
@@ -59,11 +252,11 @@ const getInvitationRecipientByEventId = async (eventId: string) => {
                 surname: "$recipients.surname",
                 status: {
                     $cond: {
-                        if: { $eq: ["$accepted", true] },
+                        if: { $eq: ["$isAccepted", true] },
                         then: "accepted",
                         else: {
                             $cond: {
-                                if: { $eq: ["$rejected", true] },
+                                if: { $eq: ["$pending", false] },
                                 then: "rejected",
                                 else: "pending"
                             }
@@ -80,29 +273,82 @@ const getInvitationRecipientByEventId = async (eventId: string) => {
 const acceptInvitation = async (invitationId: string) => {
     await Invitation.findByIdAndUpdate(invitationId, {
         $set: {
-            accepted: true,
-            pending: false
-        }
-    })
-    return;
-}
-const rejectInvitation = async (invitationId: string) => {
-    await Invitation.findByIdAndUpdate(invitationId, {
-        $set: {
-            rejected: true,
+            isAccepted: true,
             pending: false
         }
     })
     return;
 }
 
+const rejectInvitation = async (invitationId: string) => {
+    await Invitation.findByIdAndUpdate(invitationId, {
+        $set: {
+            isAccepted: false,
+            pending: false
+        }
+    })
+    return;
+}
+
+const invitationExist = async (eventId: string, senderId: string, recipientId: string) => {
+    const pipeline = [
+        {
+            $match: {
+                sender: new mongoose.Types.ObjectId(senderId),
+                recipient: new mongoose.Types.ObjectId(recipientId),
+                event: new mongoose.Types.ObjectId(eventId)
+            }
+        }
+    ]
+
+    return await Invitation.aggregate(pipeline);
+}
+
+const getEventParticipants = async (eventId: string) => {
+    const pipeline: PipelineStage[] = [
+        {
+            $match: {
+                event: new mongoose.Types.ObjectId(eventId),
+                pending: { $ne: true },
+                isAccepted: { $ne: false }
+            }
+        },
+        {
+            $lookup: {
+                from: "users",
+                localField: "recipient",
+                foreignField: "_id",
+                as: "users"
+            }
+        },
+        {
+            $unwind: {
+                path: "$users",
+                preserveNullAndEmptyArrays: true
+            }
+        },
+        {
+            $project: {
+                _id: "$users._id",
+                name: "$users.name",
+                surname: "$users.surname",
+                avatar: "$users.avatar",
+            }
+        }
+    ]
+    return await Invitation.aggregate(pipeline)
+}
+
 export default {
     createInvitation,
     getAllInvitation,
-    getAllInvitationSend,
+    getAllSentInvitation,
+    getAllReceivedInvitation,
     getInvitationById,
     getInvitationBySenderId,
     getInvitationRecipientByEventId,
     acceptInvitation,
-    rejectInvitation
+    rejectInvitation,
+    invitationExist,
+    getEventParticipants
 }

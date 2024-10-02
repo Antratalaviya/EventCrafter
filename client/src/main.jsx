@@ -29,8 +29,7 @@ import { EventStepWrapper } from './wrapper/EventStepWrapper.jsx'
 import { EventPageWrapper } from './wrapper/EventPageWrapper.jsx'
 import Payment from './pages/Payment.jsx'
 import CompletePage from './pages/CompletePage.jsx'
-import PaymentFailPage from './pages/PaymentFailPage.jsx'
-
+import OrganizerDetail from './pages/OrganizerDetail.jsx'
 
 const router = createBrowserRouter(
   createRoutesFromElements(
@@ -43,7 +42,8 @@ const router = createBrowserRouter(
         </Route>
         <Route path='own-events' element={<OwnEvents />} />
         <Route path='event/:eventId' element={<EventPage />} />
-        <Route path='event/send/invitation/:eventId' element={<SendInvitation />} />
+        <Route path='organizer/:userId' element={<OrganizerDetail />} />
+        <Route path='event/participants/:eventId' element={<SendInvitation />} />
         <Route path='settings' element={<SettingPage />} >
           <Route path='edit/avatar' element={<EditAvatar />} />
           <Route path='saved/events' element={<SavedEvents />} />

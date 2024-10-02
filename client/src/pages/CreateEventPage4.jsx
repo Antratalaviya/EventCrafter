@@ -1,26 +1,31 @@
 import React, { useEffect, useState } from 'react'
 import { SelectIcon } from '../assets/svg/Icon'
 import { useDispatch, useSelector } from 'react-redux'
-import { setPayment, setProgress, } from '../store/GlobalSlice';
+import { setAcceptConcent, setPayment, setProgress, } from '../store/GlobalSlice';
+import { setItem } from '../utils/localStorageUtility';
+import { capitalize } from '../utils/customUtility';
 
 function CreateEventPage4() {
     const event = useSelector((state) => state.event.event);
     const amount = useSelector((state) => state.global.payment.amount);
     const dispatch = useDispatch();
+    const queryString = window.location.search;
+    const urlParams = new URLSearchParams(queryString);
 
     useEffect(() => {
-        const queryString = window.location.search;
-        const urlParams = new URLSearchParams(queryString);
+        const eventId = urlParams.get('eventId');
         const status = urlParams.get('status');
         if (status === 'draft') {
             dispatch(setProgress(4));
-        }
-
-
-        return () => {
+            setItem("eventId", JSON.stringify(eventId));
+        } else {
             dispatch(setProgress(1))
         }
-    }, [amount])
+        if (event.type !== 'private') {
+            dispatch(setPayment({ amount: 9.95, name: `${capitalize(event.type)} Event Creation Purchase`, description: "Selected Silver Package" }))
+        }
+        dispatch(setAcceptConcent(false));
+    }, [])
     return (
         <>
             {event.type === 'private' ? (
@@ -64,7 +69,7 @@ function CreateEventPage4() {
                         </div>
                     </div>
 
-                    <div className='col-span-1 cursor-pointer bg-gradient-to-r from-[#444444] to-[#ACACAC] border-2 border-white rounded-2xl p-5 space-y-3 from-30%' onClick={() => dispatch(setPayment({ amount: 9.95, name: "Event Creation Purchase", description: "Selected Silver Package" }))}>
+                    <div className='col-span-1 cursor-pointer bg-gradient-to-r from-[#444444] to-[#ACACAC] border-2 border-white rounded-2xl p-5 space-y-3 from-30%' onClick={() => dispatch(setPayment({ amount: 9.95, name: `${capitalize(event.type)} Event Creation Purchase`, description: "Selected Silver Package" }))}>
                         <div className='flex justify-between'>
                             <p>Silver</p>
                             <div className='cursor-pointer'>
@@ -83,7 +88,7 @@ function CreateEventPage4() {
                             <li>Will be displayed on the map</li>
                         </div>
                     </div>
-                    <div className='col-span-1 cursor-pointer bg-gradient-to-r from-[#BF8E17] to-[#E6C060] border-2 border-white rounded-2xl p-5 space-y-3 from-30%' onClick={() => dispatch(setPayment({ amount: 19.95, name: "Event Creation Purchase", description: "Selected Gold Package" }))}>
+                    <div className='col-span-1 cursor-pointer bg-gradient-to-r from-[#BF8E17] to-[#E6C060] border-2 border-white rounded-2xl p-5 space-y-3 from-30%' onClick={() => dispatch(setPayment({ amount: 19.95, name: `${capitalize(event.type)} Event Creation Purchase`, description: "Selected Gold Package" }))}>
                         <div className='flex justify-between'>
                             <p>Gold</p>
                             <div className='cursor-pointer'>
@@ -104,7 +109,7 @@ function CreateEventPage4() {
                             <li>An event icon will appear on your Leylix ID card sothat everyone can see that you have created events</li>
                         </div>
                     </div>
-                    <div className='col-span-1 cursor-pointer bg-gradient-to-r from-[#60C5BE] to-[#087B7A] border-2 border-white rounded-2xl p-5 space-y-3 from-30%' onClick={() => dispatch(setPayment({ amount: 39.95, name: "Event Creation Purchase", description: "Selected Premium Package" }))}>
+                    <div className='col-span-1 cursor-pointer bg-gradient-to-r from-[#60C5BE] to-[#087B7A] border-2 border-white rounded-2xl p-5 space-y-3 from-30%' onClick={() => dispatch(setPayment({ amount: 39.95, name: `${capitalize(event.type)} Event Creation Purchase`, description: "Selected Premium Package" }))}>
                         <div className='flex justify-between'>
                             <p>Premium</p>
                             <div className='cursor-pointer'>

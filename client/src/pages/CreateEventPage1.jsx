@@ -219,7 +219,7 @@ function CreateEventPage1() {
             <div className='flex gap-2 flex-wrap'>
                 {event.offers.map((item, index) => (
                     <label key={index} className='cursor-pointer relative inline-flex items-center' >
-                        <div className={`py-2 rounded-full cursor-pointer mt-2 w-full flex justify-center gap-2 items-center bg-dark px-3`}>
+                        <div className={`py-2 rounded-full cursor-pointer mt-2 w-full row-center gap-2 bg-dark px-3`}>
                             <div>
                                 {offersToSelect
                                     .filter((offer) => offer.text === item)

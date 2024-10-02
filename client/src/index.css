@@ -58,3 +58,15 @@ input::-webkit-inner-spin-button {
   margin: 0;
 }
 
+@layer components {
+  .container-style {
+    @apply shadow-custom-black bg-black-light rounded-lg;
+  }
+  .col-center {
+    @apply flex flex-col items-center justify-center
+  }
+  .row-center {
+    @apply flex justify-center items-center
+  }
+}
+

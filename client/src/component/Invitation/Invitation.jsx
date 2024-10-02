@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react'
-import { useGetAllSendParticipantsQuery, useGetAllUserQuery } from '../../api/api';
+import { useGetAllSendParticipantsQuery, useGetAllUserQuery, useGetEventParticipantsQuery } from '../../api/api';
 import { AddCircleIcon, InviteIcon, LinkIcon, SearchIcon, SelectIcon, SuccessIcon, TimeIcon } from '../../assets/svg/Icon';
 import Input from '../Input';
 import Button from '../Button';
@@ -13,8 +13,9 @@ import { capitalize } from '../../utils/customUtility';
 
 function Invitation({ eventId }) {
     const [addParticipate, setAddParticipate] = useState(false);
-    const [openParticipate, setOpenParticipate] = useState(false);
+    const [openParticipate, setOpenParticipate] = useState(true);
     const [sendParticipants, setSendParticipants] = useState([]);
+    const [eventParticipants, setEventParticipants] = useState([]);
     const [openCreate, setOpenCreate] = useState(false);
     const [keyword, setKeyword] = useState("")
     const [debouncedKeyword] = useDebounce(keyword, 500);
@@ -23,14 +24,19 @@ function Invitation({ eventId }) {
         { keyword: debouncedKeyword }, {
         skip: !addParticipate
     })
-    const { data: sendParticipant, isSuccess } = useGetAllSendParticipantsQuery(eventId, {
-        skip: !addParticipate
-    })
 
+    const { data: sendParticipant, isSuccess } = useGetAllSendParticipantsQuery(eventId)
+    const { data: eventParticipant, isSuccess: participantsSuccess } = useGetEventParticipantsQuery(eventId);
 
     if (!eventId) {
         return <Spinner />
     }
+
+    useEffect(() => {
+        if (participantsSuccess) {
+            setEventParticipants(eventParticipant.data)
+        }
+    }, [eventParticipant])
 
     useEffect(() => {
         if (isSuccess) {
@@ -57,7 +63,7 @@ function Invitation({ eventId }) {
                     </div>
                     <div className={`bg-[#252A30] rounded-lg ring-1 ring-gray col-span-1 w-full flex items-center pr-5 cursor-pointer`} onClick={() => { setAddParticipate(true); setOpenParticipate(false) }}>
                         <div className={'bg-transperent focus:outline-none w-full text-body-text p-3 text-sm'}>
-                            <p>Add Participants</p>
+                            <p>Send Invitation To Participants</p>
                         </div>
                         <InviteIcon />
                     </div>
@@ -187,6 +193,73 @@ function Invitation({ eventId }) {
                             </div>
                         </div>
                     </div>}
+                <div className='flex flex-col gap-5 w-full rounded-lg bg-black-light p-5' >
+                    <h1>Event Participate Members</h1>
+                    <div className='flex gap-5 items-center'>
+                        <div className='bg-public rounded-md flex items-center gap-2 py-2 px-4'>
+                            <SelectIcon />
+                            <p>{`Total Participants ( ${eventParticipants.length} )`}</p>
+                        </div>
+                    </div>
+                    <div className='flex flex-col justify-start space-y-5'>
+                        {eventParticipants && eventParticipants.length > 0 && eventParticipants.map((item) => (
+                            <Link key={item._id} to={`/organizer/${item._id}`}>
+                                <div className='flex items-center justify-between rounded-md shadow-custom-black px-3 py-1'>
+                                    <div className='flex items-center gap-5 w-[70%]'>
+                                        <div className='rounded-full size-16 overflow-hidden'>
+                                            <img src={img.p3} alt="profile_img" className='h-16 w-24' />
+                                        </div>
+                                        <div className='flex flex-col w-[80%]'>
+                                            <p className='text-white font-medium'>{`${capitalize(item.name)} ${capitalize(item.surname)}`} </p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </Link>
+                        ))}
+                        <div className='flex items-center justify-between rounded-md shadow-custom-black px-3 py-1'>
+                            <div className='flex items-center gap-5 w-[70%]'>
+                                <div className='rounded-full size-16 overflow-hidden'>
+                                    <img src={img.p3} alt="profile_img" className='h-16 w-24' />
+                                </div>
+                                <div className='flex flex-col w-[80%]'>
+                                    <p className='text-white font-medium'>Clara Tolson </p>
+                                </div>
+                            </div>
+                            <div className='bg-public/10 rounded-md flex items-center gap-2 py-2 px-5 text-public'>
+                                <SelectIcon fill="#25d695" />
+                                <p>{`Accepted`}</p>
+                            </div>
+                        </div>
+                        <div className='flex items-center justify-between rounded-md shadow-custom-black px-3 py-1'>
+                            <div className='flex items-center gap-5 w-[70%]'>
+                                <div className='rounded-full size-16 overflow-hidden'>
+                                    <img src={img.p2} alt="profile_img" className='h-16 w-24' />
+                                </div>
+                                <div className='flex flex-col w-[80%]'>
+                                    <p className='text-white font-medium'>Clara Tolson </p>
+                                </div>
+                            </div>
+                            <div className='bg-yellow/10 rounded-md flex items-center gap-2 py-2 px-6 text-yellow'>
+                                <TimeIcon className="stroke-yellow" />
+                                <p>{`Pending`}</p>
+                            </div>
+                        </div>
+                        <div className='flex items-center justify-between rounded-md shadow-custom-black px-3 py-1'>
+                            <div className='flex items-center gap-5 w-[70%]'>
+                                <div className='rounded-full size-16 overflow-hidden'>
+                                    <img src={img.p4} alt="profile_img" className='h-16 w-24' />
+                                </div>
+                                <div className='flex flex-col w-[80%]'>
+                                    <p className='text-white font-medium'>Clara Tolson </p>
+                                </div>
+                            </div>
+                            <div className='bg-red/10 rounded-md flex items-center gap-2 py-2 px-5 text-red'>
+                                <AddCircleIcon className="rotate-45 fill-red stroke-black-light" />
+                                <p>{`Rejected`}</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
                 {openParticipate && <div className="mt-4 ml-auto w-1/5 gap-2 flex">
                     <Button
                         onEvent={() => navigate(-1)}

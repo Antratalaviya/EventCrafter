@@ -6,6 +6,8 @@ import userRoutes from "./router/user.router";
 import eventRoutes from "./router/event.router";
 import avatarRoutes from "./router/avatar.router";
 import paymentRoutes from "./router/payment.router";
+import invitationRoutes from "./router/invitation.router";
+import connectionRoutes from "./router/connection.router";
 
 const app = express();
 
@@ -41,5 +43,7 @@ app.use("/user", userRoutes);
 app.use("/event", eventRoutes);
 app.use("/avatar", avatarRoutes);
 app.use("/payment", paymentRoutes);
+app.use("/invitation", invitationRoutes);
+app.use("/connection", connectionRoutes);
 
 export { app };

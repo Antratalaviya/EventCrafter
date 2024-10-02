@@ -21,7 +21,7 @@ function CreateEventPage3() {
     return (
 
         <div className='w-full grid grid-cols-1 text-white gap-5 py-5'>
-            <div className='bg-[#252A30] flex flex-col items-center space-y-5 p-5 rounded-lg border-dashed border-2 border-primary'>
+            <div className='bg-[#252A30] col-center space-y-5 p-5 rounded-lg border-dashed border-2 border-primary'>
                 <div onClick={() => videoInputRef.current.click()}>
                     <VideoIcon />
                 </div>
@@ -44,7 +44,7 @@ function CreateEventPage3() {
                     <p className='text-body-text'>Maximum video 30 sec video upload</p>
                 </div>
             </div>
-            <div className='bg-[#252A30] flex flex-col items-center space-y-5 p-5 rounded-lg border-dashed border-2 border-primary'>
+            <div className='bg-[#252A30] col-center space-y-5 p-5 rounded-lg border-dashed border-2 border-primary'>
                 <div onClick={() => fileInputRef.current.click()}>
                     <FileIcon />
                 </div>
@@ -81,7 +81,7 @@ function CreateEventPage3() {
                                     <button
                                         type="button"
                                         onClick={() => dispatch(setEvent(({ pdfFile: event.pdfFile.filter((_, i) => i !== index) })))}
-                                        className="absolute top-4 right-2 rounded-full bg-stroke/50 size-10 flex items-center justify-center"
+                                        className="absolute top-4 right-2 rounded-full bg-stroke/50 size-10 row-center"
                                     >
                                         <CrossIcon className="size-5" />
                                     </button>
@@ -106,7 +106,7 @@ function CreateEventPage3() {
                     <span >/ 200</span>
                 </div>
             </div>
-            <div className={`bg-[#252A30] flex flex-col items-center space-y-5 p-5 rounded-lg border-dashed border-2 border-primary`}>
+            <div className={`bg-[#252A30] col-center space-y-5 p-5 rounded-lg border-dashed border-2 border-primary`}>
                 <div onClick={() => imgInputRef.current.click()}>
                     <GalleryIcon />
                 </div>
@@ -128,7 +128,7 @@ function CreateEventPage3() {
                 </div>
             </div>
             {event.photos.length > 0 && (
-                <div className={`bg-[#252A30] flex flex-col items-center space-y-5 p-5 rounded-lg border-dashed border-2 border-primary`}>
+                <div className={`bg-[#252A30] col-center space-y-5 p-5 rounded-lg border-dashed border-2 border-primary`}>
                     <div className='grid grid-cols-3 grid-rows-2 gap-5 transition-all'>
                         {event.photos.map((img, index) => (
                             <div className='relative' key={index}>
@@ -140,7 +140,7 @@ function CreateEventPage3() {
                                 <button
                                     type="button"
                                     onClick={() => dispatch(setEvent({ photos: event.photos.filter((_, i) => i !== index) }))}
-                                    className="absolute top-0 right-1 rounded-full bg-stroke/50 size-10 flex items-center justify-center"
+                                    className="absolute top-0 right-1 rounded-full bg-stroke/50 size-10 row-center"
                                 >
                                     <CrossIcon className="size-5" />
                                 </button>

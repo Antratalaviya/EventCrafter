@@ -3,7 +3,7 @@ import { Link, Outlet } from 'react-router-dom'
 
 function YourFriend() {
     return (
-        <div className='p-5 h-screen text-white flex flex-col'>
+        <div className='p-5 h-screen text-white flex flex-col overflow-y-scroll'>
             <div className='p-5 text-center font-semibold text-xl'>
                 <p>Your Friend</p>
             </div>

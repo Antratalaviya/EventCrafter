@@ -27,7 +27,7 @@ function Login() {
   }
 
   return (
-    <div className='bg-background h-screen w-screen overflow-y-scroll flex flex-col justify-center items-center text-white'>
+    <div className='bg-background h-screen w-screen overflow-y-scroll col-center text-white'>
       <ToastContainer theme="dark" limit={1} />
       <div className='w-1/3 bg-background shadow shadow-gray rounded-2xl p-8 space-y-5'>
         <div className='space-y-5 grid place-items-center'>

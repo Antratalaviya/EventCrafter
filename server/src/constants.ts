@@ -19,6 +19,8 @@ export interface UserDocument extends UserInput, Document {
   savedEvent: Array<mongoose.Types.ObjectId>;
   createdAt: Date;
   updatedAt: Date;
+  joinedEvent: Array<mongoose.Types.ObjectId>;
+  friends: Array<mongoose.Types.ObjectId>;
   isPasswordMatched(password: string): Promise<boolean>;
   generateAccessToken(): string;
   generateRefreshToken(): string;

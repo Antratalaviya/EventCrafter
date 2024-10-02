@@ -5,7 +5,7 @@ import { Link, NavLink, Outlet } from 'react-router-dom';
 function InvitationPage() {
     return (
         <div className='flex flex-col'>
-            <div className='flex items-center justify-evenly border-b-2 border-body-text/30'>
+            <div className='flex items-center justify-evenly border-b-2 border-body-text/30 sticky -top-5'>
                 <NavLink to={'/settings/your-friends/invitation/sent'} className={({ isActive }) => `py-2 ${isActive && "border-b-2 border-white"}`}>
                     <p>Sent Invitation</p>
                 </NavLink>

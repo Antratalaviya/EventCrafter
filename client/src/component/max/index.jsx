@@ -42,7 +42,7 @@ export function Max() {
     return (
         <div
             className={`size-12 cursor-pointer rounded-md mr-2 bg-new-card border border-stroke ${openMex ? "z-50 bg-white/50 border border-body-text" : ""}`}
-            onClick={!disabled && handleToggle}
+            onClick={!disabled ? handleToggle : undefined}
         >
             <img className={`w-full h-full ${openMex && "z-50"}`} src={img.happy} alt="happy" />
 

@@ -48,10 +48,10 @@ function Sidebar() {
                     case "message":
                       return <MsgIcon className={`${loc === item.key && 'stroke-white'}`} />;
 
-                    case "money":
+                    case "news":
                       return <MoneyIcon className={`${loc === item.key && 'stroke-white'}`} />;
 
-                    case "building":
+                    case "property":
                       return <BuildingIcon className={`${loc === item.key && 'stroke-white'}`} />;
 
                     case "settings":
