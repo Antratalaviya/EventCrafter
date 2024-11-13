@@ -34,13 +34,13 @@ function CreateEventPage2() {
                         </div>
                     </label>
                     <label htmlFor="capacity2" className='cursor-pointer relative inline-flex items-center' >
-                        <input type="radio" name="carCapacity" id="capacity2" value='20' onChange={handleChange} className='sr-only peer h-full w-full' />
+                        <input type="radio" name="carCapacity" id="capacity2" value='20' onChange={handleChange} className='sr-only peer h-full w-full' checked={event.carCapacity === '20'} />
                         <div className={`py-2 rounded-full cursor-pointer mt-2 w-full flex justify-center items-center peer-checked:bg-primary bg-dark px-5`}>
                             <p>20 Cars</p>
                         </div>
                     </label>
                     <label htmlFor="capacity3" className='cursor-pointer relative inline-flex items-center' >
-                        <input type="radio" name="carCapacity" id="capacity3" value='30' onChange={handleChange} className='sr-only peer h-full w-full' />
+                        <input type="radio" name="carCapacity" id="capacity3" value='30' onChange={handleChange} className='sr-only peer h-full w-full' checked={event.carCapacity === '30'} />
                         <div className={`py-2 rounded-full cursor-pointer mt-2 w-full flex justify-center items-center peer-checked:bg-primary bg-dark px-5`}>
                             <p>30 Cars</p>
                         </div>
@@ -55,6 +55,7 @@ function CreateEventPage2() {
                 name={'street'}
                 onChange={handleChange}
                 className={'col-span-2'}
+                value={event.street}
             />
             <Input
                 type={'text'}
@@ -62,6 +63,7 @@ function CreateEventPage2() {
                 name={'city'}
                 onChange={handleChange}
                 className={'col-span-2'}
+                value={event.city}
             />
             <Input
                 type={'text'}
@@ -69,6 +71,7 @@ function CreateEventPage2() {
                 name={'country'}
                 onChange={handleChange}
                 className={'col-span-2'}
+                value={event.country}
             />
         </div>
     )

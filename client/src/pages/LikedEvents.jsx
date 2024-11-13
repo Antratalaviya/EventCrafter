@@ -3,8 +3,8 @@ import { Link } from 'react-router-dom';
 import SingleEvent from '../component/events/SingleEvent';
 import { getMonth } from '../utils/customUtility';
 import { useGetLikedEventsQuery } from '../api/api';
-import { Spinner } from '@material-tailwind/react';
-import { SecurityModeIcon } from '../assets/svg/Icon';
+import { ArrowIcon, SecurityModeIcon } from '../assets/svg/Icon';
+import Spinner from '../component/Spinner';
 
 function LikedEvents() {
     const { data, isSuccess } = useGetLikedEventsQuery();
@@ -24,12 +24,17 @@ function LikedEvents() {
     }, [likedEvents]);
 
     if (!likedEvents) {
-        return <Spinner />;
+        return <div className='h-screen w-screen grid place-items-center'>
+            <Spinner />
+        </div>
     }
     return (
-        <div className='h-[77%] overflow-y-scroll p-5'>
-            <div className='grid grid-cols-1 gap-5 h-full'>
-                {likedEvents && likedEvents.length === 0 && likedEvents.map((event, index) => (
+        <div className='flex flex-col flex-grow p-5'>
+            <Link to={'/settings'} className='pb-2'>
+                <ArrowIcon />
+            </Link>
+            <div className='flex flex-col space-y-5'>
+                {likedEvents && likedEvents.length > 0 && likedEvents.map((event, index) => (
                     <SingleEvent
                         key={index}
                         eventId={event._id}
@@ -48,7 +53,7 @@ function LikedEvents() {
                     />
                 ))}
                 {likedEvents.length === 0 && (
-                    <div className='col-center text-white space-y-3'>
+                    <div className='col-center text-white space-y-3 min-h-[70vh]'>
                         <SecurityModeIcon />
                         <h1>No Liked Events !!!</h1>
                     </div>

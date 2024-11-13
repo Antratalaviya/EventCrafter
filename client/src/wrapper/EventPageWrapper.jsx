@@ -1,6 +1,6 @@
 import { useParams } from "react-router-dom";
-import CreatePriEvent from "../pages/CreatePriEvent";
 import CreatePubEvent from "../pages/CreatePubEvent";
+import CreatePriEvent from "../pages/CreatePriEvent";
 import CreateWorkShopEvent from "../pages/CreateWorkShopEvent";
 import CreateTicketEvent from "../pages/CreateTicketEvent";
 import CreateBusinessEvent from "../pages/CreateBusinessEvent";

@@ -4,20 +4,25 @@ import { useDispatch, useSelector } from 'react-redux'
 import { setAcceptConcent, setPayment, setProgress, } from '../store/GlobalSlice';
 import { setItem } from '../utils/localStorageUtility';
 import { capitalize } from '../utils/customUtility';
+import { CONSTS } from '../utils/consts';
+import { useGetFullEventQuery } from '../api/api';
+import { setEvent, updateEvent } from '../store/EventSlice';
 
 function CreateEventPage4() {
     const event = useSelector((state) => state.event.event);
+
     const amount = useSelector((state) => state.global.payment.amount);
     const dispatch = useDispatch();
     const queryString = window.location.search;
     const urlParams = new URLSearchParams(queryString);
+    const eventId = urlParams.get('eventId');
+    const { data, isSuccess } = useGetFullEventQuery(eventId)
 
     useEffect(() => {
-        const eventId = urlParams.get('eventId');
         const status = urlParams.get('status');
         if (status === 'draft') {
             dispatch(setProgress(4));
-            setItem("eventId", JSON.stringify(eventId));
+            setItem(CONSTS.EVENTID, JSON.stringify(eventId));
         } else {
             dispatch(setProgress(1))
         }
@@ -26,6 +31,12 @@ function CreateEventPage4() {
         }
         dispatch(setAcceptConcent(false));
     }, [])
+
+    useEffect(() => {
+        dispatch(setEvent(data?.data[0]))
+        console.log(event)
+    }, [data])
+    console.log(event)
     return (
         <>
             {event.type === 'private' ? (

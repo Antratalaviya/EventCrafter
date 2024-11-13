@@ -263,7 +263,7 @@ const cancelEvent = asyncHandler(async (req: Request, res: Response) => {
                     new ApiError(status.BAD_REQUEST, AppString.EVENT_OWNER_NOT_EXIST)
                 );
         }
-        if (owner._id !== req.user._id) {
+        if (owner._id.toString() !== req.user._id.toString()) {
             return res
                 .status(status.UNAUTHORIZED)
                 .json(
@@ -271,8 +271,8 @@ const cancelEvent = asyncHandler(async (req: Request, res: Response) => {
                 );
         }
 
-        let eve = await eventService.cancelEvent(eventId)
-        return res.status(status.OK).json(new ApiResponse(status.OK, { eve }, AppString.EVENT_CANCEL))
+        let eve = await eventService.updateEventStatus(eventId, "cancelled")
+        return res.status(status.OK).json(new ApiResponse(status.OK, {}, AppString.EVENT_CANCEL))
     } catch (error) {
         return res
             .status(status.INTERNAL_SERVER_ERROR)
@@ -298,20 +298,7 @@ const getAllEvents = asyncHandler(async (req: Request, res: Response) => {
             && req.query?.type || "";
         let sortby = typeof req.query?.sortby === "string"
             && req.query?.sortby || "";
-        // let eventExist = await eventService.getEventByUserId(req.user._id)
-        // if (!eventExist) {
-        //     return;
-        // }
-        // if (new Date(eventExist?.startDate).getTime() >= new Date(Date.now()).getTime()) {
-        //     if (eventExist.status !== 'cancelled') {
-        //         eventExist.status = 'upcoming'
-        //     }
 
-        // } else if (new Date(eventExist?.endDate).getTime() <= new Date(Date.now()).getTime()) {
-        //     if (eventExist.status !== 'cancelled') {
-        //         eventExist.status = "completed"
-        //     }
-        // }
         let events = await eventService.getAllEvents(req.user._id, page, limit, keyword, eventType, sortby);
         if (!events || events.length === 0) {
             return res.status(status.OK)
@@ -365,27 +352,37 @@ const getAllParticipants = asyncHandler(async (req: Request, res: Response) => {
 
 const updateEventStatus = asyncHandler(async (req: Request, res: Response) => {
     try {
+        const events = await eventService.getEvents();
+        const updatedEvents = events.map(async (event) => {
+            if (new Date(event?.startDate) >= new Date()) {
+                if (event.status !== 'cancelled' && event.status !== "draft") {
+                    event.status = 'upcoming'
+                }
+
+            } else if (new Date(event?.endDate) <= new Date()) {
+                if (event.status !== 'cancelled' && event.status !== "draft") {
+                    event.status = "completed"
+                }
+            }
+            await event.save()
+            return event
+        })
+        return res.status(status.OK).json(new ApiResponse(status.OK, {}, AppString.EVENT_UPDATED))
+    } catch (error) {
+        return res
+            .status(status.INTERNAL_SERVER_ERROR)
+            .json(
+                new ApiError(status.INTERNAL_SERVER_ERROR, (error as Error).message)
+            );
+    }
+})
+
+const eventPaymentDone = asyncHandler(async (req: Request, res: Response) => {
+    try {
         const { eventId } = req.params;
-        const userId = req.user._id;
         const { eventStatus } = req.body;
-        const event = await eventService.getEventById(eventId);
-        if (event?.owner.toString() !== userId.toString()) {
 
-            return res
-                .status(status.UNAUTHORIZED)
-                .json(
-                    new ApiResponse(status.UNAUTHORIZED, {}, AppString.ACTION_FAILED)
-                );
-        }
-        const updatedEvent = await eventService.updateEventStatus(eventId, eventStatus)
-
-        if (!updatedEvent) {
-            return res
-                .status(status.OK)
-                .json(
-                    new ApiResponse(status.OK, {}, AppString.ACTION_FAILED)
-                );
-        }
+        await eventService.updateEventStatus(eventId, eventStatus);
 
         return res.status(status.OK).json(new ApiResponse(status.OK, {}, AppString.EVENT_UPDATED))
     } catch (error) {
@@ -398,6 +395,23 @@ const updateEventStatus = asyncHandler(async (req: Request, res: Response) => {
 })
 
 
+const updateEvent = asyncHandler(async (req: Request, res: Response) => {
+    try {
+        const { eventId } = req.params;
+        const updatedEvent = await eventService.updateEvent(eventId, req.body)
+        if (!updatedEvent) {
+            return res.status(status.OK).json(new ApiResponse(status.OK, {}, AppString.EVENT_UPDATED))/////
+        }
+        return res.status(status.OK).json(new ApiResponse(status.OK, updatedEvent, AppString.EVENT_UPDATED))/////
+    } catch (error) {
+        return res
+            .status(status.INTERNAL_SERVER_ERROR)
+            .json(
+                new ApiError(status.INTERNAL_SERVER_ERROR, (error as Error).message)
+            );
+    }
+})
+
 export default {
     createEvent,
     getOwnEvents,
@@ -408,5 +422,7 @@ export default {
     getAllEvents,
     getAllParticipants,
     updateEventStatus,
-    getOwnPublicEvents
+    getOwnPublicEvents,
+    updateEvent,
+    eventPaymentDone
 }

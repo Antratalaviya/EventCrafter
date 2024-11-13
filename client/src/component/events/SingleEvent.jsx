@@ -26,8 +26,11 @@ function SingleEvent({ date = '1 Apr', likedBy = "0", img, eventId, add, title =
                     toast.success(response.message);
                 }
                 setLikedEvent((prev) => !prev)
+            } else {
+                setLikedEvent(liked)
             }
         } catch (error) {
+            setLikedEvent(liked)
             toast.error(error.data.message);
         }
     }
@@ -42,16 +45,20 @@ function SingleEvent({ date = '1 Apr', likedBy = "0", img, eventId, add, title =
                     toast.success(response.message);
                 }
                 setSavedEvent((prev) => !prev);
+            } else {
+                setSavedEvent(saved);
             }
         } catch (error) {
             toast.error(error.data.message);
+            setSavedEvent(saved);
         }
     }
 
     return (
         <div className={`grid grid-cols-12 shadow-custom-black bg-white/[3%] rounded-lg overflow-hidden relative`}>
             {status === "draft" && (
-                <Link to={`/create-event/create-${type}-event/4?status=${status}&eventId=${eventId}`} className='w-full h-full bg-white/20 absolute flex justify-center items-center z-20 backdrop-blur-sm'>
+                // <Link to={`/create-event/create-${type}-event/4?status=${status}&eventId=${eventId}`} className='w-full h-full bg-white/20 absolute flex justify-center items-center z-20 backdrop-blur-sm'>
+                <Link to={`/event/${eventId}`} className='w-full h-full bg-white/20 absolute flex justify-center items-center z-20 backdrop-blur-sm'>
                     <div className='rounded-full px-8 py-2 bg-white/25 text-white'>
                         Draft
                     </div>

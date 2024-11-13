@@ -10,6 +10,7 @@ const initialState = {
         quantity: 1,
     },
     clientSecret: "",
+    paymentDone: false
 }
 
 export const globalSlicer = createSlice({
@@ -27,10 +28,13 @@ export const globalSlicer = createSlice({
         },
         setClientSecret: (state, action) => {
             state.clientSecret = action.payload;
+        },
+        setPaymentDone: (state, action) => {
+            state.paymentDone = action.payload;
         }
     }
 })
 
-export const { setProgress, setAcceptConcent, setPayment, setClientSecret } = globalSlicer.actions;
+export const { setProgress, setAcceptConcent, setPayment, setClientSecret, setPaymentDone } = globalSlicer.actions;
 
 export default globalSlicer.reducer;

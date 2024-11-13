@@ -11,7 +11,7 @@ function SendInvitation() {
     }
 
     return (
-        <div className='overflow-y-scroll overflow-x-hidden h-screen'>
+        <div className='overflow-x-hidden h-screen'>
             <Invitation
                 eventId={eventId}
             />

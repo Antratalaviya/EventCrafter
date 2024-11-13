@@ -8,4 +8,8 @@ router.post('/create-checkout-session', paymentController.createCheckoutSession)
 
 router.get('/session-status', paymentController.sessionStatus);
 
+router.get('/orders', authMiddleware.verifyUserAccess, paymentController.getPaymentOrders);
+
+router.post('/orders/:userId', authMiddleware.verifyUserAccess, paymentController.createPaymentOrder);
+
 export default router;

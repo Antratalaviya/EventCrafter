@@ -4,10 +4,10 @@ import { Max } from '../max'
 import Button from '../Button'
 import { useCurrLocation } from "../../context/useCurrLocation"
 import { useSelector } from 'react-redux'
-import { useNavigate } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import { useGetAllNotificationQuery, useGetUserQuery, useReadNotificationMutation } from '../../api/api'
 import { useMemo } from 'react'
-import { getTime } from '../../utils/customUtility'
+import { capitalize, getTime } from '../../utils/customUtility'
 import NotificationComponent from '../Notification/NotificationComponent'
 import Location from '../Location/Location'
 import { toast } from 'react-toastify'
@@ -73,15 +73,15 @@ function Header() {
         <Max />
 
         {authStatus ? (
-          <div className='grid grid-flow-col gap-2 px-3 py-1 bg-new-card border border-stroke rounded-md'>
+          <Link to={'settings/profile'} className='grid grid-flow-col gap-2 px-3 py-1 bg-new-card border border-stroke rounded-md'>
             <div className='w-10 h-10 rounded-full overflow-hidden object-contain ring-1 ring-white'>
-              <img src={data?.data.avatar} alt="profile" />
+              <img src={data?.data?.avatar ? data?.data?.avatar : img.userProfileImg} alt="profile" />
             </div>
             <div className='flex flex-col'>
-              <p className='text-white text-sm'>{data?.data?.name + " " + data?.data?.surname}</p>
+              <p className='text-white text-sm'>{capitalize(data?.data?.name + " " + data?.data?.surname)}</p>
               <p className='text-body-text text-sm'>{data?.data?.email}</p>
             </div>
-          </div>
+          </Link>
         ) : (
           <Button
             text={'Sign in'}

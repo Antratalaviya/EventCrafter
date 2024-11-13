@@ -1,15 +1,15 @@
 import React, { useEffect, useMemo, useState } from 'react'
+import { getMonth } from '../utils/customUtility';
+import Search from '../component/Search/Search';
+import Spinner from '../component/Spinner';
 import SingleEvent from '../component/events/SingleEvent';
 import { img } from '../assets/assets';
-import { capitalize, getMonth } from '../utils/customUtility';
-import { useDebounce } from '../context/useDebounce';
+import Button from '../component/Button';
 import { useGetAllOwnEventsQuery } from '../api/api';
-import Search from '../component/Search/Search';
-import { CrossIcon, FoodIcon } from '../assets/svg/Icon';
-import Spinner from '../component/Spinner';
 
 function OwnEvents() {
     const [search, setSearch] = useState(true);
+    const [loadMoreFilter, setLoadMoreFilter] = useState(false);
     const [events, setEvents] = useState([]);
     const [filterEvents, setFilterEvents] = useState([])
     const [filter, setFilter] = useState({
@@ -19,6 +19,19 @@ function OwnEvents() {
         page: 1,
         limit: 10,
     });
+    const { data, isSuccess, isLoading } = useGetAllOwnEventsQuery(
+        { keyword: "", filter },
+        { skip: !loadMoreFilter }
+    );
+
+    useEffect(() => {
+        if (isSuccess) {
+            setEvents((prev) => ([...prev, ...data?.data]));
+            console.log(events)
+            setLoadMoreFilter(false);
+        }
+    }, [data])
+
 
     useEffect(() => {
         if (events) {
@@ -27,7 +40,11 @@ function OwnEvents() {
     }, [events, setEvents])
 
     const filterEvent = (key) => {
-        setFilterEvents(events.filter((e) => (e.status === key)))
+        if (!key) {
+            setFilterEvents(events)
+        } else {
+            setFilterEvents(events.filter((e) => (e.status === key)))
+        }
     }
 
     const date = useMemo(() => {
@@ -38,7 +55,9 @@ function OwnEvents() {
     }, [events]);
 
     if (!events) {
-        return <Spinner />;
+        return <div className='h-screen w-screen grid place-items-center'>
+            <Spinner />
+        </div>
     }
     return (
         <div className='p-5 flex flex-col overflow-y-scroll'>
@@ -64,6 +83,9 @@ function OwnEvents() {
                 <button className='focus:bg-red-gradient focus:text-white focus:border-none bg-red-gradient/10 text-red-gradient border border-red-gradient/50 rounded-full px-4 py-2' onClick={() => filterEvent('draft')}>
                     Draft
                 </button>
+                <button className='focus:bg-primary focus:text-white focus:border-none bg-red-gradient/10 text-primary border border-primary/50 rounded-full px-4 py-2' onClick={() => filterEvent('')}>
+                    All
+                </button>
             </div>
 
             <div className='grid grid-cols-2 gap-5'>
@@ -86,11 +108,21 @@ function OwnEvents() {
                         own={true}
                     />
                 ))}
-                <SingleEvent eventId='66c87da83c2e7bb657c929bn' img={img.eventImg} add="Suite 577 44666 O'Keefe Turnpike, New Marianobury, SC 66348" />
+                {events.length < filter.page * filter.limit ? (<></>) : (
+                    <div className="col-span-2 flex items-center text-white">
+                        <Button
+                            className="w-1/3 mx-auto"
+                            text="Load More"
+                            onClick={() => { setFilter((prev) => ({ ...prev, page: prev.page + 1 })); setLoadMoreFilter(true) }}
+                        />
+                    </div>
+                )}
+                {/* <SingleEvent eventId='66c87da83c2e7bb657c929bn' img={img.eventImg} add="Suite 577 44666 O'Keefe Turnpike, New Marianobury, SC 66348" />
                 <SingleEvent eventId='66c87da83c2e7bb657c929bn' img={img.eventImg1} add="01040 Duncan Vista" />
                 <SingleEvent eventId='66c87da83c2e7bb657c929bn' img={img.eventImg2} add="01040 Duncan Vista" />
-                <SingleEvent eventId='66c87da83c2e7bb657c929bn' img={img.eventImg3} add="01040 Duncan Vista" />
+                <SingleEvent eventId='66c87da83c2e7bb657c929bn' img={img.eventImg3} add="01040 Duncan Vista" /> */}
             </div>
+
         </div >
     )
 }

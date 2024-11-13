@@ -30,9 +30,6 @@ const eventSchema = new mongoose.Schema({
         type: String,
         required: true
     },
-    expiresIn: {
-        type: Number,
-    },
     startDate: {
         type: String,
         required: true

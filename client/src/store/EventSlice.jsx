@@ -30,9 +30,12 @@ export const eventSlicer = createSlice({
         setEvent: (state, action) => {
             state.event = { ...state.event, ...action.payload };
         },
+        updateEvent: (state, action) => {
+            state.event = { ...action.payload };
+        },
     }
 })
 
-export const { setEvent } = eventSlicer.actions;
+export const { setEvent, updateEvent } = eventSlicer.actions;
 
 export default eventSlicer.reducer;

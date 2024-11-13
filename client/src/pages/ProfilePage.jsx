@@ -1,26 +1,28 @@
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 import { useSelector } from 'react-redux'
 import { ArrowIcon, CameraIcon, CompanyIcon, EditIcon, EmailIcon, InstituteIcon, LogoIcon, ShareIcon, UserIcon, CalenderIcon, PostIcon, SchoolIcon, } from '../assets/svg/Icon'
-import { img } from '../assets/assets'
 import { capitalize } from '../utils/customUtility'
 import Input from '../component/Input'
-import { useForm } from 'react-hook-form';
 import Button from '../component/Button';
 import "../index.css"
 import { Link } from 'react-router-dom'
-import { useUpdateEmailMutation, useUpdateProfileMutation } from '../api/api'
+import { useUpdateEmailMutation, useUpdateProfileImageMutation, useUpdateProfileMutation } from '../api/api'
 import Modal from "../component/Modal/Modal"
-import OtpInput from '../component/Otp/OtpInput'
 import Otp from '../component/Otp/Otp'
 import { toast } from 'react-toastify'
+import { img } from '../assets/assets'
+import { uploadImg } from '../Firebase/upload'
+import { deleteImg } from '../Firebase/delete'
 
 function ProfilePage() {
     const user = useSelector(state => state.auth.userData)
     const [openEmailModal, setOpenEmailModal] = useState(false);
     const [verify, setVerify] = useState(false);
     const [email, setEmail] = useState(user.email);
+    const [profileImg, setProfileImg] = useState(user.profileImg);
     const [updateProfile, { isLoading }] = useUpdateProfileMutation();
     const [updateEmail, { isLoading: emailChangeLoading }] = useUpdateEmailMutation();
+    const [updateProfileImg, { isLoading: profileImgUploadLoading }] = useUpdateProfileImageMutation();
     const [userDetail, setUserDetail] = useState({
         name: user.name,
         surname: user.surname,
@@ -28,7 +30,7 @@ function ProfilePage() {
         postcode: user.postcode ? user.postcode : null,
         orgName: user.orgName ? user.orgName : null,
     })
-
+    const fileInputRef = useRef(null);
 
     const handleChange = (e) => {
         setUserDetail({
@@ -59,9 +61,37 @@ function ProfilePage() {
             toast.error(error.message)
         }
     }
+
+    const handleFileChange = async (e) => {
+        const file = e.target.files[0];
+        if (file) {
+            await deleteImg(profileImg)
+            setProfileImg(URL.createObjectURL(file));
+            await handleUpload(file);
+        }
+    }
+    const handleIconClick = async () => {
+        fileInputRef.current.click();
+    }
+
+    const handleUpload = async (file) => {
+        try {
+            const url = await uploadImg(file);
+
+            if (url) {
+                const response = await updateProfileImg({ profileImg: url });
+                if (response.success) {
+                    toast.success(response.message)
+                }
+            }
+        } catch (error) {
+            toast.error(error.message)
+        }
+    }
+
     return (
-        <div className='grid grid-cols-4 p-5 h-screen'>
-            <div className="overflow-hidden text-white bg-black-light col-span-2 rounded-md h-[90%]">
+        <div className='grid grid-cols-4 lg:p-5 lg:h-screen'>
+            <div className="overflow-hidden text-white bg-black-light pb-5 lg:py-0 col-span-4 lg:col-span-2 rounded-md h-full lg:h-[90%]">
                 <div className='flex items-center justify-between p-8 bg-gray relative'>
                     <Link to={'/settings'}>
                         <ArrowIcon />
@@ -69,7 +99,7 @@ function ProfilePage() {
                     <p className='text-3xl font-semibold'>Profile</p>
                     <LogoIcon />
                     <div className='rounded-full overflow-hidden ring-8 ring-black-light size-16 cursor-pointer absolute -bottom-12 z-20'>
-                        <img src={img.p3} alt="User Avatar" />
+                        <img src={profileImg || img.userProfileImg} alt="profile_img" />
                     </div>
                 </div>
                 <div className='px-3 space-y-5'>
@@ -93,7 +123,7 @@ function ProfilePage() {
                         <hr className='text-body-text/30' />
                         <div className='flex gap-3 p-2'>
                             <div className='rounded-full overflow-hidden ring-4 ring-black-light size-10'>
-                                <img src={img.p3} alt="User Avatar" />
+                                <img src={profileImg || img.userProfileImg} alt="profile_img" />
                             </div>
                             <div>
                                 <p className='font-semibold'>{capitalize(`${user.name} ${user.surname}`)}</p>
@@ -126,16 +156,25 @@ function ProfilePage() {
                         </div>
                     </div>
                 </div>
-
             </div>
-            <div className='col-span-2 p-5 text-white flex flex-col items-center space-y-5'>
+            <div className='col-span-4 lg:col-span-2 p-5 text-white flex flex-col items-center space-y-5'>
                 <div className='relative gap-5 flex flex-col'>
                     <p className='font-semibold'>Edit Profile</p>
                     <div className='rounded-full overflow-hidden size-20'>
-                        <img src={img.p3} alt="User Avatar" />
+                        <img src={profileImg || img.userProfileImg} alt="profile_img" />
                     </div>
-                    <div className='rounded-full bg-primary p-1 absolute bottom-0 right-1/2 translate-x-12 ring-1 ring-black-light'>
+                    <div
+                        className='rounded-full bg-primary p-1 absolute bottom-0 right-1/2 translate-x-12 ring-1 ring-black-light'
+                        onClick={handleIconClick}
+                    >
                         <CameraIcon />
+                        <input
+                            ref={fileInputRef}
+                            type="file"
+                            className="hidden"
+                            accept="image/*"
+                            onChange={handleFileChange}
+                        />
                     </div>
                 </div>
                 <div className='w-full space-y-5'>

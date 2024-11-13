@@ -316,7 +316,9 @@ const getUserProfile = async (userId: string) => {
           }
         },
         joinedEvent: {
-          $size: "$joinedEvent"
+          $size: {
+            $ifNull: ["$joinedEvent", []]
+          }
         }
       }
     }

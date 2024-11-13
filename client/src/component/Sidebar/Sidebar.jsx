@@ -45,8 +45,8 @@ function Sidebar() {
                     case "home":
                       return <HomeIcon fill={'white'} className={`${loc === item.key ? 'stroke-transperent fill-white' : "stroke-[#96989D] fill-transperent"}`} />;
 
-                    case "message":
-                      return <MsgIcon className={`${loc === item.key && 'stroke-white'}`} />;
+                    case "chat":
+                      return <MsgIcon stroke={`${loc === item.key ? 'white' : "#96989D"}`} />;
 
                     case "news":
                       return <MoneyIcon className={`${loc === item.key && 'stroke-white'}`} />;

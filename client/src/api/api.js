@@ -4,6 +4,7 @@ import { getItem, removeItem, setItem } from "../utils/localStorageUtility";
 import { CONSTS } from "../utils/consts";
 import { authLogin, authLogout } from "../store/AuthSlice";
 import { setClientSecret } from "../store/GlobalSlice";
+import { setSocketConnection } from "../store/ChatSlice";
 
 export const baseQueryIntercepter = (args) => {
   const baseQuery = fetchBaseQuery(args);
@@ -65,7 +66,7 @@ export const api = createApi({
     },
   },
   ),
-  tagTypes: ['Auth', "Notification", "Refresh", "EventUpdate", "Invitation", "Connection", "Users"],
+  tagTypes: ['Auth', "Notification", "Refresh", "EventUpdate", "Invitation", "Connection", "Users", "Message", "Chat"],
   endpoints: (builder) => ({
     /************************************************************* Auth APIs ************************************************************** */
     register: builder.mutation({
@@ -97,7 +98,14 @@ export const api = createApi({
       query: () => ({
         url: "/auth/sign-out",
         method: "PATCH"
-      })
+      }),
+      onQueryStarted: async (args, { dispatch, queryFulfilled }) => {
+        try {
+          dispatch(setSocketConnection(""))
+        } catch (error) {
+          console.log("Login failed !! ", error);
+        }
+      },
     }),
     sendOtp: builder.mutation({
       query: ({ email }) => ({
@@ -234,7 +242,7 @@ export const api = createApi({
         method: "GET"
       }),
     }),
-    /************************************************************* Event APIs ************************************************************** */
+    /************************************************** Event APIs *********************************************************** */
     getFullEvent: builder.query({
       query: (eventId) => ({
         url: `/event/${eventId}`,
@@ -316,6 +324,21 @@ export const api = createApi({
       }),
       invalidatesTags: ["EventUpdate"]
     }),
+    cancelEvent: builder.mutation({
+      query: ({ eventId }) => ({
+        url: `/event/cancel/${eventId}`,
+        method: "POST",
+      }),
+      invalidatesTags: ["EventUpdate"]
+    }),
+    updateEvent: builder.mutation({
+      query: ({ eventId, event }) => ({
+        url: `/event/${eventId}`,
+        method: "PUT",
+        body: event
+      }),
+      invalidatesTags: ["EventUpdate"]
+    }),
     getAllEvents: builder.query({
       query: ({ keyword, filter }) => {
         let queryString = '';
@@ -337,7 +360,8 @@ export const api = createApi({
       },
       providesTags: ['Auth', "EventUpdate"]
     }),
-    /************************************************************* Invitation APIs************************************************************** */
+    /****************************************************** Invitatio APIs************************************************* */
+
     sendInvitation: builder.mutation({
       query: ({ eventId, userId }) => ({
         url: '/invitation/send',
@@ -426,14 +450,14 @@ export const api = createApi({
       }),
       invalidatesTags: ["Connection"]
     }),
-    /************************************************************* Avatar APIs ************************************************************** */
+    /************************************************* Avatar API ******************************************************** */
     getAllAvatars: builder.query({
       query: () => ({
         url: "/avatar",
         method: "GET"
       })
     }),
-    /************************************************************* Payment APIs ************************************************************** */
+    /************************************************ Payment APIs *********************************************** */
     createCheckoutSession: builder.mutation({
       query: ({ amount, description, quantity, name }) => ({
         url: "/payment/create-checkout-session",
@@ -460,6 +484,48 @@ export const api = createApi({
         url: `/payment/session-status?session_id=${session_id}`,
         method: 'GET'
       })
+    }),
+    createOrder: builder.mutation({
+      query: ({ session, userId }) => ({
+        url: `/payment/orders/${userId}`,
+        method: 'POST',
+        body: {
+          session
+        }
+      })
+    }),
+    /************************************************ Chat APIs *********************************************** */
+    sendMessage: builder.mutation({
+      query: ({ chatId, text }) => ({
+        url: `/message`,
+        method: 'POST',
+        body: {
+          chatId,
+          text
+        }
+      }),
+      invalidatesTags: ["Message", "Chat"]
+    }),
+    getMessage: builder.query({
+      query: (chatId) => ({
+        url: `/message/${chatId}`,
+        method: 'GET',
+      }),
+      providesTags: ["Message"]
+    }),
+    getUserChats: builder.query({
+      query: () => ({
+        url: `/chat`,
+        method: 'GET',
+      }),
+      providesTags: ["Chat"]
+    }),
+    createChat: builder.mutation({
+      query: ({ secondId }) => ({
+        url: `/chat/${secondId}`,
+        method: 'POST',
+      }),
+      invalidatesTags: ["Chat"],
     }),
   })
 })
@@ -494,6 +560,8 @@ export const {
   useCreateEventMutation,
   useUpdateEventStatusMutation,
   useGetOwnPublicEventsQuery,
+  useCancelEventMutation,
+  useUpdateEventMutation,
 
   useGetAllSendParticipantsQuery,
   useSendInvitationMutation,
@@ -513,4 +581,10 @@ export const {
 
   useCreateCheckoutSessionMutation,
   useSessionStatusMutation,
+  useCreateOrderMutation,
+
+  useSendMessageMutation,
+  useGetMessageQuery,
+  useGetUserChatsQuery,
+  useCreateChatMutation
 } = api;

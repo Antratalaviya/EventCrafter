@@ -2,6 +2,7 @@ import React, { useEffect, useRef } from 'react'
 import { CrossIcon, FileIcon, GalleryIcon, PdfIcon, VideoIcon } from '../assets/svg/Icon';
 import { useDispatch, useSelector } from 'react-redux';
 import { setEvent } from '../store/EventSlice';
+import { deleteImg } from '../Firebase/delete';
 
 function CreateEventPage3() {
     const fileInputRef = useRef(null);
@@ -99,6 +100,7 @@ function CreateEventPage3() {
                     onChange={handleChange}
                     maxLength={200}
                     style={{ resize: "none" }}
+                    value={event.description}
                     className='bg-transperent focus:outline-none w-full text-body-text p-3 text-sm'
                 />
                 <div className='float-right text-body-text pr-3'>
@@ -132,14 +134,27 @@ function CreateEventPage3() {
                     <div className='grid grid-cols-3 grid-rows-2 gap-5 transition-all'>
                         {event.photos.map((img, index) => (
                             <div className='relative' key={index}>
-                                <img
-                                    src={URL.createObjectURL(img)}
-                                    alt={`Selected ${index}`}
-                                    className='h-48 w-full object-cover rounded'
-                                />
+                                {img?.url && img?.url.includes("https") ? (
+                                    <img
+                                        src={img.url}
+                                        alt={`Selected ${index}`}
+                                        className='h-48 w-full object-cover rounded'
+                                    />
+                                ) : (
+                                    <img
+                                        src={URL.createObjectURL(img)}
+                                        alt={`Selected ${index}`}
+                                        className='h-48 w-full object-cover rounded'
+                                    />
+                                )}
                                 <button
                                     type="button"
-                                    onClick={() => dispatch(setEvent({ photos: event.photos.filter((_, i) => i !== index) }))}
+                                    onClick={async () => {
+                                        if (img?.includes("https")) {
+                                            await deleteImg(img);
+                                        }
+                                        dispatch(setEvent({ photos: event.photos.filter((_, i) => i !== index) }));
+                                    }}
                                     className="absolute top-0 right-1 rounded-full bg-stroke/50 size-10 row-center"
                                 >
                                     <CrossIcon className="size-5" />

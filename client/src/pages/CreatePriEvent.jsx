@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from 'react'
-import Button from '../component/Button';
 import { CurrectIcon } from '../assets/svg/Icon';
 import '../index.css'
 import Modal from '../component/Modal/Modal';
@@ -13,6 +12,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { setEvent } from '../store/EventSlice';
 import { setAcceptConcent, setProgress } from '../store/GlobalSlice';
 import { getItem } from '../utils/localStorageUtility';
+import Button from '../component/Button';
 
 function CreatePriEvent() {
     const [openConsent, setOpenConsent] = useState(false);

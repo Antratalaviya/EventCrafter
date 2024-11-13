@@ -82,8 +82,12 @@ export enum AppString {
   REQ_NOT_EXIST = "connection request does not exist",
   REQ_ALREADY_SENT = "connection request already sent",
 
+  CHAT_RETRIEVED = "chat retrieved successfully",
+  MESSAGE_SENT = "message sent successfully",
 
   CLIENT_SECRET_RETRIEVED = "client secret retrieved successfully",
+  PAYMENT_ORDERS = "payment orders retrieved successfully",
+  ORDER_PLACED = "payment orders placed successfully",
 };
 
 export enum Collection {
@@ -93,6 +97,9 @@ export enum Collection {
   MODEL_INVITATION = "Invitation",
   MODEL_CONNECTION = "Connection",
   MODEL_NOTIFICATION = "Notification",
+  MODEL_MESSAGE = "Message",
+  MODEL_CHAT = "Chat",
+  MODEL_PAYMENT = "Payment",
 };
 
 export enum NotificationMsg {

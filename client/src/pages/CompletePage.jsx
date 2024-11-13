@@ -1,19 +1,26 @@
 import React, { useEffect, useState } from 'react'
 import Modal from '../component/Modal/Modal'
 import { Link, Navigate } from 'react-router-dom'
-import { useSessionStatusMutation, useUpdateEventStatusMutation } from '../api/api';
+import { useCreateOrderMutation, useSessionStatusMutation, useUpdateEventStatusMutation } from '../api/api';
 import { img } from '../assets/assets';
 import Button from '../component/Button';
-import { useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { toast } from 'react-toastify';
 import { getItem } from '../utils/localStorageUtility';
+import { setPaymentDone } from '../store/GlobalSlice';
 
 function CompletePage() {
     const eventId = JSON.parse(getItem("eventId"))
+    const user = useSelector((state) => state.auth.userData);
+    const paymentDone = useSelector((state) => state.global.paymentDone);
+    const [session, setSession] = useState(null);
     const [status, setStatus] = useState(null);
-    const [customerEmail, setCustomerEmail] = useState('');
+    const [customerEmail, setCustomerEmail] = useState(null);
     const [sessionStatus] = useSessionStatusMutation();
     const [updateEventStatus] = useUpdateEventStatusMutation();
+    const [createOrder] = useCreateOrderMutation();
+
+    const dispatch = useDispatch();
 
     useEffect(() => {
         const handlePayment = async () => {
@@ -24,6 +31,7 @@ function CompletePage() {
 
             const response = await sessionStatus({ session_id: sessionId }).unwrap()
             if (response.success) {
+                setSession(response.data.session);
                 setStatus(response.data.status);
                 setCustomerEmail(response.data.customer_email);
             }
@@ -38,6 +46,12 @@ function CompletePage() {
             const response = await updateEventStatus({ eventId: eventId, status: "upcoming" }).unwrap();
             if (response.success) {
                 toast.success("Your payment has been done successfully");
+            }
+            if (session && !paymentDone) {
+                const res = await createOrder({ session: session, userId: user._id }).unwrap();
+                if (res.success) {
+                    dispatch(setPaymentDone(true))
+                }
             }
         })();
     }, [status])

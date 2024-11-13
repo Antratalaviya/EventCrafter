@@ -1,9 +1,10 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux';
 import { EventCategory, offers } from '../lib/consts';
 import { AddCircleIcon, CalenderIcon, CrossIcon, DownIcon, SelectIcon, TimeIcon } from '../assets/svg/Icon';
 import { setEvent } from '../store/EventSlice';
 import Input from '../component/Input';
+import { capitalize } from '../utils/customUtility';
 
 function CreateEventPage1() {
     const [openCat, setOpenCat] = useState(false);
@@ -13,6 +14,11 @@ function CreateEventPage1() {
     const event = useSelector((state) => state.event.event);
     const dispatch = useDispatch();
 
+    useEffect(() => {
+        event.offers.map((offer) => (
+            setOfferToSelect((prev) => (prev.map((p) => capitalize(p.text) === capitalize(offer) ? { ...p, checked: true } : p)))
+        ))
+    }, [])
     const handleChange = (e) => {
         dispatch(setEvent({
             ...event,
@@ -47,7 +53,7 @@ function CreateEventPage1() {
 
                                 </div>
                                 <div className='cursor-pointer'>
-                                    {event.category === item.text ? <SelectIcon /> : (
+                                    {capitalize(event.category) === capitalize(item.text) ? <SelectIcon /> : (
                                         <div className='w-4 h-4 rounded-full ring-1 ring-white' />
                                     )}
                                 </div>
@@ -63,6 +69,7 @@ function CreateEventPage1() {
                     name={'title'}
                     onChange={handleChange}
                     className={'col-span-1'}
+                    value={event.title}
                 />
                 <Input
                     type={'text'}
@@ -70,6 +77,7 @@ function CreateEventPage1() {
                     name={'subtitle1'}
                     onChange={handleChange}
                     className={'col-span-1'}
+                    value={event.subtitle1}
                 />
                 <Input
                     type={'text'}
@@ -77,6 +85,7 @@ function CreateEventPage1() {
                     name={'subtitle2'}
                     onChange={handleChange}
                     className={'col-span-1'}
+                    value={event.subtitle2}
                 />
                 <div className='col-span-1 flex gap-5'>
                     <Input
@@ -88,6 +97,7 @@ function CreateEventPage1() {
                         onBlur={(e) => e.target.type = 'text'}
                         className={'w-1/2 flex items-center relative'}
                         InputClassName={'datepicker-input'}
+                        value={`${new Date(event.startDate).getFullYear()}-${new Date(event.startDate).getMonth() + 1}-${new Date(event.startDate).getDate()}`}
                     >
                         <CalenderIcon className="mr-3" />
                     </Input>
@@ -100,6 +110,7 @@ function CreateEventPage1() {
                         onBlur={(e) => e.target.type = 'text'}
                         className={'w-1/2 flex items-center relative'}
                         InputClassName={'datepicker-input'}
+                        value={`${new Date(event.endDate).getFullYear()}-${new Date(event.endDate).getMonth() + 1}-${new Date(event.endDate).getDate()}`}
                     >
                         <CalenderIcon className="mr-3" />
                     </Input>
@@ -114,6 +125,7 @@ function CreateEventPage1() {
                         onBlur={(e) => e.target.type = 'text'}
                         className={'w-1/2 flex items-center relative'}
                         InputClassName={'datepicker-input'}
+                        value={event.startTime}
                     >
                         <TimeIcon className="mr-3" />
                     </Input>
@@ -126,6 +138,7 @@ function CreateEventPage1() {
                         onBlur={(e) => e.target.type = 'text'}
                         className={'w-1/2 flex items-center relative'}
                         InputClassName={'datepicker-input'}
+                        value={event.endTime}
                     >
                         <TimeIcon className="mr-3" />
                     </Input>
@@ -141,6 +154,7 @@ function CreateEventPage1() {
                                 name={'vip'}
                                 onChange={handleChange}
                                 className={'col-span-1'}
+                                value={event.vip}
                             />
                             <Input
                                 type={'text'}
@@ -148,6 +162,7 @@ function CreateEventPage1() {
                                 name={'economy'}
                                 onChange={handleChange}
                                 className={'col-span-1'}
+                                value={event.economy}
                             />
                         </div>
                         <div className='space-y-5 col-span-1 mt-2'>
@@ -158,6 +173,7 @@ function CreateEventPage1() {
                                 name={'vip_price'}
                                 onChange={handleChange}
                                 className={'col-span-1'}
+                                value={event.vip_price}
                             />
                             <Input
                                 type={'text'}
@@ -165,6 +181,7 @@ function CreateEventPage1() {
                                 name={'economy_price'}
                                 onChange={handleChange}
                                 className={'col-span-1'}
+                                value={event.economy_price}
                             />
                         </div>
                     </>
@@ -222,14 +239,14 @@ function CreateEventPage1() {
                         <div className={`py-2 rounded-full cursor-pointer mt-2 w-full row-center gap-2 bg-dark px-3`}>
                             <div>
                                 {offersToSelect
-                                    .filter((offer) => offer.text === item)
+                                    .filter((offer) => offer.text === capitalize(item))
                                     .map((offer) => (
                                         <div key={offer.text}>
                                             {offer.icon}
                                         </div>
                                     ))}
                             </div>
-                            <p>{item}</p>
+                            <p>{capitalize(item)}</p>
                             <div
                                 onClick={() => {
                                     dispatch(setEvent({ offers: event.offers.filter((i) => i !== item) }))

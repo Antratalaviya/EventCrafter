@@ -1,5 +1,5 @@
 import mongoose, { PipelineStage } from "mongoose";
-import { EventInput } from "../constants";
+import { EventDocument, EventInput } from "../constants";
 import { Event } from "../model/event.model";
 /**
  * @param userId 
@@ -15,15 +15,9 @@ const createEvent = async (userId: string, event: EventInput) => {
     })
 }
 
-/**
- * @param userId 
- * @returns 
- */
-
-/**
- title,category, type, photos,start-date, time-both, carCapacity, street, city, country,description, offers, 
- name, surname, subscriber, 
- */
+const getEvents = async () => {
+    return await Event.find();
+}
 
 const getOwnEventsByUserId = async (userId: string, page: number, limit: number, keyword: string, eventStatus: string, eventType: string, sortby: string) => {
     const pipeline: PipelineStage[] = [];
@@ -50,11 +44,6 @@ const getOwnEventsByUserId = async (userId: string, page: number, limit: number,
             $match: { type: { $eq: eventType } }
         })
     }
-    pipeline.push({
-        $skip: (page - 1) * limit
-    }, {
-        $limit: limit
-    })
     pipeline.push(
         {
             $addFields: {
@@ -77,19 +66,19 @@ const getOwnEventsByUserId = async (userId: string, page: number, limit: number,
             $unset: "sortPriority"
         }
     );
-    // if (sortby === 'asc') {
-    //     pipeline.push({
-    //         $sort: {
-    //             createdAt: 1
-    //         }
-    //     })
-    // } else {
-    //     pipeline.push({
-    //         $sort: {
-    //             createdAt: -1
-    //         }
-    //     })
-    // }
+
+    // pipeline.push({
+    //     $sort: {
+    //         createdAt: -1
+    //     }
+    // })
+
+    pipeline.push({
+        $skip: (page - 1) * limit
+    }, {
+        $limit: limit
+    })
+
     pipeline.push(
         {
             $lookup: {
@@ -113,7 +102,6 @@ const getOwnEventsByUserId = async (userId: string, page: number, limit: number,
                 street: 1,
                 city: 1,
                 country: 1,
-                status: 1,
                 startDate: 1,
                 photos: { $first: "$photos" },
                 likedBy: {
@@ -122,6 +110,7 @@ const getOwnEventsByUserId = async (userId: string, page: number, limit: number,
                     }
                 },
                 price: 1,
+                status: 1,
                 liked: {
                     $cond: {
                         if: {
@@ -169,7 +158,11 @@ const getOwnEventsByUserId = async (userId: string, page: number, limit: number,
 const getOwnPublicEventsByUserId = async (userId: string, page: number, limit: number) => {
     const pipeline: PipelineStage[] = [];
     pipeline.push({
-        $match: { owner: new mongoose.Types.ObjectId(userId), type: { $ne: "private" } }
+        $match: {
+            owner: new mongoose.Types.ObjectId(userId),
+            status: { $ne: "draft" },
+            type: { $ne: "private" },
+        }
     })
     pipeline.push({
         $skip: (page - 1) * limit
@@ -221,7 +214,6 @@ const getOwnPublicEventsByUserId = async (userId: string, page: number, limit: n
                 street: 1,
                 city: 1,
                 country: 1,
-                status: 1,
                 startDate: 1,
                 photos: { $first: "$photos" },
                 likedBy: {
@@ -230,6 +222,7 @@ const getOwnPublicEventsByUserId = async (userId: string, page: number, limit: n
                     }
                 },
                 price: 1,
+                status: 1,
                 liked: {
                     $cond: {
                         if: {
@@ -309,7 +302,7 @@ const getFullEventByEventId = async (eventId: string) => {
                 category: 1,
                 type: 1,
                 photos: 1,
-                userId: '$user._id',
+                owner: '$user._id',
                 name: '$user.name',
                 surname: '$user.surname',
                 subscriber: {
@@ -321,6 +314,9 @@ const getFullEventByEventId = async (eventId: string) => {
                 startDate: 1,
                 startTime: 1,
                 endTime: 1,
+                endDate: 1,
+                subtitle1: 1,
+                subtitle2: 1,
                 street: 1,
                 city: 1,
                 country: 1,
@@ -332,7 +328,7 @@ const getFullEventByEventId = async (eventId: string) => {
                         $ifNull: ["$participants", []]
                     }
                 },
-                status: 1
+                status: 1,
             }
         }
     ];
@@ -386,11 +382,11 @@ const addUserToParticipants = async (eventId: mongoose.Types.ObjectId, userId: m
     return;
 }
 
-const cancelEvent = async (eventId: string) => {
+const updateEventStatus = async (eventId: string, status: string) => {
     return await Event.findByIdAndUpdate(eventId,
         {
             $set: {
-                status: 'cancelled'
+                status: status
             }
         }
     )
@@ -461,12 +457,12 @@ const getAllEvents = async (userId: string, page: number, limit: number, keyword
             $project: {
                 _id: 1,
                 type: 1,
-                status: 1,
                 title: 1,
                 street: 1,
                 city: 1,
                 country: 1,
                 startDate: 1,
+                endDate: 1,
                 photos: { $first: "$photos" },
                 price: 1,
                 likedBy: {
@@ -474,6 +470,7 @@ const getAllEvents = async (userId: string, page: number, limit: number, keyword
                         $ifNull: ["$likedBy", []]
                     }
                 },
+                status: 1,
                 liked: {
                     $cond: {
                         if: {
@@ -554,25 +551,22 @@ const getAllParticipants = async (userId: string, eventId: string) => {
     return await Event.aggregate(pipeline);
 }
 
-const updateEventStatus = async (eventId: string, status: string) => {
-    return await Event.findByIdAndUpdate(eventId, {
-        $set: {
-            status: status
-        }
-    }, { new: true })
+const updateEvent = async (eventId: string, event: EventDocument) => {
+    return await Event.findByIdAndUpdate(eventId, { ...event }, { new: true })
 }
 
 export default {
     createEvent,
+    getEvents,
     getEventByUserId,
     getFullEventByEventId,
     getOwnEventsByUserId,
     getEventById,
     eventLikedByUser,
     addUserToParticipants,
-    cancelEvent,
+    updateEventStatus,
     getAllEvents,
     getAllParticipants,
-    updateEventStatus,
-    getOwnPublicEventsByUserId
+    updateEvent,
+    getOwnPublicEventsByUserId,
 }

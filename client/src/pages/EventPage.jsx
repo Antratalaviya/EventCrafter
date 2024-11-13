@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react'
 import { Link, useNavigate, useParams } from 'react-router-dom'
-import { useAcceptInvitationsMutation, useGetFullEventQuery, useRejectInvitationsMutation } from '../api/api';
+import { useAcceptInvitationsMutation, useCancelEventMutation, useGetFullEventQuery, useRejectInvitationsMutation } from '../api/api';
 import { capitalize, getDay, getFullDay, getFullTime, getMonth } from '../utils/customUtility';
 import { CalenderIcon, CarIcon, DropDownIcon, LikeIcon, LocationIcon } from '../assets/svg/Icon';
 import ProfilesComponent from '../component/ProfilesComponent';
@@ -9,22 +9,28 @@ import { img } from '../assets/assets';
 import { offers as EventOffer } from '../lib/consts';
 import Button from '../component/Button';
 import { toast } from 'react-toastify';
+import { useSelector } from 'react-redux';
 
 function EventPage() {
     const { eventId } = useParams();
-    const { data, isSuccess } = useGetFullEventQuery(eventId);
     const [event, setEvent] = useState();
+
+    const { data, isSuccess } = useGetFullEventQuery(eventId);
+
+    const user = useSelector((state) => state.auth.userData);
+
     const queryString = window.location.search;
     const urlParams = new URLSearchParams(queryString);
     const invitation = urlParams.get("invitation");
+
     const [acceptInvitation, { isLoading: acceptLoading }] = useAcceptInvitationsMutation();
     const [rejectedInvitation, { isLoading: rejectLoading }] = useRejectInvitationsMutation();
+    const [cancelEvent, { isLoading: cancelEventLoading }] = useCancelEventMutation();
 
     const navigate = useNavigate()
     useEffect(() => {
         if (isSuccess) {
             setEvent({ ...data.data[0] })
-            console.log(data.data)
         }
     }, [data])
 
@@ -51,9 +57,22 @@ function EventPage() {
             toast.error(error.message)
         }
     }
+    const handleCancelEvent = async () => {
+        try {
+            const response = await cancelEvent({ eventId: event._id }).unwrap();
+            if (response.success) {
+                toast.success(response.message)
+            }
+            navigate(-1);
+        } catch (error) {
+            toast.error(error.message)
+        }
+    }
 
     if (!event) {
-        return <Spinner />
+        return <div className='h-screen w-screen grid place-items-center'>
+            <Spinner />
+        </div>
     }
     return (
         <div className='p-5 w-full h-full text-white overflow-y-scroll'>
@@ -214,20 +233,19 @@ function EventPage() {
                             text={acceptLoading ? "Loading..." : "Accept"}
                         />
                     ) : event.status === 'draft' ? (
-                        <Link to={`/create-event/create-${event.type}-event/4?status=${event.status}`} className="w-2/12">
+                        <Link to={`/create-event/create-${event.type}-event/4?eventId=${event._id}&status=${event.status}`} className="w-2/12">
                             <Button
                                 text="Continue Payment"
                             />
                         </Link>
-                    ) : (
+                    ) : event.userId === user._id && (
                         <Button
                             className="bg-red text-sm hover:bg-red/80 w-2/12"
-                            text="Cancel Event"
+                            text={cancelEventLoading ? "Loading..." : "Cancel Event"}
+                            onClick={handleCancelEvent}
                         />
                     )
                     }
-
-
                 </div>
             </div>
         </div >

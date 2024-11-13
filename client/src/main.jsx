@@ -14,7 +14,6 @@ import OwnEvents from './pages/OwnEvents.jsx'
 import EventPage from './pages/EventPage.jsx'
 import SendInvitation from './pages/SendInvitation.jsx'
 import SettingPage from './pages/SettingPage.jsx'
-import EditAvatar from './pages/EditAvatar.jsx'
 import SavedEvents from './pages/SavedEvents.jsx'
 import LikedEvents from './pages/LikedEvents.jsx'
 import ProfilePage from './pages/ProfilePage.jsx'
@@ -22,6 +21,7 @@ import YourFriend from './pages/YourFriend.jsx'
 import ConnectRequest from './pages/ConnectRequest.jsx'
 import InvitationPage from './pages/InvitationPage.jsx'
 import MyFriendPage from './pages/MyFriendPage.jsx'
+import EditAvatar from './pages/EditAvatar.jsx'
 import SentInvitation from './pages/SentInvitation.jsx'
 import AcceptInvitation from './pages/AcceptInvitation.jsx'
 import ReceivedInvitation from './pages/ReceivedInvitation.jsx'
@@ -30,6 +30,7 @@ import { EventPageWrapper } from './wrapper/EventPageWrapper.jsx'
 import Payment from './pages/Payment.jsx'
 import CompletePage from './pages/CompletePage.jsx'
 import OrganizerDetail from './pages/OrganizerDetail.jsx'
+import ChatPage from './pages/chat/ChatPage.jsx'
 
 const router = createBrowserRouter(
   createRoutesFromElements(
@@ -62,13 +63,12 @@ const router = createBrowserRouter(
         </Route>
         <Route path='payment' element={<Payment />} />
         <Route path='return' element={<CompletePage />} />
+        <Route path='chat' element={<ChatPage />} />
       </Route >
       <Route path='/sign-in' element={<Login />} />
       <Route path='/sign-up' element={<SignUp />} />
       <Route path='*' element={<PageNotFound />} />
     </>
-
-
   )
 )
 

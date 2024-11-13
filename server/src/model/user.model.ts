@@ -56,6 +56,10 @@ const userSchema = new mongoose.Schema(
       type: String,
       default: "",
     },
+    admin: {
+      type: Boolean,
+      default: false,
+    },
     refreshTokenExpiry: {
       type: Date,
     },
@@ -129,7 +133,7 @@ userSchema.methods.generateRefreshToken = async function (this: UserDocument) {
   this.refreshToken = refreshToken;
   const expiry = new Date();
   expiry.setDate(expiry.getDate() + 30);
-  this.refreshTokenExpiry = expiry;
+  this.refreshTokenExpiry = new Date(expiry);
   this.save();
   return refreshToken;
 };

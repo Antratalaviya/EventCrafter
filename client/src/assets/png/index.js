@@ -24,6 +24,7 @@ import businessEvent from './businessevent.png'
 import event_main_1 from "./event_main_1.png"
 import done from "./done.gif"
 import loading from "./loading.gif"
+import userProfileImg from "./default_profile.jpg"
 
 export default {
     happy,
@@ -51,5 +52,6 @@ export default {
     businessEvent,
     event_main_1,
     done,
-    loading
+    loading,
+    userProfileImg
 }

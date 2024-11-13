@@ -6,11 +6,8 @@ export const uploadImg = async (file) => {
     const imgRef = ref(storage, `img/${v4()}`);
 
     const data = await uploadBytes(imgRef, file);
-    console.log(data);
-
 
     const url = await getDownloadURL(data.ref);
-    console.log(url);
 
     return url;
 };

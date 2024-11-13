@@ -4,7 +4,7 @@ import { CurrectIcon } from '../assets/svg/Icon';
 import '../index.css'
 import Modal from '../component/Modal/Modal';
 import { uploadImg } from '../Firebase/upload';
-import { useCreateEventMutation } from '../api/api';
+import { useCreateEventMutation, useUpdateEventMutation } from '../api/api';
 import Spinner from "../component/Spinner"
 import { img } from '../assets/assets';
 import { Link, Outlet, useNavigate } from 'react-router-dom';
@@ -13,6 +13,8 @@ import { setEvent } from '../store/EventSlice';
 import { toast } from 'react-toastify';
 import { setAcceptConcent, setProgress } from '../store/GlobalSlice';
 import { getItem } from '../utils/localStorageUtility';
+import { filterProperty } from '../utils/customUtility';
+import { deleteImg } from '../Firebase/delete';
 
 function CreatePubEvent() {
     const [openConsent, setOpenConsent] = useState(false);
@@ -29,6 +31,7 @@ function CreatePubEvent() {
     const dispatch = useDispatch();
 
     const [createEvent, { isLoading }] = useCreateEventMutation()
+    const [updateEvent] = useUpdateEventMutation()
 
     useEffect(() => {
         dispatch(setEvent({ type: "public" }))
@@ -36,22 +39,35 @@ function CreatePubEvent() {
 
     const handleCreateEvent = async () => {
         try {
-            const urlPhotos = await Promise.all(event.photos.map(uploadImg));
+            const alreadyUploaded = event.photos.filter((photo) => photo.url);
+            const filterPhotos = event.photos.filter((photo) => !photo.url);
+            const urlPhotos = await Promise.all(filterPhotos.map(uploadImg));
 
             if (urlPhotos.every((url) => url !== undefined)) {
                 const updatedEvent = {
                     ...event,
-                    photos: urlPhotos.map((url) => ({ url }))
+                    photos: [...alreadyUploaded, urlPhotos.map((url) => ({ url }))]
                 };
                 setEvent(updatedEvent);
+                let result;
                 if (urlPhotos.every((url) => url && typeof url === 'string')) {
-                    const result = await createEvent({ ...updatedEvent, type: "public" }).unwrap();
-                    console.log(result);
-                    setEventCreated(result?.data[0]);
-
-                    if (result.success) {
-                        return 1;
+                    if (event?._id) {
+                        let updatedEvent = filterProperty(event)
+                        result = await updateEvent({ eventId: event._id, event: updatedEvent }).unwrap()
+                        setEventCreated(result?.data);
+                        if (result.success) {
+                            return 1;
+                        }
+                    } else {
+                        result = await createEvent({ ...updatedEvent, type: "public" }).unwrap();
+                        console.log(result);
+                        setEventCreated(result?.data[0]);
+                        if (result.success) {
+                            return 1;
+                        }
                     }
+
+
                 }
             }
         } catch (error) {
@@ -63,8 +79,9 @@ function CreatePubEvent() {
     useEffect(() => {
         if (progress > 0 && progress < 4) {
             navigate(`/create-event/create-public-event/${progress}`);
-        } else if (progress === 4) {
-            navigate(`/create-event/create-public-event/${progress}?eventId=${eventCreated ? eventCreated._id : eventId}`);
+        }
+        else if (progress === 4) {
+            navigate(`/create-event/create-public-event/${progress}?eventId=${eventCreated ? eventCreated._id : eventId}&status=draft`);
         }
     }, [progress]);
 

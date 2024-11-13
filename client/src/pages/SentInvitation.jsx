@@ -27,7 +27,7 @@ function SentInvitation() {
         }
     }, [data])
     return (
-        <div className=' text-white p-5 pb-20'>
+        <div className='text-white p-5 pb-20'>
             <div className='grid xl:grid-cols-2 grid-cols-1 gap-10'>
                 {sentInvitation && sentInvitation.length > 0 && sentInvitation.map((item, i) => (
                     <React.Fragment key={item._id}>

@@ -23,6 +23,10 @@ html {
   width: 10px;
 }
 
+.userScrollBarHorizontal::-webkit-scrollbar {
+ display: none;
+}
+
 .datepicker-input::-webkit-calendar-picker-indicator {
   position: absolute;
   right: 12px;
@@ -60,13 +64,14 @@ input::-webkit-inner-spin-button {
 
 @layer components {
   .container-style {
-    @apply shadow-custom-black bg-black-light rounded-lg;
+    @apply shadow-custom-black bg-black-light rounded-lg overflow-hidden;
   }
+
   .col-center {
     @apply flex flex-col items-center justify-center
   }
+
   .row-center {
     @apply flex justify-center items-center
   }
 }
-

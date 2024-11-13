@@ -16,7 +16,7 @@ function MyFriendPage() {
     }, [data])
     return (
         <>
-            <div className='h-screen overflow-y-scroll text-white'>
+            <div className='h-screen text-white'>
                 <div className='grid xl:grid-cols-2 grid-cols-1 gap-10'>
                     {friends && friends.map((item, i) => (
                         <div className='bg-black-light p-5 rounded-md space-y-2' key={item._id}>

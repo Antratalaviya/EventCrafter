@@ -3,8 +3,8 @@ import { Link } from 'react-router-dom';
 import SingleEvent from '../component/events/SingleEvent';
 import { getMonth } from '../utils/customUtility';
 import { useGetSavedEventsQuery } from '../api/api';
-import { Spinner } from '@material-tailwind/react';
-import { SecurityModeIcon } from '../assets/svg/Icon';
+import { ArrowIcon, SecurityModeIcon } from '../assets/svg/Icon';
+import Spinner from '../component/Spinner';
 
 function SavedEvents() {
     const { data, isSuccess } = useGetSavedEventsQuery();
@@ -24,11 +24,17 @@ function SavedEvents() {
     }, [savedEvents]);
 
     if (!savedEvents) {
-        return <Spinner />;
+        return <div className='h-screen w-screen grid place-items-center'>
+            <Spinner />
+        </div>
     }
+
     return (
-        <div className='h-[77%] p-5 overflow-y-scroll'>
-            <div className='grid grid-cols-1 gap-5 h-full'>
+        <div className='flex flex-col flex-grow p-5'>
+            <Link to={'/settings'} className='pb-2'>
+                <ArrowIcon />
+            </Link>
+            <div className='flex flex-col space-y-5'>
                 {savedEvents && savedEvents.length > 0 && savedEvents.map((event, index) => (
                     <SingleEvent
                         key={index}
@@ -48,7 +54,7 @@ function SavedEvents() {
                     />
                 ))}
                 {savedEvents.length === 0 && (
-                    <div className='col-center text-white space-y-3'>
+                    <div className='col-center text-white space-y-3 min-h-[70vh]'>
                         <SecurityModeIcon />
                         <h1>No Saved Events !!!</h1>
                     </div>

@@ -22,7 +22,9 @@ router.post('/cancel/:eventId', authMiddleware.verifyUserAccess, eventController
 
 router.get('/participants/:eventId', authMiddleware.verifyUserAccess, eventController.getAllParticipants);
 
-router.put('/status/:eventId', authMiddleware.verifyUserAccess, eventController.updateEventStatus);
+router.put('/status', authMiddleware.verifyUserAccess, eventController.updateEventStatus);
+router.put('/status/:eventId', authMiddleware.verifyUserAccess, eventController.eventPaymentDone);
+router.put('/:eventId', authMiddleware.verifyUserAccess, eventController.updateEvent);
 
 export default router;
 

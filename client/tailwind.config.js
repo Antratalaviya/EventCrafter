@@ -35,6 +35,15 @@ export default {
       boxShadow: {
         "custom-black": "0px 4px 4px 0px #00000040",
       },
+      animation: {
+        'bounce-slow': 'bounce-slow 1.5s infinite',
+      },
+      keyframes: {
+        "bounce-slow": {
+          '0%, 100%': { transform: 'translateY(0)' },
+          '50%': { transform: 'translateY(-25px)' }
+        }
+      }
     },
   },
   plugins: [],

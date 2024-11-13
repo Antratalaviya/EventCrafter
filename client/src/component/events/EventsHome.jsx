@@ -3,6 +3,7 @@ import SingleEvent from './SingleEvent'
 import { img } from '../../assets/assets'
 import { getMonth } from '../../utils/customUtility';
 import Spinner from '../Spinner';
+// import { Spinner } from "tailwindcss"
 import { Link } from 'react-router-dom';
 
 function EventsHome({ events }) {

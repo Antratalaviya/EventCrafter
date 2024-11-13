@@ -1,6 +1,5 @@
 import { createSlice } from '@reduxjs/toolkit';
-import { getItem, removeItem, setItem } from '../utils/localStorageUtility';
-import { CONSTS } from '../utils/consts';
+import { getItem, setItem } from '../utils/localStorageUtility';
 
 const initialState = {
     userData: getItem("user") ? JSON.parse(getItem("user")) : null,

@@ -13,10 +13,10 @@ export const SidebarLinks = [
         path: "/",
     },
     {
-        key: "message",
-        label: "Messages",
+        key: "chat",
+        label: "Chat",
         icon: <MsgIcon />,
-        path: "/message",
+        path: "/Chat",
     },
     {
         key: "news",
@@ -34,7 +34,7 @@ export const SidebarLinks = [
         key: "settings",
         label: "Settings",
         icon: <SettingIcon />,
-        path: "/settings/profile",
+        path: "/settings",
     },
 ];
 

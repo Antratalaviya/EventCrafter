@@ -1,4 +1,5 @@
 import mongoose, { Document } from "mongoose";
+import Stripe from "stripe";
 
 export interface UserInput {
   orgType: string;
@@ -77,4 +78,38 @@ export interface NotificationIp {
 export interface NotificationDoc extends NotificationIp, Document {
   isRead: boolean;
   createdAt: Date;
+}
+
+export interface ChatDocument extends Document {
+  _id: mongoose.Types.ObjectId;
+  sender: mongoose.Types.ObjectId;
+  receiver: mongoose.Types.ObjectId;
+  messages: MsgDocument[];
+  createdAt: Date;
+  updatedAt: Date;
+}
+
+export interface MsgDocument extends Document {
+  _id: mongoose.Types.ObjectId;
+  sender: mongoose.Types.ObjectId;
+  text: string;
+  image: string;
+  seen: boolean;
+  createdAt: Date;
+  updatedAt: Date;
+}
+export interface PaymentInput {
+  user?: mongoose.Types.ObjectId;
+  amount: string | null
+  currency: string | null
+  status: string | null
+  paymentMethod: string
+  customerDetails: Stripe.Checkout.Session.CustomerDetails | null
+  paymentIntent: string | Stripe.PaymentIntent | null
+  paymentStatus: string | null
+}
+export interface PaymentDocument extends Document, PaymentInput {
+  _id: mongoose.Types.ObjectId;
+  createdAt: Date;
+  updatedAt: Date;
 }
