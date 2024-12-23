@@ -34,6 +34,13 @@ function EventPage() {
         }
     }, [data])
 
+    const handleClick = async () => {
+        if (event.type !== "private") {
+            navigate('/event/booking');
+        } else {
+            await handleAccept();
+        }
+    };
     const handleAccept = async () => {
         try {
             const response = await acceptInvitation({ invitationId: invitation }).unwrap();
@@ -76,11 +83,11 @@ function EventPage() {
     }
     return (
         <div className='p-5 w-full h-full text-white overflow-y-scroll'>
-            <div className='bg-black-light rounded-md border border-dark p-5 space-y-5 text-[12px]'>
-                <div className='w-full h-80 rounded-md overflow-hidden'>
+            <div className='bg-black-light rounded-xl border border-dark overflow-hidden text-xs'>
+                <div className='w-full h-80 overflow-hidden'>
                     <img src={event.photos[0].url} alt="event_img" className='w-full h-full' />
                 </div>
-                <div className='flex items-center'>
+                <div className='flex items-center p-5'>
                     <h1 className='text-2xl'>{capitalize(event.title)}</h1>
                     {event.economy_price && (
                         <div className='rounded-md bg-black-light text-white px-4 py-2 col-span-1 flex items-center justify-center ml-5 border gap-2 border-body-text'>
@@ -96,7 +103,7 @@ function EventPage() {
                         </div>
                     )}
                 </div>
-                <div className='flex items-center gap-5'>
+                <div className='flex items-center gap-5 p-5'>
                     <div className='rounded-md bg-primary text-white px-5 py-2 col-span-1 flex items-center justify-center'>
                         <p>{capitalize(event.category)}</p>
                     </div>
@@ -136,8 +143,8 @@ function EventPage() {
                         </div>
                     )}
                 </div>
-                <div className='flex items-center gap-10'>
-                    <Link to={`/organizer/${event.userId}`}>
+                <div className='flex items-center gap-10 p-5'>
+                    <Link to={`/organizer/${event.owner}`}>
                         <div className='flex items-center gap-2'>
                             <div className='rounded-full size-10 overflow-hidden'>
                                 <img src={event.avatar} alt="profile_img" className='h-10 w-16' />
@@ -170,7 +177,7 @@ function EventPage() {
                         </div>
                     </div>
                 </div>
-                <div className='space-y-5 w-1/3'>
+                <div className='space-y-5 w-1/3 p-5'>
                     <Link to={`/event/participants/${eventId}`}>
                         <div className='shadow-custom-black p-4 flex items-center justify-around bg-new-card/50 rounded-lg'>
                             <div>
@@ -186,11 +193,11 @@ function EventPage() {
                         </div>
                     </Link>
                 </div>
-                <div className='p-2'>
+                <div className='p-5'>
                     <h1>About Event</h1>
                     <p className='text-body-text'>{event.description}</p>
                 </div>
-                <div className='flex flex-col space-y-2 p-2'>
+                <div className='flex flex-col space-y-2 p-5'>
                     <h1>Possibilities</h1>
                     <div className='flex items-center'>
                         {EventOffer.map((offer) =>
@@ -202,7 +209,7 @@ function EventPage() {
                         )}
                     </div>
                 </div>
-                <div className='space-y-2 p-2'>
+                <div className='space-y-2 p-5'>
                     <p>Parking spaces</p>
                     <div className='flex items-center gap-2'>
                         <CarIcon />
@@ -210,8 +217,8 @@ function EventPage() {
                         <p>{`${event.carCapacity} + cars parking`}</p>
                     </div>
                 </div>
-                <hr className='text-body-text' />
-                <div className='flex justify-between '>
+                <hr className='text-body-text mx-5' />
+                <div className='flex justify-between p-5'>
                     {invitation ? (
                         <Button
                             className="w-2/12 bg-red hover:bg-red/80"
@@ -228,7 +235,7 @@ function EventPage() {
                     }
                     {invitation ? (
                         <Button
-                            onClick={handleAccept}
+                            onClick={handleClick}
                             className="w-2/12"
                             text={acceptLoading ? "Loading..." : "Accept"}
                         />
@@ -238,7 +245,7 @@ function EventPage() {
                                 text="Continue Payment"
                             />
                         </Link>
-                    ) : event.userId === user._id && (
+                    ) : event.owner === user._id && (
                         <Button
                             className="bg-red text-sm hover:bg-red/80 w-2/12"
                             text={cancelEventLoading ? "Loading..." : "Cancel Event"}

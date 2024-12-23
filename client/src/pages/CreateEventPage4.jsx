@@ -16,7 +16,7 @@ function CreateEventPage4() {
     const queryString = window.location.search;
     const urlParams = new URLSearchParams(queryString);
     const eventId = urlParams.get('eventId');
-    const { data, isSuccess } = useGetFullEventQuery(eventId)
+    const { data, isSuccess } = useGetFullEventQuery(eventId, { skip: !eventId })
 
     useEffect(() => {
         const status = urlParams.get('status');
@@ -27,7 +27,7 @@ function CreateEventPage4() {
             dispatch(setProgress(1))
         }
         if (event.type !== 'private') {
-            dispatch(setPayment({ amount: 9.95, name: `${capitalize(event.type)} Event Creation Purchase`, description: "Selected Silver Package" }))
+            dispatch(setPayment({ amount: 9.95, name: `${capitalize(event.type)} Event Creation Purchase`, description: "Selected Silver Package", package: 'silver' }))
         }
         dispatch(setAcceptConcent(false));
     }, [])
@@ -36,7 +36,6 @@ function CreateEventPage4() {
         dispatch(setEvent(data?.data[0]))
         console.log(event)
     }, [data])
-    console.log(event)
     return (
         <>
             {event.type === 'private' ? (
@@ -80,7 +79,7 @@ function CreateEventPage4() {
                         </div>
                     </div>
 
-                    <div className='col-span-1 cursor-pointer bg-gradient-to-r from-[#444444] to-[#ACACAC] border-2 border-white rounded-2xl p-5 space-y-3 from-30%' onClick={() => dispatch(setPayment({ amount: 9.95, name: `${capitalize(event.type)} Event Creation Purchase`, description: "Selected Silver Package" }))}>
+                    <div className='col-span-1 cursor-pointer bg-gradient-to-r from-[#444444] to-[#ACACAC] border-2 border-white rounded-2xl p-5 space-y-3 from-30%' onClick={() => dispatch(setPayment({ amount: 9.95, name: `${capitalize(event.type)} Event Creation Purchase`, description: "Selected Silver Package", package: 'silver' }))}>
                         <div className='flex justify-between'>
                             <p>Silver</p>
                             <div className='cursor-pointer'>
@@ -99,7 +98,7 @@ function CreateEventPage4() {
                             <li>Will be displayed on the map</li>
                         </div>
                     </div>
-                    <div className='col-span-1 cursor-pointer bg-gradient-to-r from-[#BF8E17] to-[#E6C060] border-2 border-white rounded-2xl p-5 space-y-3 from-30%' onClick={() => dispatch(setPayment({ amount: 19.95, name: `${capitalize(event.type)} Event Creation Purchase`, description: "Selected Gold Package" }))}>
+                    <div className='col-span-1 cursor-pointer bg-gradient-to-r from-[#BF8E17] to-[#E6C060] border-2 border-white rounded-2xl p-5 space-y-3 from-30%' onClick={() => dispatch(setPayment({ amount: 19.95, name: `${capitalize(event.type)} Event Creation Purchase`, description: "Selected Gold Package", package: 'gold' }))}>
                         <div className='flex justify-between'>
                             <p>Gold</p>
                             <div className='cursor-pointer'>
@@ -120,7 +119,7 @@ function CreateEventPage4() {
                             <li>An event icon will appear on your Leylix ID card sothat everyone can see that you have created events</li>
                         </div>
                     </div>
-                    <div className='col-span-1 cursor-pointer bg-gradient-to-r from-[#60C5BE] to-[#087B7A] border-2 border-white rounded-2xl p-5 space-y-3 from-30%' onClick={() => dispatch(setPayment({ amount: 39.95, name: `${capitalize(event.type)} Event Creation Purchase`, description: "Selected Premium Package" }))}>
+                    <div className='col-span-1 cursor-pointer bg-gradient-to-r from-[#60C5BE] to-[#087B7A] border-2 border-white rounded-2xl p-5 space-y-3 from-30%' onClick={() => dispatch(setPayment({ amount: 39.95, name: `${capitalize(event.type)} Event Creation Purchase`, description: "Selected Premium Package", package: 'premium' }))}>
                         <div className='flex justify-between'>
                             <p>Premium</p>
                             <div className='cursor-pointer'>

@@ -1,11 +1,11 @@
 import { AddCircleIcon, AlcoholIcon, BuildingIcon, DrinkIcon, FoodIcon, HandicappedIcon, HomeIcon, LogoutIcon, MedicIcon, MoneyIcon, MsgIcon, MusicIcon, SettingIcon, ToiletsIcon, VeganIcon } from '../assets/svg/Icon'
 export const SidebarLinks = [
-    {
-        key: "add",
-        label: "Create Event",
-        icon: <AddCircleIcon className={`fill-none`} />,
-        path: "/create-event",
-    },
+    // {
+    //     key: "add",
+    //     label: "Create Event",
+    //     icon: <AddCircleIcon className={`fill-none`} />,
+    //     path: "/",
+    // },
     {
         key: "home",
         label: "My Home",

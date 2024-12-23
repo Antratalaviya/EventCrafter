@@ -113,3 +113,27 @@ export interface PaymentDocument extends Document, PaymentInput {
   createdAt: Date;
   updatedAt: Date;
 }
+
+export interface PropertyInput {
+  name: string;
+  amenities: string;
+  startDate: string;
+  purpose: string;
+  amount: string;
+  street: string;
+  city: string;
+  country: string;
+  photos: [{
+    url: string;
+  }];
+  description: string;
+}
+
+export interface PropertyDocument extends Document, PropertyInput {
+  videoFile: {
+    url: string
+  };
+  owner: mongoose.Types.ObjectId;
+  createdAt: Date;
+  updatedAt: Date;
+}

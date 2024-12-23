@@ -8,9 +8,11 @@ const initialState = {
         name: "Private event purchase",
         description: "Selected Silver Package",
         quantity: 1,
+        package: "silver",
     },
     clientSecret: "",
-    paymentDone: false
+    paymentType: "",
+    paymentDone: false,
 }
 
 export const globalSlicer = createSlice({
@@ -29,12 +31,15 @@ export const globalSlicer = createSlice({
         setClientSecret: (state, action) => {
             state.clientSecret = action.payload;
         },
+        setPaymentType: (state, action) => {
+            state.paymentType = action.payload;
+        },
         setPaymentDone: (state, action) => {
             state.paymentDone = action.payload;
         }
     }
 })
 
-export const { setProgress, setAcceptConcent, setPayment, setClientSecret, setPaymentDone } = globalSlicer.actions;
+export const { setProgress, setAcceptConcent, setPayment, setClientSecret, setPaymentType, setPaymentDone } = globalSlicer.actions;
 
 export default globalSlicer.reducer;

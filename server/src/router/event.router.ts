@@ -1,11 +1,11 @@
 import express from 'express'
 import authMiddleware from '../middleware/auth.middleware';
 import eventController from '../controller/event.controller';
+import bookEventController from '../controller/book.event.controller';
 // import cacheData from '../cache/cacheData';
 
 const router = express.Router();
 
-router.post('/', authMiddleware.verifyUserAccess, eventController.createEvent)
 
 // router.get('/', authMiddleware.verifyUserAccess, cacheData.allEvents, eventController.getAllEvents);
 router.get('/', authMiddleware.verifyUserAccess, eventController.getAllEvents);
@@ -13,14 +13,15 @@ router.get('/', authMiddleware.verifyUserAccess, eventController.getAllEvents);
 router.get('/own', authMiddleware.verifyUserAccess, eventController.getOwnEvents);
 router.get('/own/public/:userId', authMiddleware.verifyUserAccess, eventController.getOwnPublicEvents);
 router.get('/:eventId', authMiddleware.verifyUserAccess, eventController.getFullEvent);
+router.get('/participants/:eventId', authMiddleware.verifyUserAccess, eventController.getAllParticipants);
 
 
+router.post('/', authMiddleware.verifyUserAccess, eventController.createEvent)
 router.post('/like/:eventId', authMiddleware.verifyUserAccess, eventController.likeEvent);
 router.post('/save/:eventId', authMiddleware.verifyUserAccess, eventController.saveEvent);
+router.post('/cancel/:eventId', authMiddleware.verifyUserAccess, eventController.cancelEvent);
+router.post('/book', authMiddleware.verifyUserAccess, bookEventController.bookEvent);
 
-router.post('/cancel/:eventId', authMiddleware.verifyUserAccess, eventController.cancelEvent);  //to test
-
-router.get('/participants/:eventId', authMiddleware.verifyUserAccess, eventController.getAllParticipants);
 
 router.put('/status', authMiddleware.verifyUserAccess, eventController.updateEventStatus);
 router.put('/status/:eventId', authMiddleware.verifyUserAccess, eventController.eventPaymentDone);

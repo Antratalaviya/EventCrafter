@@ -7,6 +7,14 @@ export const getMonth = (index) => {
     return months[index];
 };
 
+export const getFullMonth = (index) => {
+    const months = [
+        "January", "February", "March", "April", "May", "Jun",
+        "July", "August", "September", "October", "November", "December"
+    ];
+    return months[index];
+};
+
 export const getDay = (index) => {
     const days = [
         "Sun", "Mon", "Tue", "Wed", "Thu", "Fri",

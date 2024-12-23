@@ -29,7 +29,7 @@ function CreateEventPage1() {
         <div className='w-full space-y-5 '>
             <div className='grid grid-cols-3 gap-5'>
                 <div className='space-y-2 col-span-1'>
-                    <div className='bg-[#252A30] rounded-lg ring-1 ring-gray flex items-center'>
+                    <div className='bg-[#1F252C] rounded-lg ring-1 ring-gray flex items-center'>
                         <input
                             type='text'
                             placeholder={event.category}
@@ -45,7 +45,7 @@ function CreateEventPage1() {
                     <div className={`${openCat ? "visible block" : "hidden"} w-full bg-transperent focus:outline-none text-body-text rounded-lg overflow-hidden text-sm transition-all`}>
 
                         {EventCategory && EventCategory.map((item, index) => (
-                            <div className='bg-[#252A30] flex items-center pr-3 w-full cursor-pointer transition-all delay-150'
+                            <div className='bg-[#1F252C] flex items-center pr-3 w-full cursor-pointer transition-all delay-150'
                                 key={index}
                                 onClick={() => dispatch(setEvent({ category: item.text }))}>
                                 <div className={`bg-transperent focus:outline-none w-full py-3 px-5 text-sm ${event.category === item.text ? "text-white" : "text-white/40"}`}>
@@ -97,7 +97,7 @@ function CreateEventPage1() {
                         onBlur={(e) => e.target.type = 'text'}
                         className={'w-1/2 flex items-center relative'}
                         InputClassName={'datepicker-input'}
-                        value={`${new Date(event.startDate).getFullYear()}-${new Date(event.startDate).getMonth() + 1}-${new Date(event.startDate).getDate()}`}
+                        value={event.startDate && `${new Date(event.startDate).getFullYear()}-${new Date(event.startDate).getMonth() + 1}-${new Date(event.startDate).getDate()}`}
                     >
                         <CalenderIcon className="mr-3" />
                     </Input>
@@ -110,7 +110,7 @@ function CreateEventPage1() {
                         onBlur={(e) => e.target.type = 'text'}
                         className={'w-1/2 flex items-center relative'}
                         InputClassName={'datepicker-input'}
-                        value={`${new Date(event.endDate).getFullYear()}-${new Date(event.endDate).getMonth() + 1}-${new Date(event.endDate).getDate()}`}
+                        value={event.endDate && `${new Date(event.endDate).getFullYear()}-${new Date(event.endDate).getMonth() + 1}-${new Date(event.endDate).getDate()}`}
                     >
                         <CalenderIcon className="mr-3" />
                     </Input>

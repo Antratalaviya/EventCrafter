@@ -36,6 +36,15 @@ const paymentSchema = new mongoose.Schema({
         type: String,
         required: true
     },
+    // transactionType: {
+    //     type: String,
+    //     enum: ['spent', 'received'],
+    //     default: "spent"
+    // }
+    // transaction: {
+    //     type: mongoose.Schema.Types.ObjectId,
+    //     ref: "Transaction",
+    // }
 }, {
     timestamps: true
 })

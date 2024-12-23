@@ -22,7 +22,7 @@ function CreateEventPage3() {
     return (
 
         <div className='w-full grid grid-cols-1 text-white gap-5 py-5'>
-            <div className='bg-[#252A30] col-center space-y-5 p-5 rounded-lg border-dashed border-2 border-primary'>
+            <div className='bg-[#1F252C] col-center space-y-5 p-5 rounded-lg border-dashed border-2 border-primary'>
                 <div onClick={() => videoInputRef.current.click()}>
                     <VideoIcon />
                 </div>
@@ -45,7 +45,7 @@ function CreateEventPage3() {
                     <p className='text-body-text'>Maximum video 30 sec video upload</p>
                 </div>
             </div>
-            <div className='bg-[#252A30] col-center space-y-5 p-5 rounded-lg border-dashed border-2 border-primary'>
+            <div className='bg-[#1F252C] col-center space-y-5 p-5 rounded-lg border-dashed border-2 border-primary'>
                 <div onClick={() => fileInputRef.current.click()}>
                     <FileIcon />
                 </div>
@@ -73,7 +73,7 @@ function CreateEventPage3() {
                     <>
                         <div className='grid grid-cols-2 gap-5'>
                             {event.pdfFile.map((file, index) => (
-                                <div className='relative flex items-center justify-start gap-5 bg-[#252A30] rounded-lg w-full py-3 px-5' key={index}>
+                                <div className='relative flex items-center justify-start gap-5 bg-[#1F252C] rounded-lg w-full py-3 px-5' key={index}>
                                     <PdfIcon />
                                     <div>
                                         <p>{file.name}</p>
@@ -92,7 +92,7 @@ function CreateEventPage3() {
                     </>
                 )
             }
-            <div className='bg-[#252A30] rounded-lg ring-1 ring-gray'>
+            <div className='bg-[#1F252C] rounded-lg ring-1 ring-gray'>
                 <textarea
                     type="text"
                     placeholder='Please describe your event in more detail so that you arouse curiosity and your visitors know what to expect at yours. Upload an agenda if you have one. Think of the images you can use too. Maybe also pictures of the location or what you think what could be interesting'
@@ -108,7 +108,7 @@ function CreateEventPage3() {
                     <span >/ 200</span>
                 </div>
             </div>
-            <div className={`bg-[#252A30] col-center space-y-5 p-5 rounded-lg border-dashed border-2 border-primary`}>
+            <div className={`bg-[#1F252C] col-center space-y-5 p-5 rounded-lg border-dashed border-2 border-primary`}>
                 <div onClick={() => imgInputRef.current.click()}>
                     <GalleryIcon />
                 </div>
@@ -130,11 +130,11 @@ function CreateEventPage3() {
                 </div>
             </div>
             {event.photos.length > 0 && (
-                <div className={`bg-[#252A30] col-center space-y-5 p-5 rounded-lg border-dashed border-2 border-primary`}>
-                    <div className='grid grid-cols-3 grid-rows-2 gap-5 transition-all'>
+                <div className={`bg-[#1F252C] col-center space-y-5 p-5 rounded-lg border-dashed border-2 border-primary`}>
+                    <div className='grid grid-cols-6 gap-5 transition-all'>
                         {event.photos.map((img, index) => (
-                            <div className='relative' key={index}>
-                                {img?.url && img?.url.includes("https") ? (
+                            <div className='relative rounded-xl overflow-hidden' key={index}>
+                                {img?.url ? (
                                     <img
                                         src={img.url}
                                         alt={`Selected ${index}`}
@@ -150,8 +150,8 @@ function CreateEventPage3() {
                                 <button
                                     type="button"
                                     onClick={async () => {
-                                        if (img?.includes("https")) {
-                                            await deleteImg(img);
+                                        if (img?.url) {
+                                            await deleteImg(img?.url);
                                         }
                                         dispatch(setEvent({ photos: event.photos.filter((_, i) => i !== index) }));
                                     }}

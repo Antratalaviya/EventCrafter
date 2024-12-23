@@ -43,9 +43,9 @@ function Search({ filter, setFilter, search, setSearch, events, setEvents }) {
 
     return (
         <>
-            <div className='flex justify-between bg-background w-2/5 items-center mr-2 relative  rounded-md border border-gray pr-5 pl-3 mt-5'>
-                <div className='flex items-center justify-between w-full'>
-                    <div className='flex items-center'>
+            <div className='flex justify-between bg-background w-2/5 items-center mx-auto relative  rounded-md border border-gray'>
+                <div className='flex items-center justify-between pr-5 w-full'>
+                    <div className='flex items-center pl-2'>
                         <div onClick={handleSubmit}>
                             <SearchIcon stroke={"#9697A1"} className="w-10 cursor-pointer" />
                         </div>
@@ -63,7 +63,7 @@ function Search({ filter, setFilter, search, setSearch, events, setEvents }) {
                     </div>
                 </div>
                 {filterOpen && (
-                    <div className='absolute top-full mt-2 right-5 bg-background z-50 border- border-gray rounded-xl min-w-96 p-5 space-y-5 gap-5 text-white'>
+                    <div className='absolute top-full mt-2 bg-background z-50 border border-gray rounded-xl w-full p-5 space-y-5 gap-5 text-white'>
                         <h1 className='text-center'>Filter</h1>
                         <hr className='text-body-text' />
                         <div className='w-full overflow-hidden space-y-3'>

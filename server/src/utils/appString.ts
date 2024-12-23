@@ -43,6 +43,7 @@ export enum AppString {
   EVENT_CANCEL = "event cancelled successfully",
   EVENT_NOT_EXIST = "event does not exist",
   EVENT_OWNER_NOT_EXIST = "event owner does not exist",
+  EVENT_BOOKED = "event booked successfully",
 
   USER_NOT_OWNER = "user is not owner of this event",
 
@@ -88,6 +89,14 @@ export enum AppString {
   CLIENT_SECRET_RETRIEVED = "client secret retrieved successfully",
   PAYMENT_ORDERS = "payment orders retrieved successfully",
   ORDER_PLACED = "payment orders placed successfully",
+
+  ADMIN_ONLY = "Access Denied: Admins only",
+
+  PROPERTY_CREATED = "property listed successfully",
+  PROPERTY_UPDATED = "property updated successfully",
+  PROPERTY_DELETED = "property deleted successfully",
+  PROPERTY_BOOKED = "property booked successfully",
+  PROPERTY_CREATION_FAILED = "property listing failed!!!! please try again",
 };
 
 export enum Collection {
@@ -100,6 +109,10 @@ export enum Collection {
   MODEL_MESSAGE = "Message",
   MODEL_CHAT = "Chat",
   MODEL_PAYMENT = "Payment",
+  MODEL_PROPERTY = "Property",
+  MODEL_REVIEW = "Review",
+  MODEL_BOOKEVENT = "BookEvent",
+  MODEL_BOOKPROPERTY = "BookProperty",
 };
 
 export enum NotificationMsg {

@@ -9,11 +9,12 @@ import { useMax } from '../context/useMax'
 import SecurityMode from '../component/events/SecurityMode'
 import { Link } from 'react-router-dom'
 import { useCurrLocation } from '../context/useCurrLocation'
-import { useGetAllEventsQuery } from '../api/api'
+import { useGetAllEventsQuery, useUpdateAllEventStatusMutation } from '../api/api'
 
 function HomePage() {
   const { active } = useMax();
   const { data, isSuccess } = useGetAllEventsQuery("");
+  const [updateAllEventStatus] = useUpdateAllEventStatusMutation();
   const { setPageName } = useCurrLocation();
   const [filterEvents, setFilterEvents] = useState([])
   useEffect(() => {
@@ -29,6 +30,11 @@ function HomePage() {
       setFilterEvents(data?.data.filter((e) => (e.type === key)))
     }
   }
+  useEffect(() => {
+    (async () => {
+      await updateAllEventStatus();
+    })();
+  }, [])
 
   return (
     <div className='grid grid-flow-col grid-cols-12 p-5 gap-5 overflow-y-scroll'>
@@ -80,7 +86,7 @@ function HomePage() {
           <Link to={'/own-events'} onClick={() => setPageName('Own Events')} >
             <EventTypeBox img={img.eventType3} event="Own Events" />
           </Link>
-          <Link to={'/'}>
+          <Link to={'/property/booking'}>
             <EventTypeBox img={img.eventType3} event="Properties Booking" />
           </Link>
           <Link to={'/'}>

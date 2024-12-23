@@ -250,7 +250,6 @@ const verifyOtp = asyncHandler(async (req: Request, res: Response) => {
 
 
     let otpExist = await otpService.getOtp(email);
-
     if (!otpExist) {
       return res
         .status(status.NOT_FOUND)

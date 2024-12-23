@@ -95,9 +95,6 @@ const createPaymentOrder = asyncHandler(async (req: Request, res: Response) => {
 
 const getPaymentOrders = asyncHandler(async (req: Request, res: Response) => {
     try {
-        if (!req.user.admin) {
-            return res.status(status.UNAUTHORIZED).json(new ApiResponse(status.UNAUTHORIZED, {}, AppString.UNAUTHORIZED))
-        }
         const payments = await paymentService.getPayent();
 
         if (payments.length === 0) {

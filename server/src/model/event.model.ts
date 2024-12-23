@@ -111,6 +111,16 @@ const eventSchema = new mongoose.Schema({
     likedBy: [{
         type: mongoose.Schema.Types.ObjectId,
         ref: "User"
+    }],
+    package: {
+        type: String,
+    },
+    amount: {
+        type: String,
+    },
+    review: [{
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "Review"
     }]
 }, {
     timestamps: true

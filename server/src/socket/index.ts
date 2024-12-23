@@ -20,9 +20,10 @@ io.on('connection', async (socket) => {
     const token = socket.handshake.auth.token;
 
     const user = await getUserFromToken(token);
-
-    socket.join(user?._id.toString());
-    onlineUsers.add(user?._id.toString());
+    if (user) {
+        socket.join(user?._id.toString());
+        onlineUsers.add(user?._id.toString());
+    }
 
     io.emit("onlineUser", Array.from(onlineUsers))
 

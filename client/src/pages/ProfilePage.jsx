@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react'
 import { useSelector } from 'react-redux'
-import { ArrowIcon, CameraIcon, CompanyIcon, EditIcon, EmailIcon, InstituteIcon, LogoIcon, ShareIcon, UserIcon, CalenderIcon, PostIcon, SchoolIcon, } from '../assets/svg/Icon'
+import { ArrowIcon, CameraIcon, CompanyIcon, EditIcon, EmailIcon, InstituteIcon, LogoIcon, ShareIcon, UserIcon, CalenderIcon, PostIcon, SchoolIcon, LocationIcon, } from '../assets/svg/Icon'
 import { capitalize } from '../utils/customUtility'
 import Input from '../component/Input'
 import Button from '../component/Button';
@@ -130,28 +130,32 @@ function ProfilePage() {
                                 <p className='text-body-text text-sm font-extralight'>{user.subscriber} Subscribers</p>
                             </div>
                         </div>
-                        <div>
+                        <div className='space-y-2 pl-5'>
                             <div className='flex items-center gap-2'>
-                                <EmailIcon fill="white" />
-                                <p className='text-xs'>{user.email}</p>
+                                <EmailIcon fill="white" className="size-5" />
+                                <p className='text-sm'>{user.email}</p>
                             </div>
                             <div className='flex items-center gap-2'>
                                 {user.orgType === "personal" && <>
-                                    <UserIcon fill="white" />
-                                    <p className='text-xs'>Personal</p>
+                                    <UserIcon fill="white" className="size-5" />
+                                    <p className='text-sm'>Personal</p>
                                 </>}
                                 {user.orgType === "institute" && <>
-                                    <InstituteIcon fill="white" />
-                                    <p className='text-xs'>Institution member</p>
+                                    <InstituteIcon fill="white" className="size-5" />
+                                    <p className='text-sm'>Institution member</p>
                                 </>}
                                 {user.orgType === "company" && <>
-                                    <CompanyIcon fill="white" />
-                                    <p className='text-xs'>Company member</p>
+                                    <CompanyIcon fill="white" className="size-5" />
+                                    <p className='text-sm'>Company member</p>
                                 </>}
                                 {user.orgType === "school" && <>
-                                    <SchoolIcon fill="white" />
-                                    <p className='text-xs'>School member</p>
+                                    <SchoolIcon fill="white" className="size-5" />
+                                    <p className='text-sm'>School member</p>
                                 </>}
+                            </div>
+                            <div className='flex items-center gap-2'>
+                                <LocationIcon className="size-5" />
+                                <p className='text-sm'>{user.address}</p>
                             </div>
                         </div>
                     </div>

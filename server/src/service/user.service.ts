@@ -27,6 +27,7 @@ interface updateUserDto {
   postcode?: string;
   orgName?: string;
   dob?: string;
+  address?: string;
 }
 
 const updateUser = async (id: string, body: updateUserDto) => {
@@ -305,6 +306,8 @@ const getUserProfile = async (userId: string) => {
         dob: 1,
         profileImg: 1,
         avatar: 1,
+        admin: 1,
+        address: 1,
         subscriber: {
           $size: {
             $ifNull: ["$subscriber", []]

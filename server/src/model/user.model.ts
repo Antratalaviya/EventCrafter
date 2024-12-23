@@ -63,6 +63,9 @@ const userSchema = new mongoose.Schema(
     refreshTokenExpiry: {
       type: Date,
     },
+    address: {
+      type: String,
+    },
     likedEvent: [{
       type: mongoose.Schema.Types.ObjectId,
       ref: "Event"

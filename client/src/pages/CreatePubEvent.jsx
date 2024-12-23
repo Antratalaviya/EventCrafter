@@ -44,16 +44,16 @@ function CreatePubEvent() {
             const urlPhotos = await Promise.all(filterPhotos.map(uploadImg));
 
             if (urlPhotos.every((url) => url !== undefined)) {
+                dispatch(setEvent({ photos: [...alreadyUploaded, ...urlPhotos.map((url) => ({ url }))] }));
                 const updatedEvent = {
                     ...event,
-                    photos: [...alreadyUploaded, urlPhotos.map((url) => ({ url }))]
+                    photos: [...alreadyUploaded, ...urlPhotos.map((url) => ({ url }))]
                 };
-                setEvent(updatedEvent);
                 let result;
-                if (urlPhotos.every((url) => url && typeof url === 'string')) {
-                    if (event?._id) {
-                        let updatedEvent = filterProperty(event)
-                        result = await updateEvent({ eventId: event._id, event: updatedEvent }).unwrap()
+                if (updatedEvent?.photos?.every((item) => item?.url && typeof item?.url === 'string')) {
+                    if (updatedEvent?._id) {
+                        let filterEvent = filterProperty(updatedEvent);
+                        result = await updateEvent({ eventId: updatedEvent._id, event: filterEvent }).unwrap();
                         setEventCreated(result?.data);
                         if (result.success) {
                             return 1;
@@ -66,14 +66,15 @@ function CreatePubEvent() {
                             return 1;
                         }
                     }
-
-
+                } else {
+                    toast.error("All Fields are required");
                 }
             }
         } catch (error) {
-            toast.error("All Fields are required")
+            toast.error("Error updating event: " + error.message);
         }
         return 0;
+
     };
 
     useEffect(() => {

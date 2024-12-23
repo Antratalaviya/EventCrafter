@@ -66,7 +66,7 @@ export const api = createApi({
     },
   },
   ),
-  tagTypes: ['Auth', "Notification", "Refresh", "EventUpdate", "Invitation", "Connection", "Users", "Message", "Chat"],
+  tagTypes: ['Auth', "Notification", "Refresh", "EventUpdate", "UpdateEventStatus", "Invitation", "Connection", "Users", "Message", "Chat", "Property"],
   endpoints: (builder) => ({
     /************************************************************* Auth APIs ************************************************************** */
     register: builder.mutation({
@@ -179,6 +179,16 @@ export const api = createApi({
         method: "GET"
       }),
       providesTags: ["EventUpdate"]
+    }),
+    updateAddress: builder.mutation({
+      query: ({ address }) => ({
+        url: "/user/edit/address",
+        method: "PUT",
+        body: {
+          address
+        }
+      }),
+      invalidatesTags: ["Auth"]
     }),
     updateAvatar: builder.mutation({
       query: ({ avatar }) => ({
@@ -308,12 +318,6 @@ export const api = createApi({
         body
       }),
     }),
-    getFullEvent: builder.query({
-      query: (eventId) => ({
-        url: `/event/${eventId}`,
-        method: "GET"
-      }),
-    }),
     updateEventStatus: builder.mutation({
       query: ({ eventId, status }) => ({
         url: `/event/status/${eventId}`,
@@ -321,6 +325,13 @@ export const api = createApi({
         body: {
           eventStatus: status
         }
+      }),
+      invalidatesTags: ["EventUpdate"]
+    }),
+    updateAllEventStatus: builder.mutation({
+      query: () => ({
+        url: `/event/status`,
+        method: "PUT",
       }),
       invalidatesTags: ["EventUpdate"]
     }),
@@ -358,7 +369,7 @@ export const api = createApi({
 
         return `/event?${queryString}`;
       },
-      providesTags: ['Auth', "EventUpdate"]
+      providesTags: ["EventUpdate"],
     }),
     /****************************************************** Invitatio APIs************************************************* */
 
@@ -457,6 +468,28 @@ export const api = createApi({
         method: "GET"
       })
     }),
+    /************************************************* Property API ******************************************************** */
+    getAllProperties: builder.query({
+      query: ({ keyword, filter }) => {
+        let queryString = '';
+
+        if (keyword) {
+          queryString += `keyword=${keyword}`;
+        }
+
+        if (filter) {
+          Object.keys(filter).forEach((key) => {
+            const value = filter[key];
+            if (value) {
+              queryString += `&${key}=${value}`;
+            }
+          });
+        }
+
+        return `/property?${queryString}`;
+      },
+      providesTags: ["Property"]
+    }),
     /************************************************ Payment APIs *********************************************** */
     createCheckoutSession: builder.mutation({
       query: ({ amount, description, quantity, name }) => ({
@@ -543,6 +576,7 @@ export const {
   useGetSavedEventsQuery,
   useGetLikedEventsQuery,
   useReadNotificationMutation,
+  useUpdateAddressMutation,
   useUpdateAvatarMutation,
   useUpdateProfileImageMutation,
   useUpdateProfileMutation,
@@ -562,6 +596,7 @@ export const {
   useGetOwnPublicEventsQuery,
   useCancelEventMutation,
   useUpdateEventMutation,
+  useUpdateAllEventStatusMutation,
 
   useGetAllSendParticipantsQuery,
   useSendInvitationMutation,
@@ -578,6 +613,9 @@ export const {
   useGetConnectionExistQuery,
 
   useGetAllAvatarsQuery,
+
+  useGetAllPropertiesQuery,
+
 
   useCreateCheckoutSessionMutation,
   useSessionStatusMutation,

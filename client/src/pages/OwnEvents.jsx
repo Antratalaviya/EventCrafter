@@ -27,7 +27,6 @@ function OwnEvents() {
     useEffect(() => {
         if (isSuccess) {
             setEvents((prev) => ([...prev, ...data?.data]));
-            console.log(events)
             setLoadMoreFilter(false);
         }
     }, [data])
@@ -60,7 +59,7 @@ function OwnEvents() {
         </div>
     }
     return (
-        <div className='p-5 flex flex-col overflow-y-scroll'>
+        <div className='p-5 flex flex-col h-screen overflow-y-scroll'>
             <Search
                 filter={filter}
                 setFilter={setFilter}

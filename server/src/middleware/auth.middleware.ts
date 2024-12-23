@@ -53,6 +53,22 @@ const verifyToken = async (token: string, secret: string) => {
   })
 }
 
+const verifyAdminAccess = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+
+  try {
+    if (req.user.admin) {
+      next();
+    } else {
+      res.status(status.FORBIDDEN).json(new ApiError(status.FORBIDDEN, AppString.ADMIN_ONLY));
+    }
+  } catch (error) {
+    next(error)
+  }
+};
 const getUserFromToken = async (token: string): Promise<UserDocument> => {
   return new Promise(async (resolve, reject) => {
     jwt.verify(
@@ -61,24 +77,24 @@ const getUserFromToken = async (token: string): Promise<UserDocument> => {
       { complete: true },
       async (err, decoded) => {
         if (err) {
-          return reject(err); // Handle error
+          return reject(null);
         }
 
         const payload = decoded?.payload as UserTokenPayload;
 
         if (!payload?._id) {
-          return reject(new Error('Invalid token payload')); // Handle missing ID
+          return reject(new Error('Invalid token payload'));
         }
 
         try {
           const user = await userService.getUserById(payload._id);
-          resolve(user!); // Resolve with the user
+          resolve(user!);
         } catch (error) {
-          reject(error); // Handle user retrieval error
+          reject(error);
         }
       }
     );
   });
 };
 export { getUserFromToken }
-export default { verifyUserAccess };
+export default { verifyUserAccess, verifyAdminAccess };

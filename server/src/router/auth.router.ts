@@ -12,8 +12,8 @@ router.post("/refresh", authController.refreshToken);
 
 router.patch("/sign-out", authMiddleware.verifyUserAccess, authController.logout);
 
-router.post("/send-otp", authMiddleware.verifyUserAccess, authController.sendOtp);
+router.post("/send-otp", authController.sendOtp);
 
-router.post("/verify-otp", authMiddleware.verifyUserAccess, authController.verifyOtp);
+router.post("/verify-otp", authController.verifyOtp);
 
 export default router;

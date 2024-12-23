@@ -58,7 +58,6 @@ function OrganizerDetail() {
         if (userSuccess) {
             setUser(userObj.data)
         }
-        console.log(userObj)
     }, [userObj])
 
     useEffect(() => {
@@ -68,61 +67,63 @@ function OrganizerDetail() {
     }, [data])
     return (
         <div className='text-white p-5 overflow-y-scroll'>
-            <div className='p-5 rounded-md space-y-2 grid grid-cols-4 bg-black-light gap-3'>
-                <p className='col-span-4 text-xl'>Organizer Details</p>
+            <div className='p-5 rounded-md space-y-2 mx-auto w-1/2 bg-black-light gap-3'>
+                {/* <p className='col-span-4 text-xl'>Organizer Details</p> */}
                 {user && (
-                    <>
-                        <div className='flex justify-around items-center col-span-1'>
-                            <div className='rounded-full overflow-hidden ring-4 ring-black-light size-20'>
-                                <img src={user.avatar} alt="User Avatar" />
-                            </div>
-                            <div className='space-y-2'>
-                                <p>{capitalize(`${user.name} ${user.surname}`)}</p>
-                                <p className='text-sm text-body-text'>{`${user.subscriber} Subscribers`}</p>
-                                <div className='flex gap-2 h-8'>
-
-                                    {user.orgType === 'personal' && (
-                                        <div className='rounded-md bg-red-gradient text-white px-4 flex items-center justify-center'>
-                                            <p>Personal Account</p>
-                                        </div>
-                                    )}
-                                    {user.orgType === 'institute' && (
-                                        <div className='rounded-md bg-public text-white px-5 flex items-center justify-center'>
-                                            <p>Institute Account</p>
-                                        </div>
-                                    )}
-                                    {user.orgType === 'company' && (
-                                        <div className='rounded-md bg-workshop text-white px-3 flex items-center justify-center'>
-                                            <p>Company Account</p>
-                                        </div>
-                                    )}
-                                    {user.orgType === 'school' && (
-                                        <div className='rounded-md bg-primary text-white px-5 flex items-center justify-center'>
-                                            <p>School Account</p>
-                                        </div>
-                                    )}
+                    <div className='flex items-center justify-around'>
+                        <div className='flex flex-col gap-2'>
+                            <div className='flex gap-5 items-center'>
+                                <div className='rounded-full overflow-hidden ring-4 ring-black-light size-20'>
+                                    <img src={user.profileImg} alt="User Avatar" />
+                                </div>
+                                <div className='space-y-1'>
+                                    <p>{capitalize(`${user.name} ${user.surname}`)}</p>
+                                    <p className='text-sm text-body-text'>{`${user.subscriber} Subscribers`}</p>
+                                    {/* <div className='flex gap-2 h-8'>
+                                        {user.orgType === 'personal' && (
+                                            <div className='rounded-md bg-red-gradient text-white px-4 flex items-center justify-center'>
+                                                <p>Personal Account</p>
+                                            </div>
+                                        )}
+                                        {user.orgType === 'institute' && (
+                                            <div className='rounded-md bg-public text-white px-5 flex items-center justify-center'>
+                                                <p>Institute Account</p>
+                                            </div>
+                                        )}
+                                        {user.orgType === 'company' && (
+                                            <div className='rounded-md bg-workshop text-white px-3 flex items-center justify-center'>
+                                                <p>Company Account</p>
+                                            </div>
+                                        )}
+                                        {user.orgType === 'school' && (
+                                            <div className='rounded-md bg-primary text-white px-5 flex items-center justify-center'>
+                                                <p>School Account</p>
+                                            </div>
+                                        )}
+                                    </div> */}
                                 </div>
                             </div>
-
+                            <div className='row-center col-span-1 gap-8'>
+                                <div className='col-center space-y-2'>
+                                    <p className='text-body-text'>Events</p>
+                                    <p>{user.events}</p>
+                                </div>
+                                <div className='h-16 border-r border-body-text' />
+                                <div className='col-center space-y-2'>
+                                    <p className='text-body-text'>Joint Events</p>
+                                    <p>{user.joinedEvent}</p>
+                                </div>
+                                <div className='h-16 border-r border-body-text' />
+                                <div className='col-center space-y-2'>
+                                    <p className='text-body-text'>Sunscribing</p>
+                                    <p>{user.subscribing}</p>
+                                </div>
+                            </div>
                         </div>
-                        <div className='flex items-center col-span-2 gap-8'>
-                            <div className='col-center space-y-2'>
-                                <p className='text-body-text'>Events</p>
-                                <p>{user.events}</p>
-                            </div>
-                            <div className='h-16 border-r border-body-text' />
-                            <div className='col-center space-y-2'>
-                                <p className='text-body-text'>Joint Events</p>
-                                <p>{user.joinedEvent}</p>
-                            </div>
-                            <div className='h-16 border-r border-body-text' />
-                            <div className='col-center space-y-2'>
-                                <p className='text-body-text'>Sunscribing</p>
-                                <p>{user.subscribing}</p>
-                            </div>
+                        <div>
                             {!connection && (
                                 <Button
-                                    className='rounded-md bg-primary text-white py-2 w-36 row-center '
+                                    className='bg-primary text-white py-4 text-sm w-36 row-center '
                                     text="Send Request"
                                     onClick={handleSendRequest}
                                 />
@@ -151,7 +152,7 @@ function OrganizerDetail() {
                             )}
                         </div>
 
-                    </>
+                    </div>
                 )}
             </div>
             <hr className='text-body-text/30 my-5' />

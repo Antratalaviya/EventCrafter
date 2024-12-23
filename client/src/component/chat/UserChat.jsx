@@ -47,7 +47,7 @@ function UserChat() {
             ref={scrollContainerRef}
         >
             {users && users.map((u) => (
-                <div className='flex flex-col items-center gap-1 relative' key={u._id} onClick={() => dispatch(setCurrentRecipient(u))}>
+                <div className='flex flex-col items-center gap-1 relative cursor-pointer' key={u._id} onClick={() => dispatch(setCurrentRecipient(u))}>
                     {/* <div className='rounded-full flex-shrink-0 overflow-hidden border border-public border-dashed size-14'>
                         <img src={u.avatar} alt="User Avatar" />
                     </div> */}

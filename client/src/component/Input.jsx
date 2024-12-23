@@ -4,7 +4,7 @@ import "../index.css"
 
 const Input = ({ className, children, type, InputClassName, onClick, ...props }, ref) => {
     return (
-        <div className={twMerge(`bg-[#252A30] rounded-lg ring-1 ring-gray`, className)} onClick={onClick}>
+        <div className={twMerge(`bg-[#1F252C] rounded-xl ring-1 ring-gray shadow-custom-black`, className)} onClick={onClick}>
             <input
                 type={type}
                 ref={ref}

@@ -13,7 +13,7 @@ function UserList({ chat }) {
     return (
         <>
             {recipient && (
-                <div className='flex items-center gap-2 relative' onClick={() => dispatch(setCurrentRecipient(recipient))}>
+                <div className='flex items-center gap-2 relative cursor-pointer hover:bg-white/5 p-2 rounded' onClick={() => dispatch(setCurrentRecipient(recipient))}>
                     {/* <div className='rounded-full h-10 w-11 overflow-hidden relative border border-black-light'>
                         <img src={recipient.avatar} alt="profile_img" className='h-full w-full' />
                     </div> */}

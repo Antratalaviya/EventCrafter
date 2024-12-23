@@ -20,8 +20,19 @@ const initialState = {
         videoFile: "",
         pdfFile: [],
         photos: [],
+        vip: "",
+        vip_price: "",
+        economy: "",
+        economy_price: "",
     },
 }
+/**
+
+"mumbai, maharashtra"
+"India"
+"Important: Outsiders are strictly prohibited"
+"01, Aterior Party Plot" 
+ */
 
 export const eventSlicer = createSlice({
     name: 'event',

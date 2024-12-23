@@ -337,6 +337,31 @@ const getEventParticipants = asyncHandler(async (req: Request, res: Response) =>
             );
     }
 })
+const updateUserAddress = asyncHandler(async (req: Request, res: Response) => {
+    try {
+        const { address } = req.body;
+        const updatedUser = await userService.updateUser(req.user._id, { address });
+
+        if (!updatedUser) {
+            return res
+                .status(status.INTERNAL_SERVER_ERROR)
+                .json(
+                    new ApiError(status.INTERNAL_SERVER_ERROR, AppString.ACTION_FAILED)
+                );
+        }
+
+        return res.status(status.OK)
+            .json(
+                new ApiResponse(status.OK, {}, AppString.USER_UPDATED)
+            );
+    } catch (error) {
+        return res
+            .status(status.INTERNAL_SERVER_ERROR)
+            .json(
+                new ApiError(status.INTERNAL_SERVER_ERROR, (error as Error).message)
+            );
+    }
+})
 
 export default {
     getUserProfile,
@@ -346,9 +371,10 @@ export default {
     likedEventsByUser,
     getAllUsers,
     updateUserAvatar,
-    updateUserEmail,  //
-    updateUserProfile, //
-    updateUserProfileImage,//
+    updateUserEmail,
+    updateUserProfile,
+    updateUserAddress,
+    updateUserProfileImage,
     readAllNotification,
     deleteUserAccount, //
     getAllFriends,

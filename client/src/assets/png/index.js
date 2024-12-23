@@ -23,8 +23,19 @@ import ticket from './ticket.png'
 import businessEvent from './businessevent.png'
 import event_main_1 from "./event_main_1.png"
 import done from "./done.gif"
+import admin from "./admin.gif"
 import loading from "./loading.gif"
 import userProfileImg from "./default_profile.jpg"
+import img1 from "./img1.png"
+import img2 from "./img2.png"
+import img3 from "./img3.png"
+import img4 from "./img4.png"
+import img5 from "./img5.png"
+import img6 from "./img6.png"
+import img7 from "./img7.png"
+import img8 from "./img8.png"
+import img9 from "./img9.png"
+
 
 export default {
     happy,
@@ -53,5 +64,16 @@ export default {
     event_main_1,
     done,
     loading,
-    userProfileImg
+    userProfileImg,
+    admin,
+    img1,
+    img2,
+    img3,
+    img4,
+    img5,
+    img6,
+    img7,
+    img8,
+    img9,
+
 }

@@ -96,7 +96,7 @@ function ChatPage() {
                     </div>
                     <div className='space-y-5'>
                         <p className='mx-5 font-semibold'>Recent Chat</p>
-                        <div className='flex flex-col flex-grow space-y-5 overflow-y-scroll h-full px-5'>
+                        <div className='flex flex-col flex-grow space-y-3 overflow-y-scroll h-full px-5'>
                             {userChats.length > 0 && userChats.map(chat => (
                                 <UserList chat={chat} key={chat._id} />
                             ))}

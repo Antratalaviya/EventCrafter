@@ -1,0 +1,996 @@
+openapi: 3.0.0
+info:
+  title: EventCrafter
+  description: This is a api documentation for the EventCrafter - Event Management website.
+  version: 1.0.0
+servers:
+  - url: http://localhost:8080
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+tags:
+  - name: Auth
+  - name: Events
+  - name: User
+  - name: Avatar
+  - name: Payment
+  - name: Invitation
+  - name: Connection
+  - name: Conversation
+  - name: Message
+  - name: Property
+paths:
+  /auth/sign-up:
+    post:
+      tags:
+        - Auth
+      summary: register
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              example:
+                orgType: institute
+                orgName: abcInsti
+                postcode: 394326
+                name: abc
+                surname: abc
+                dob: 12-05-2003
+                email: abc123@gmail.com
+                password: abc123
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json: {}
+  /auth/sign-in:
+    post:
+      tags:
+        - Auth
+      summary: login
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              example:
+                email: abc@gmail.com
+                password: abc123
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json: {}
+  /auth/sign-out:
+    patch:
+      tags:
+        - Auth
+      summary: logout
+      requestBody:
+        content: {}
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json: {}
+  /auth/refresh:
+    post:
+      tags:
+        - Auth
+      summary: Refresh Token
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              example:
+                refreshToken: b4d42f74-86f2-4e71-a107-5ed4ffbc1fec
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json: {}
+  /auth/send-otp:
+    post:
+      tags:
+        - Auth
+      summary: sendOtp
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              example:
+                email: abc@gmail.com
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json: {}
+  /auth/verify-otp:
+    post:
+      tags:
+        - Auth
+      summary: verifyOtp
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              example:
+                email: abc@gmail.com
+                otp: '7909'
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json: {}
+  /event:
+    post:
+      tags:
+        - Events
+      summary: createEvent
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              example:
+                type: public
+                category: birthday party
+                title: birthday party
+                subtitle1: sub1
+                subtitle2: sub2
+                offers:
+                  - food
+                street: abc
+                city: surat
+                country: india
+                carCapacity: '20'
+                startDate: '2024-08-24'
+                endDate: '2024-08-30'
+                startTime: '05:00'
+                endTime: '13:00'
+                photos:
+                  - url: abc
+                pdfFile:
+                  - url: abc
+                description: abc
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json: {}
+    get:
+      tags:
+        - Events
+      summary: Get All Event
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: page
+          in: query
+          schema:
+            type: integer
+          example: '2'
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json: {}
+  /event/own:
+    get:
+      tags:
+        - Events
+      summary: Get Own Events
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json: {}
+  /event/{eventId}:
+    get:
+      tags:
+        - Events
+      summary: Get Event
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: eventId
+          in: path
+          schema:
+            type: string
+          required: true
+          example: 673742061a035f05f9d350e8
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json: {}
+    put:
+      tags:
+        - Events
+      summary: Update Event
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              example:
+                photos:
+                  url: >-
+                    https://firebasestorage.googleapis.com/v0/b/eventcrafter-82e46.appspot.com/o/img%2Fa981fc4e-58be-4a31-a2e1-83acd5ff67f1?alt=media&token=f5e4bf16-877d-4302-8b1a-57951d48ab84
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: eventId
+          in: path
+          schema:
+            type: string
+          required: true
+          example: 673742061a035f05f9d350e8
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json: {}
+  /event/like/{eventId}:
+    post:
+      tags:
+        - Events
+      summary: likeEvent
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              example: ''
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: ''
+          in: header
+          schema:
+            type: string
+        - name: eventId
+          in: path
+          schema:
+            type: string
+          required: true
+          example: 66c87da83c2e7bb657c929ba
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json: {}
+  /event/save/{eventId}:
+    post:
+      tags:
+        - Events
+      summary: Save Event
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              example: ''
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: ''
+          in: header
+          schema:
+            type: string
+        - name: eventId
+          in: path
+          schema:
+            type: string
+          required: true
+          example: 66c87da83c2e7bb657c929ba
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json: {}
+  /event/participants/{eventId}:
+    get:
+      tags:
+        - Events
+      summary: All Participants
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: eventId
+          in: path
+          schema:
+            type: string
+          required: true
+          example: 66c85fea1c51e8a619196a9b
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json: {}
+  /event/status:
+    put:
+      tags:
+        - Events
+      summary: Update Event Status
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              example:
+                eventStatus: upcoming
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json: {}
+  /event/status/{eventId}:
+    put:
+      tags:
+        - Events
+      summary: Update Single Event Status
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              example:
+                eventStatus: draft
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: eventId
+          in: path
+          schema:
+            type: string
+          required: true
+          example: 66c87da83c2e7bb657c929ba
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json: {}
+  /event/own/public/{userId}:
+    get:
+      tags:
+        - Events
+      summary: Get Own Public
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: userId
+          in: path
+          schema:
+            type: string
+          required: true
+          example: 66abca1b94796e854a050ecb
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json: {}
+  /user/profile:
+    get:
+      tags:
+        - User
+      summary: Get Profile
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json: {}
+  /user/saved:
+    get:
+      tags:
+        - User
+      summary: Get Saved Events
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json: {}
+  /user/liked:
+    get:
+      tags:
+        - User
+      summary: Get Liked Events
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json: {}
+  /user/notifications:
+    get:
+      tags:
+        - User
+      summary: Notifications
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json: {}
+  /user/notifications/read:
+    post:
+      tags:
+        - User
+      summary: Read Notifications
+      requestBody:
+        content: {}
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json: {}
+  /user:
+    get:
+      tags:
+        - User
+      summary: All Users
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json: {}
+  /user/edit/avatar:
+    put:
+      tags:
+        - User
+      summary: Update Avatar
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              example:
+                avatar: >-
+                  https://firebasestorage.googleapis.com/v0/b/eventcrafter-82e46.appspot.com/o/avatar%2Favatar1.png?alt=media&token=c9a92381-c142-41a4-98e8-eb9a1ad455c5
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json: {}
+  /user/edit/address:
+    put:
+      tags:
+        - User
+      summary: Update Address
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              example:
+                address: gujarat
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json: {}
+  /user/friends:
+    get:
+      tags:
+        - User
+      summary: My Friends
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json: {}
+  /user/participants/{eventId}:
+    get:
+      tags:
+        - User
+      summary: Get Event Participants
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: eventId
+          in: path
+          schema:
+            type: string
+          required: true
+          example: 66d04c2f6c33410ba39099f1
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json: {}
+  /user/{userId}:
+    get:
+      tags:
+        - User
+      summary: Get User
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: userId
+          in: path
+          schema:
+            type: string
+          required: true
+          example: 6658ced5d0fbeb1ec5294679
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json: {}
+  /avatar:
+    get:
+      tags:
+        - Avatar
+      summary: All Avatar
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json: {}
+    post:
+      tags:
+        - Avatar
+      summary: Create Avatar
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              example:
+                url: >-
+                  https://firebasestorage.googleapis.com/v0/b/eventcrafter-82e46.appspot.com/o/avatar%2Favatar15.avif?alt=media&token=83da17ad-c5bd-464a-b81f-8ab67398b9b5
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json: {}
+  /payment/create-checkout-session:
+    post:
+      tags:
+        - Payment
+      summary: Create Checkout Session
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              example:
+                amount: '10'
+                description: private subscription
+                name: private event
+                quantity: 1
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: x-api-key
+          in: header
+          schema:
+            type: string
+          example: >-
+            sk_test_51PErw9SGO3pe3b4NoUqk6yV8DqkT1xOfBzsSu01qaWqpVmaPGvv1ELPa0JI0rgqe4tPdcxodJoPOLZmeOPqCTCRT00iJWEE5d1
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json: {}
+  /payment/session-status:
+    get:
+      tags:
+        - Payment
+      summary: Session Status
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: session_id
+          in: query
+          schema:
+            type: string
+          example: sdfd
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json: {}
+  /payment/orders:
+    get:
+      tags:
+        - Payment
+      summary: Get Payment History
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json: {}
+  /invitation/send:
+    post:
+      tags:
+        - Invitation
+      summary: Send Invitation
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              example:
+                recipientId: 6658cd787b713f50f0ba1439
+                eventId: 66d063766c33410ba3909d42
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json: {}
+  /invitation:
+    get:
+      tags:
+        - Invitation
+      summary: Invitations
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json: {}
+  /invitation/sent/{eventId}:
+    get:
+      tags:
+        - Invitation
+      summary: All send Invitations
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: eventId
+          in: path
+          schema:
+            type: string
+          required: true
+          example: 66c85fea1c51e8a619196a9b
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json: {}
+  /invitation/received:
+    get:
+      tags:
+        - Invitation
+      summary: Get Received Invitation
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json: {}
+  /invitation/accept/{invitationId}:
+    post:
+      tags:
+        - Invitation
+      summary: Accept Invitation
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              example:
+                recipientId: 6658cd787b713f50f0ba1439
+                eventId: 66c85fea1c51e8a619196a9b
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: invitationId
+          in: path
+          schema:
+            type: string
+          required: true
+          example: 66cc666cd7b11e1b2afa0e86
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json: {}
+  /invitation/reject/{invitationId}:
+    post:
+      tags:
+        - Invitation
+      summary: Reject Invitation
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              example:
+                recipientId: 6658cd787b713f50f0ba1439
+                eventId: 66c85fea1c51e8a619196a9b
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: invitationId
+          in: path
+          schema:
+            type: string
+          required: true
+          example: 66c9aa39240bd524e64cb254
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json: {}
+  /connection/send/{recipientId}:
+    post:
+      tags:
+        - Connection
+      summary: Send Connection Request
+      requestBody:
+        content: {}
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: recipientId
+          in: path
+          schema:
+            type: string
+          required: true
+          example: 6658cd787b713f50f0ba1439
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json: {}
+  /connection/accept/{connectionId}:
+    post:
+      tags:
+        - Connection
+      summary: Accept Connection Request
+      requestBody:
+        content: {}
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: connectionId
+          in: path
+          schema:
+            type: string
+          required: true
+          example: 66fa852823cdde2dffd452d2
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json: {}
+  /connection/reject/{connectionId}:
+    post:
+      tags:
+        - Connection
+      summary: Reject Connection Request
+      requestBody:
+        content: {}
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: connectionId
+          in: path
+          schema:
+            type: string
+          required: true
+          example: 66fa8734d74c105e914cac61
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json: {}
+  /connection:
+    get:
+      tags:
+        - Connection
+      summary: Get All Connection Request
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json: {}
+  /connection/exist/{userId}:
+    get:
+      tags:
+        - Connection
+      summary: Connection Exist
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: userId
+          in: path
+          schema:
+            type: string
+          required: true
+          example: 66abca1b94796e854a050ecb
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json: {}
+  /chat/{secondId}:
+    post:
+      tags:
+        - Conversation
+      summary: Create Chat
+      requestBody:
+        content: {}
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: secondId
+          in: path
+          schema:
+            type: string
+          required: true
+          example: 6658ced5d0fbeb1ec5294679
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json: {}
+  /chat/:
+    get:
+      tags:
+        - Conversation
+      summary: Get Chat
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json: {}
+  /message/:
+    post:
+      tags:
+        - Message
+      summary: Create Message
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              example:
+                chatId: 6707ac1e1c162f9479d52b2c
+                text: hello
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json: {}
+  /message/{chatId}:
+    get:
+      tags:
+        - Message
+      summary: Get Messages
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: chatId
+          in: path
+          schema:
+            type: string
+          required: true
+          example: 6707ac1e1c162f9479d52b2c
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json: {}
+  /property:
+    post:
+      tags:
+        - Property
+      summary: List Property
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              example:
+                name: Gateway Town luxuria
+                street: 17A, Street no.2, Beverly Hills
+                city: new abc, LA
+                country: USA
+                description: >-
+                  A stay at Ardency Inn by bustom farm house places you in the
+                  heart of Udaipur, within a 5-minute drive of 17A street no 2
+                  and famouse food cafe. This hotel is 2 mi (3.3 km) from
+                  Vintage Collection of Classic Cars and 2.2 mi (3.5 km) from
+                  City Palace. Make yourself at home in one of the 46
+                  air-conditioned rooms featuring minibars. Your memory foam bed
+                  comes with premium bedding. Bathrooms have showers and
+                  complimentary toiletries. Conveniences include phones, as well
+                  as desks and complimentary newspapers. Featured amenities
+                  include a 24-hour business center, express check-in, and
+                  express check-out. Free valet parking is available onsite.
+                amount: '500'
+                amenities:
+                  - Car parking available
+                  - Swimming Pool
+                  - Free WiFi
+                  - Food available on spot
+                  - Child friendly
+                purpose: Parties
+                photos:
+                  url: >-
+                    https://firebasestorage.googleapis.com/v0/b/eventcrafter-82e46.appspot.com/o/img%2Ff771e6fa-5f8c-406d-b5d2-38c65b0b84ee?alt=media&token=62a10afd-e746-4433-b478-c57d3fb419ae
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json: {}
+    get:
+      tags:
+        - Property
+      summary: Get Properties
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: amenities
+          in: query
+          schema:
+            type: string
+          example: Child friendly,Food available on spot
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json: {}
+  /property/own:
+    get:
+      tags:
+        - Property
+      summary: Get Own Property
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json: {}

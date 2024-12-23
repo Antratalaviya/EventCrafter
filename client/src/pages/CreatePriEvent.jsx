@@ -3,7 +3,7 @@ import { CurrectIcon } from '../assets/svg/Icon';
 import '../index.css'
 import Modal from '../component/Modal/Modal';
 import { uploadImg } from '../Firebase/upload';
-import { useCreateEventMutation } from '../api/api';
+import { useCreateEventMutation, useUpdateEventMutation } from '../api/api';
 import Spinner from "../component/Spinner"
 import { img } from '../assets/assets';
 import { Link, Outlet, useNavigate } from 'react-router-dom';
@@ -13,6 +13,7 @@ import { setEvent } from '../store/EventSlice';
 import { setAcceptConcent, setProgress } from '../store/GlobalSlice';
 import { getItem } from '../utils/localStorageUtility';
 import Button from '../component/Button';
+import { filterProperty } from '../utils/customUtility';
 
 function CreatePriEvent() {
     const [openConsent, setOpenConsent] = useState(false);
@@ -29,6 +30,7 @@ function CreatePriEvent() {
     const dispatch = useDispatch();
 
     const [createEvent, { isLoading, error }] = useCreateEventMutation()
+    const [updateEvent] = useUpdateEventMutation()
 
     useEffect(() => {
         dispatch(setEvent({ type: "private" }))
@@ -36,22 +38,34 @@ function CreatePriEvent() {
 
     const handleCreateEvent = async () => {
         try {
-            const urlPhotos = await Promise.all(event.photos.map(uploadImg));
+            const alreadyUploaded = event.photos.filter((photo) => photo.url);
+            const filterPhotos = event.photos.filter((photo) => !photo.url);
+            const urlPhotos = await Promise.all(filterPhotos.map(uploadImg));
 
             if (urlPhotos.every((url) => url !== undefined)) {
+                dispatch(setEvent({ photos: [...alreadyUploaded, ...urlPhotos.map((url) => ({ url }))] }));
                 const updatedEvent = {
                     ...event,
-                    photos: urlPhotos.map((url) => ({ url }))
+                    photos: [...alreadyUploaded, ...urlPhotos.map((url) => ({ url }))]
                 };
-                setEvent(updatedEvent);
-                if (urlPhotos.every((url) => url && typeof url === 'string')) {
-                    const result = await createEvent({ ...updatedEvent, type: "private" }).unwrap();
-                    console.log(result);
-                    setEventCreated(result?.data[0]);
+                let result;
+                if (updatedEvent?.photos?.every((item) => item?.url && typeof item?.url === 'string')) {
+                    if (updatedEvent?._id) {
+                        let filterEvent = filterProperty(updatedEvent);
+                        result = await updateEvent({ eventId: updatedEvent._id, event: filterEvent }).unwrap();
+                        setEventCreated(result?.data);
+                        if (result.success) {
+                            return 1;
+                        }
+                    } else {
+                        const result = await createEvent({ ...updatedEvent, type: "private" }).unwrap();
+                        console.log(result);
+                        setEventCreated(result?.data[0]);
 
-                    if (result.success) {
-                        dispatch(setEvent(null))
-                        return 1;
+                        if (result.success) {
+                            dispatch(setEvent(null))
+                            return 1;
+                        }
                     }
                 }
             }
@@ -65,7 +79,7 @@ function CreatePriEvent() {
         if (progress > 0 && progress < 4) {
             navigate(`/create-event/create-private-event/${progress}`);
         } else if (progress === 4) {
-            navigate(`/create-event/create-private-event/${progress}?eventId=${eventCreated ? eventCreated._id : eventId}`);
+            navigate(`/create-event/create-private-event/${progress}?eventId=${eventCreated ? eventCreated._id : eventId}&status=draft`);
         }
     }, [progress]);
 

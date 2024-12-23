@@ -6,7 +6,7 @@ import { RouterProvider, Route, createBrowserRouter, createRoutesFromElements } 
 import HomePage from './pages/HomePage.jsx'
 import CreateEventPage from './pages/CreateEventPage.jsx'
 import Login from './pages/Login.jsx'
-import { Provider } from 'react-redux'
+import { Provider, useSelector } from 'react-redux'
 import store from "./store/store.js"
 import SignUp from './pages/SignUp.jsx'
 import PageNotFound from './pages/PageNotFound.jsx'
@@ -31,6 +31,20 @@ import Payment from './pages/Payment.jsx'
 import CompletePage from './pages/CompletePage.jsx'
 import OrganizerDetail from './pages/OrganizerDetail.jsx'
 import ChatPage from './pages/chat/ChatPage.jsx'
+import AdminDashboard from './pages/admin/AdminDashboard.jsx'
+import EventBooking from './pages/EventBooking.jsx'
+import ListProperty from './pages/property/ListProperty.jsx'
+import Properties from './pages/property/Properties.jsx'
+import PropertyBooking from './pages/property/PropertyBooking.jsx'
+import PropertyPage from './pages/property/PropertyPage.jsx'
+import BookProperty from './pages/property/BookProperty.jsx'
+
+const AdminRoute = ({ children }) => {
+  const user = useSelector((state) => state.auth.userData);
+
+  return user && user.admin ? children : <Navigate to="/login" />;
+};
+
 
 const router = createBrowserRouter(
   createRoutesFromElements(
@@ -43,6 +57,7 @@ const router = createBrowserRouter(
         </Route>
         <Route path='own-events' element={<OwnEvents />} />
         <Route path='event/:eventId' element={<EventPage />} />
+        <Route path='event/booking/:eventId' element={<EventBooking />} />
         <Route path='organizer/:userId' element={<OrganizerDetail />} />
         <Route path='event/participants/:eventId' element={<SendInvitation />} />
         <Route path='settings' element={<SettingPage />} >
@@ -61,12 +76,18 @@ const router = createBrowserRouter(
             <Route path='myfriends' element={<MyFriendPage />} />
           </Route>
         </Route>
+        <Route path='property' element={<Properties />} />
+        <Route path='property/listproperty' element={<ListProperty />} />
+        <Route path='property/booking' element={<PropertyBooking />} />
+        <Route path='property/booking/:propertyId' element={<BookProperty />} />
+        <Route path='property/:propertyId' element={<PropertyPage />} />
         <Route path='payment' element={<Payment />} />
         <Route path='return' element={<CompletePage />} />
         <Route path='chat' element={<ChatPage />} />
       </Route >
       <Route path='/sign-in' element={<Login />} />
       <Route path='/sign-up' element={<SignUp />} />
+      <Route path='/admin' element={<AdminRoute><AdminDashboard /></AdminRoute>} />
       <Route path='*' element={<PageNotFound />} />
     </>
   )

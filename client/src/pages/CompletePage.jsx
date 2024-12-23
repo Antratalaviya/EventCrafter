@@ -7,13 +7,14 @@ import Button from '../component/Button';
 import { useDispatch, useSelector } from 'react-redux';
 import { toast } from 'react-toastify';
 import { getItem } from '../utils/localStorageUtility';
-import { setPaymentDone } from '../store/GlobalSlice';
+import { setPaymentDone, setPaymentType } from '../store/GlobalSlice';
 
 function CompletePage() {
     const eventId = JSON.parse(getItem("eventId"))
     const user = useSelector((state) => state.auth.userData);
+    const paymentType = useSelector((state) => state.global.paymentType);
     const paymentDone = useSelector((state) => state.global.paymentDone);
-    const [session, setSession] = useState(null);
+    const payment = useSelector((state) => state.global.payment);
     const [status, setStatus] = useState(null);
     const [customerEmail, setCustomerEmail] = useState(null);
     const [sessionStatus] = useSessionStatusMutation();
@@ -31,7 +32,6 @@ function CompletePage() {
 
             const response = await sessionStatus({ session_id: sessionId }).unwrap()
             if (response.success) {
-                setSession(response.data.session);
                 setStatus(response.data.status);
                 setCustomerEmail(response.data.customer_email);
             }
@@ -43,15 +43,23 @@ function CompletePage() {
 
     useEffect(() => {
         (async () => {
-            const response = await updateEventStatus({ eventId: eventId, status: "upcoming" }).unwrap();
-            if (response.success) {
-                toast.success("Your payment has been done successfully");
-            }
-            if (session && !paymentDone) {
-                const res = await createOrder({ session: session, userId: user._id }).unwrap();
-                if (res.success) {
-                    dispatch(setPaymentDone(true))
+            if (paymentType === "book" && !paymentDone && status === "complete") {
+                //booking Api call
+                // if (res.success) {
+                // dispatch(setPaymentType(""));
+                //         dispatch(setPaymentDone(true))
+                //     }
+            } else if (paymentType === "" && status === "complete") {
+                const response = await updateEventStatus({ eventId: eventId, status: "upcoming", package: payment.package, amount: payment.amount }).unwrap();
+                if (response.success) {
+                    toast.success("Your payment has been done successfully");
                 }
+                // if (session && !paymentDone) {
+                //     const res = await createOrder({ session: session, userId: user._id }).unwrap();
+                //     if (res.success) {
+                //         dispatch(setPaymentDone(true))
+                //     }
+                // }
             }
         })();
     }, [status])
